@@ -90,22 +90,6 @@ export default function Login({
                                 <InputError message={errors.password} />
                             </div>
 
-                            {/* Remember Me */}
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                    className="border-border"
-                                />
-                                <Label
-                                    htmlFor="remember"
-                                    className="text-sm font-normal cursor-pointer select-none"
-                                >
-                                    Remember me for 30 days
-                                </Label>
-                            </div>
-
                             {/* Submit Button */}
                             <Button
                                 type="submit"
@@ -115,7 +99,7 @@ export default function Login({
                                 data-test="login-button"
                             >
                                 {processing && <Spinner className="mr-2" />}
-                                {processing ? 'Signing in...' : 'Sign in'}
+                                {processing ? 'Proses...' : 'Masuk'}
                             </Button>
                         </div>
 

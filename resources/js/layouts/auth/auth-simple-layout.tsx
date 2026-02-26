@@ -27,19 +27,12 @@ export default function AuthSimpleLayout({
                                 href={home()}
                                 className="flex flex-col items-center gap-4 group"
                             >
-                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-primary/80 shadow-lg shadow-primary/20 group-hover:shadow-xl group-hover:shadow-primary/30 transition-all duration-300 group-hover:scale-105">
-                                    <AppLogoIcon className="size-8 fill-current text-white" />
+                                <div className="flex h-16 pt-12 items-center justify-center rounded-2xl ">
+                                    <img src="/assets/images/logo_landscape.png" alt="Logo Login" />
                                 </div>
                             </Link>
 
-                            <div className="space-y-2">
-                                <h1 className="text-2xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                                    {title}
-                                </h1>
-                                <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                                    {description}
-                                </p>
-                            </div>
+
                         </div>
 
                         {/* Form Card */}
