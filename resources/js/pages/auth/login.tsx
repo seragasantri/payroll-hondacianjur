@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { Lock, User } from 'lucide-react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -24,97 +25,104 @@ export default function Login({
 }: Props) {
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title="Welcome Back"
+            description="Sign in to your account to continue"
         >
             <Head title="Log in" />
+
+            {status && (
+                <div className="mb-6 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-4 py-3 text-center text-sm font-medium text-emerald-700 dark:text-emerald-400 animate-in fade-in slide-in-from-top-2 duration-300">
+                    {status}
+                </div>
+            )}
 
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
+                            {/* Username Input with Icon */}
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
+                                <Label htmlFor="username" className="text-sm font-medium">
+                                    Username
+                                </Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground pointer-events-none" />
+                                    <Input
+                                        id="username"
+                                        type="text"
+                                        name="username"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="username"
+                                        placeholder="Masukan username anda..."
+                                        className="pl-10 h-11 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                                <InputError message={errors.username} />
                             </div>
 
+                            {/* Password Input with Icon */}
                             <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password" className="text-sm font-medium">
+                                        Password
+                                    </Label>
+
                                 </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground pointer-events-none" />
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="current-password"
+                                        placeholder="Masukan password..."
+                                        className="pl-10 h-11 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
                                 <InputError message={errors.password} />
                             </div>
 
+                            {/* Remember Me */}
                             <div className="flex items-center space-x-3">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
+                                    className="border-border"
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label
+                                    htmlFor="remember"
+                                    className="text-sm font-normal cursor-pointer select-none"
+                                >
+                                    Remember me for 30 days
+                                </Label>
                             </div>
 
+                            {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-2 h-11 text-base font-medium shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
-                                {processing && <Spinner />}
-                                Log in
+                                {processing && <Spinner className="mr-2" />}
+                                {processing ? 'Signing in...' : 'Sign in'}
                             </Button>
                         </div>
 
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
-                            </div>
-                        )}
+
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </AuthLayout>
     );
 }
