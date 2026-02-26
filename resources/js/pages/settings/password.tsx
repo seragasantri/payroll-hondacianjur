@@ -11,6 +11,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import type { BreadcrumbItem } from '@/types';
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import { edit } from '@/routes/user-password';
+import { CheckCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,14 +28,14 @@ export default function Password() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Password settings" />
 
-            <h1 className="sr-only">Password Settings</h1>
+            <h1 className="sr-only">Ganti Password</h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title="Update password"
-                        description="Ensure your account is using a long, random password to stay secure"
+                        title="Perbarui Password"
+                        description="Gunakan password yang panjang, atau gunakan password yang unik untuk keamanan akun anda"
                     />
 
                     <Form
@@ -63,7 +64,7 @@ export default function Password() {
                             <>
                                 <div className="grid gap-2">
                                     <Label htmlFor="current_password">
-                                        Current password
+                                        Password Lama
                                     </Label>
 
                                     <Input
@@ -73,7 +74,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="current-password"
-                                        placeholder="Current password"
+                                        placeholder="Password Lama"
                                     />
 
                                     <InputError
@@ -83,7 +84,7 @@ export default function Password() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">
-                                        New password
+                                        Password Baru
                                     </Label>
 
                                     <Input
@@ -93,7 +94,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="new-password"
-                                        placeholder="New password"
+                                        placeholder="Password Baru"
                                     />
 
                                     <InputError message={errors.password} />
@@ -101,7 +102,7 @@ export default function Password() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password_confirmation">
-                                        Confirm password
+                                        Konfirmasi Password Baru
                                     </Label>
 
                                     <Input
@@ -110,7 +111,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="new-password"
-                                        placeholder="Confirm password"
+                                        placeholder="Konfirmasi password baru"
                                     />
 
                                     <InputError
@@ -123,7 +124,7 @@ export default function Password() {
                                         disabled={processing}
                                         data-test="update-password-button"
                                     >
-                                        Save password
+                                        Simpan Password
                                     </Button>
 
                                     <Transition
@@ -133,8 +134,8 @@ export default function Password() {
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="text-sm text-neutral-600">
-                                            Saved
+                                        <p className="text-sm text-green-600 flex">
+                                            Saved <CheckCircle className='ml-2' />
                                         </p>
                                     </Transition>
                                 </div>

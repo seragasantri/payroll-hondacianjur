@@ -18,14 +18,14 @@ export default function Appearance() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Appearance settings" />
 
-            <h1 className="sr-only">Appearance Settings</h1>
+            <h1 className="sr-only">Settings Tampilan</h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <Heading
                         variant="small"
                         title="Appearance settings"
-                        description="Update your account's appearance settings"
+                        description="Manajemen pengaturan tampilan akun"
                     />
                     <AppearanceTabs />
                 </div>

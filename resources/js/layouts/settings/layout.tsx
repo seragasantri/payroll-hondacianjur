@@ -11,12 +11,12 @@ import { edit as editPassword } from '@/routes/user-password';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Password',
+        title: 'Ganti Password',
         href: editPassword(),
         icon: null,
     },
     {
-        title: 'Appearance',
+        title: 'Tampilan',
         href: editAppearance(),
         icon: null,
     },
@@ -34,7 +34,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         <div className="px-4 py-6">
             <Heading
                 title="Settings"
-                description="Manage your profile and account settings"
+                description="Manajemen mengatur tampilan dan password"
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
