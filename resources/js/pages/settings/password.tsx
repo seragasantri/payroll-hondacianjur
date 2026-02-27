@@ -1,6 +1,8 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
+import { CheckCircle } from 'lucide-react';
 import { useRef } from 'react';
+import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -8,10 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import type { BreadcrumbItem } from '@/types';
-import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import { edit } from '@/routes/user-password';
-import { CheckCircle } from 'lucide-react';
+import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -134,8 +134,9 @@ export default function Password() {
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="text-sm text-green-600 flex">
-                                            Saved <CheckCircle className='ml-2' />
+                                        <p className="flex text-sm text-green-600">
+                                            Saved{' '}
+                                            <CheckCircle className="ml-2" />
                                         </p>
                                     </Transition>
                                 </div>

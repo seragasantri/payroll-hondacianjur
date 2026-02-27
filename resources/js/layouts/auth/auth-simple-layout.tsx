@@ -1,51 +1,48 @@
 import { Link } from '@inertiajs/react';
-import AppLogoIcon from '@/components/app-logo-icon';
-import type { AuthLayoutProps } from '@/types';
 import { home } from '@/routes';
+import type { AuthLayoutProps } from '@/types';
 
-export default function AuthSimpleLayout({
-    children,
-    title,
-    description,
-}: AuthLayoutProps) {
+export default function AuthSimpleLayout({ children }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-svh flex-col bg-linear-to-br from-background via-background to-muted/20 overflow-hidden relative">
+        <div className="relative flex min-h-svh flex-col overflow-hidden bg-linear-to-br from-background via-background to-muted/20">
             {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-primary/3 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+                <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/5 blur-3xl" />
+                <div className="absolute top-1/2 left-1/2 h-150 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/3 blur-3xl" />
             </div>
 
             {/* Main content */}
-            <div className="flex flex-1 items-center justify-center p-6 md:p-10 relative z-10">
+            <div className="relative z-10 flex flex-1 items-center justify-center p-6 md:p-10">
                 <div className="w-full max-w-md">
                     <div className="flex flex-col gap-8">
                         {/* Logo and Header */}
-                        <div className="flex flex-col items-center gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex animate-in flex-col items-center gap-4 text-center duration-500 fade-in slide-in-from-bottom-4">
                             <Link
                                 href={home()}
-                                className="flex flex-col items-center gap-4 group"
+                                className="group flex flex-col items-center gap-4"
                             >
-                                <div className="flex h-16 pt-12 items-center justify-center rounded-2xl ">
-                                    <img src="/assets/images/logo_landscape.png" alt="Logo Login" />
+                                <div className="flex h-16 items-center justify-center rounded-2xl pt-12">
+                                    <img
+                                        src="/assets/images/logo_landscape.png"
+                                        alt="Logo Login"
+                                    />
                                 </div>
                             </Link>
-
-
                         </div>
 
                         {/* Form Card */}
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-                            <div className="rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-xl shadow-black/5 p-8">
+                        <div className="animate-in delay-100 duration-500 fade-in slide-in-from-bottom-4">
+                            <div className="rounded-2xl border border-border/50 bg-card/50 p-8 shadow-xl shadow-black/5 backdrop-blur-sm">
                                 {children}
                             </div>
                         </div>
 
                         {/* Footer info */}
-                        <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+                        <div className="animate-in text-center delay-200 duration-500 fade-in slide-in-from-bottom-4">
                             <p className="text-xs text-muted-foreground">
-                                Secure login powered by enterprise-grade encryption
+                                Secure login powered by enterprise-grade
+                                encryption
                             </p>
                         </div>
                     </div>
