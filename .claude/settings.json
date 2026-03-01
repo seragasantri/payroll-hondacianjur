@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan make:controller EmployeeController)",
+      "Bash(php artisan make:policy EmployeePolicy --model=Employee)",
+      "Bash(php artisan make:resource EmployeeResource)",
+      "Bash(php artisan migrate)",
+      "Bash(php artisan wayfinder:generate)",
+      "Bash(php artisan make:migration create_bpjs_table)",
+      "Bash(php artisan make:model Bpjs)",
+      "Bash(php artisan make:controller BpjsController --model=Bpjs)",
+      "Bash(php artisan make:policy BpjsPolicy --model=Bpjs)",
+      "Bash(php artisan make:request BpjsStoreRequest)",
+      "Bash(php artisan make:request BpjsUpdateRequest)",
+      "Bash(php artisan make:resource BpjsResource)"
+    ]
+  }
+}

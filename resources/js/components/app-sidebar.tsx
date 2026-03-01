@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { KeyRound, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users } from 'lucide-react';
+import { Briefcase, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -13,12 +13,15 @@ import {
 } from '@/components/ui/sidebar';
 import { useCan } from '@/hooks/useCan';
 import { dashboard } from '@/routes';
+import employees from '@/routes/employees';
 import permissions from '@/routes/permissions';
 import roles from '@/routes/roles';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { NavManajemenUsers } from './nav-manajemen-users';
+import { NavMasterData } from './nav-master-data';
+import bpjs from '@/routes/bpjs';
 
 export function AppSidebar() {
     const can = useCan();
@@ -31,12 +34,20 @@ export function AppSidebar() {
             href: dashboard(),
             icon: LayoutGrid,
             show: true
-        },
+        }
+    ];
+    const masterDataNavItems: NavItem[] = [
         {
             title: 'Karyawan',
-            href: '#',
-            icon: Users,
-            show: false
+            href: employees.index().url,
+            icon: Briefcase,
+            show: isSuperAdmin || can('employees.view any') || can('employees.view')
+        },
+        {
+            title: 'BPJS',
+            href: bpjs.index().url,
+            icon: HeartPulse,
+            show: isSuperAdmin || can('bpjs.view any') || can('bpjs.view')
         },
     ];
 
@@ -78,6 +89,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} />
 
+                <NavMasterData items={masterDataNavItems} />
                 <NavManajemenUsers items={settingNavItems} />
             </SidebarContent>
 
