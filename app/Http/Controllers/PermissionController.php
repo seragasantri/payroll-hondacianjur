@@ -28,6 +28,7 @@ class PermissionController extends Controller
         // Check authorization using Gate and PermissionPolicy
         Gate::authorize('viewAny', Permission::class);
 
+        $perPage = $request->get('perPage', 10);
         $searchName = $request->input('searchName');
         $searchModule = $request->input('searchModule');
         $sortField = $request->input('sortField', 'name');
@@ -48,7 +49,7 @@ class PermissionController extends Controller
         // Sorting
         $query->orderBy($sortField, $sortDirection);
 
-        $permissions = $query->with('roles')->paginate(10);
+        $permissions = $query->with('roles')->paginate($perPage);
 
         return Inertia::render('permissions/index', [
             'permissions' => PermissionResource::collection($permissions)

@@ -27,6 +27,7 @@ class EmployeeController extends Controller
         // Check authorization
         Gate::authorize('viewAny', \App\Models\Employee::class);
 
+        $perPage = $request->get('perPage', 10);
         $searchNama = $request->input('searchNama');
         $searchNIP = $request->input('searchNIP');
         $searchDivisi = $request->input('searchDivisi');
@@ -53,7 +54,7 @@ class EmployeeController extends Controller
         // Sorting
         $query->orderBy($sortField, $sortDirection);
 
-        $employees = $query->paginate(10);
+        $employees = $query->paginate($perPage);
 
         return Inertia::render('employees/index', [
             'employees' => EmployeeResource::collection($employees)

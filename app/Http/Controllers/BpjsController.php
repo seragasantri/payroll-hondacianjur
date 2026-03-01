@@ -27,8 +27,22 @@ class BpjsController extends Controller
         // Check authorization
         Gate::authorize('viewAny', \App\Models\Bpjs::class);
 
+        $perPage = $request->get('perPage', 10);
+        $searchJenis = $request->get('searchJenis');
+        $sortField = $request->get('sortField', 'jenis_bpjs');
+        $sortDirection = $request->get('sortDirection', 'asc');
+
         $query = $this->bpjsServices->getAll();
-        $bpjs = $query->paginate(10);
+
+        // Search filter
+        if ($searchJenis) {
+            $query = $query->where('jenis_bpjs', 'like', '%' . $searchJenis . '%');
+        }
+
+        // Sorting
+        $query = $query->orderBy($sortField, $sortDirection);
+
+        $bpjs = $query->paginate($perPage);
 
         return Inertia::render('bpjs/index', [
             'bpjs' => BpjsResource::collection($bpjs)

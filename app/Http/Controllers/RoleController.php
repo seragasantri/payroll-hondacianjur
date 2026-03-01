@@ -29,6 +29,7 @@ class RoleController extends Controller
         // Check authorization using Gate and RolePolicy
         Gate::authorize('viewAny', Role::class);
 
+        $perPage = $request->get('perPage', 10);
         $searchName = $request->input('searchName');
         $sortField = $request->input('sortField', 'name');
         $sortDirection = $request->input('sortDirection', 'asc');
@@ -43,7 +44,7 @@ class RoleController extends Controller
         // Sorting
         $query->orderBy($sortField, $sortDirection);
 
-        $roles = $query->with('permissions')->paginate(10);
+        $roles = $query->with('permissions')->paginate($perPage);
 
         return Inertia::render('roles/index', [
             'roles' => RoleResource::collection($roles)

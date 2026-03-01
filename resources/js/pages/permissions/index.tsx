@@ -25,6 +25,7 @@ export default function PermissionIndex({ permissions }: { permissions: Permissi
     const urlParams = new URLSearchParams(window.location.search);
     const currentSortField = urlParams.get('sortField') || 'name';
     const currentSortDirection = urlParams.get('sortDirection') || 'asc';
+    const currentPerPage = urlParams.get('perPage') || '10';
 
     const handleSort = (field: string) => {
         let direction = 'asc';
@@ -53,12 +54,24 @@ export default function PermissionIndex({ permissions }: { permissions: Permissi
             : <ArrowDown className="size-4" />;
     };
 
+    const handlePerPageChange = (perPage: string) => {
+        router.get(index().url, {
+            ...Object.fromEntries(urlParams),
+            perPage: perPage,
+            page: '1',
+        }, {
+            preserveState: true,
+            preserveScroll: false,
+        });
+    };
+
     const buildUrl = (page: number) => {
         const params = new URLSearchParams();
         params.set('page', page.toString());
 
         if (currentSortField) params.set('sortField', currentSortField);
         if (currentSortDirection) params.set('sortDirection', currentSortDirection);
+        if (currentPerPage) params.set('perPage', currentPerPage);
 
         const searchName = getSearchValue('searchName');
         if (searchName) params.set('searchName', searchName);
@@ -146,7 +159,31 @@ export default function PermissionIndex({ permissions }: { permissions: Permissi
                 {/* Table Card */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
 
-                    <table className='w-full'>
+                    {/* Per Page Selector */}
+                    <div className="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="perPage" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Tampilkan
+                            </label>
+                            <select
+                                id="perPage"
+                                value={currentPerPage}
+                                onChange={(e) => handlePerPageChange(e.target.value)}
+                                className="inline-flex items-center justify-center rounded-lg border-2 border-orange-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-orange-500 dark:hover:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors cursor-pointer"
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                                data per halaman
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className='w-full'>
                         <thead className='bg-gradient-to-r from-orange-500 to-amber-500 dark:from-orange-700 dark:to-amber-800'>
                             <tr>
                                 <th className='rounded-tl-2xl px-6 py-4 text-left text-sm font-bold text-white'>#</th>
@@ -317,6 +354,7 @@ export default function PermissionIndex({ permissions }: { permissions: Permissi
                             )}
                         </tbody>
                     </table>
+                    </div>
 
                     {/* Pagination */}
                     {permissions?.meta && (

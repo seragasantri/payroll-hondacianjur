@@ -28,6 +28,7 @@ class UserController extends Controller
         // Check authorization using Gate and UserPolicy
         Gate::authorize('viewAny', \App\Models\User::class);
 
+        $perPage = $request->get('perPage', 10);
         $searchName = $request->input('searchName');
         $searchUsername = $request->input('searchUsername');
         $sortField = $request->input('sortField', 'name');
@@ -58,7 +59,7 @@ class UserController extends Controller
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $users = $query->with('roles')->paginate(10);
+        $users = $query->with('roles')->paginate($perPage);
 
         return Inertia::render('users/index', [
             'users' => UserResource::collection($users)

@@ -32,6 +32,7 @@ export default function UserIndex({ users }: { users: UserList }) {
     const urlParams = new URLSearchParams(window.location.search);
     const currentSortField = urlParams.get('sortField') || 'name';
     const currentSortDirection = urlParams.get('sortDirection') || 'asc';
+    const currentPerPage = urlParams.get('perPage') || '10';
 
     const handleSort = (field: string) => {
         let direction = 'asc';
@@ -45,6 +46,17 @@ export default function UserIndex({ users }: { users: UserList }) {
             ...Object.fromEntries(urlParams),
             sortField: field,
             sortDirection: direction,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    const handlePerPageChange = (perPage: string) => {
+        router.get(index().url, {
+            ...Object.fromEntries(urlParams),
+            perPage: perPage,
+            page: '1',
         }, {
             preserveState: true,
             preserveScroll: true,
@@ -66,6 +78,7 @@ export default function UserIndex({ users }: { users: UserList }) {
 
         if (currentSortField) params.set('sortField', currentSortField);
         if (currentSortDirection) params.set('sortDirection', currentSortDirection);
+        if (currentPerPage) params.set('perPage', currentPerPage);
 
         const searchName = getSearchValue('searchName');
         const searchUsername = getSearchValue('searchUsername');
@@ -147,8 +160,26 @@ export default function UserIndex({ users }: { users: UserList }) {
 
                 {/* Table Card */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
+                    {/* Show Per Page */}
+                    <div className="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tampilkan:</span>
+                            <select
+                                value={currentPerPage}
+                                onChange={(e) => handlePerPageChange(e.target.value)}
+                                className="px-3 py-2 border-2 border-orange-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors cursor-pointer hover:border-orange-300 dark:hover:border-gray-600"
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">data per halaman</span>
+                        </div>
+                    </div>
 
-                    <table className='w-full'>
+                    <div className="overflow-x-auto">
+                        <table className='w-full'>
                         <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
                             <tr>
                                 <th className='rounded-tl-2xl px-6 py-4 text-left text-sm font-bold text-white'>#</th>
@@ -341,6 +372,7 @@ export default function UserIndex({ users }: { users: UserList }) {
                             )}
                         </tbody>
                     </table>
+                    </div>
 
                     {/* Pagination */}
                     {users?.meta && (
