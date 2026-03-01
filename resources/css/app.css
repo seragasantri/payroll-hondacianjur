@@ -141,3 +141,128 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* PrimeReact DataTable Custom Styles */
+@layer components {
+    .users-datatable {
+        @apply border-0;
+
+        .p-datatable-thead > tr > th {
+            @apply bg-muted/50 text-foreground font-semibold text-sm border-b border-border;
+            padding: 0.75rem 1rem;
+        }
+
+        .p-datatable-tbody > tr {
+            @apply border-b border-border transition-colors hover:bg-muted/30;
+
+            > td {
+                @apply text-sm border-0;
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .p-datatable-tbody > tr.p-datatable-striped {
+            @apply bg-muted/10;
+        }
+
+        .p-datatable-paginator {
+            @apply bg-muted/30 border-t border-border px-4 py-3;
+        }
+
+        .p-paginator-pages .p-paginator-page {
+            @apply min-w-10 h-10 rounded-lg transition-all;
+        }
+
+        .p-paginator-pages .p-paginator-page.p-paginator-page-selected {
+            @apply bg-primary text-primary-foreground;
+        }
+
+        .p-paginator-prev,
+        .p-paginator-next,
+        .p-paginator-first,
+        .p-paginator-last {
+            @apply min-w-10 h-10 rounded-lg transition-all hover:bg-muted;
+        }
+
+        /* Filter Input Styles */
+        .p-column-filter {
+            @apply w-full text-sm border border-input bg-background rounded-md px-3 py-2;
+
+            &:focus {
+                @apply ring-2 ring-ring ring-offset-2 outline-none;
+            }
+        }
+
+        .p-column-filter-menu {
+            @apply bg-background border border-border rounded-lg shadow-lg;
+        }
+
+        /* Empty State */
+        .p-datatable-emptymessage {
+            @apply text-center py-12;
+        }
+    }
+
+    /* PrimeReact Button Custom Styles */
+    .p-button {
+        @apply font-medium transition-all duration-200;
+    }
+
+    .p-button.p-button-sm {
+        @apply text-sm px-3 py-1.5;
+    }
+
+    .p-button-rounded {
+        @apply rounded-full;
+    }
+
+    .p-button-outlined {
+        @apply border-2 bg-transparent;
+    }
+
+    .p-button-outlined:hover {
+        @apply bg-primary/10;
+    }
+
+    /* PrimeReact Tag Custom Styles */
+    .p-tag {
+        @apply text-xs font-semibold px-2.5 py-1 rounded-full;
+    }
+
+    .p-tag.p-tag-success {
+        @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400;
+    }
+
+    .p-tag.p-tag-info {
+        @apply bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400;
+    }
+
+    .p-tag.p-tag-warning {
+        @apply bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400;
+    }
+
+    .p-tag.p-tag-danger {
+        @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400;
+    }
+
+    /* PrimeReact Dropdown Custom Styles */
+    .p-dropdown {
+        @apply border border-input bg-background rounded-md shadow-sm;
+    }
+
+    .p-dropdown:not(.p-disabled):hover {
+        @apply border-primary;
+    }
+
+    .p-dropdown:not(.p-disabled).p-focus {
+        @apply ring-2 ring-ring ring-offset-2 border-primary;
+    }
+
+    .p-dropdown-panel {
+        @apply bg-background border border-border rounded-lg shadow-lg mt-1;
+    }
+
+    .p-dropdown-item {
+        @apply px-3 py-2 text-sm transition-colors hover:bg-muted/50 cursor-pointer;
+    }
+}

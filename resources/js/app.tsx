@@ -1,7 +1,11 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { PrimeReactProvider } from 'primereact/api';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
 
@@ -19,7 +23,9 @@ createInertiaApp({
 
         root.render(
             <StrictMode>
-                <App {...props} />
+                <PrimeReactProvider>
+                    <App {...props} />
+                </PrimeReactProvider>
             </StrictMode>,
         );
     },

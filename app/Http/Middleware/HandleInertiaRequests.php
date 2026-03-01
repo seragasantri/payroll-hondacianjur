@@ -35,11 +35,23 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'username' => $request->user()->username,
+                    'username_verified_at' => $request->user()->username_verified_at,
+                    'created_at' => $request->user()->created_at,
+                    'updated_at' => $request->user()->updated_at,
+                    'can' => $request->user() ? $request->user()->getPermissionsViaRoles()->pluck('name')->mapWithKeys(fn($permission) => [$permission => true])->all() : (object)[],
+                    'roles' => $request->user()->roles->pluck('name')->toArray(),
+                    'is_super_admin' => $request->user()->hasRole('Super Admin'),
+                ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
