@@ -5,6 +5,22 @@ import { dashboard } from '@/routes';
 import employees from '@/routes/employees';
 import type { BreadcrumbItem } from '@/types';
 
+// Fungsi helper untuk format mata uang Rupiah dengan separator ribuan
+const formatRupiah = (value: string): string => {
+    // Hapus semua karakter kecuali angka
+    const number = value.replace(/[^0-9]/g, '');
+
+    if (!number) return '';
+
+    // Format dengan titik sebagai separator ribuan
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
+
+// Fungsi helper untuk mendapatkan nilai numerik dari string Rupiah
+const parseRupiah = (value: string): string => {
+    return value.replace(/[^0-9]/g, '');
+};
+
 interface Employee {
     id: number;
     user_id: number;
@@ -253,8 +269,8 @@ export default function EmployeeEdit({ employee }: PageProps) {
                                         <input
                                             id="gaji_pokok"
                                             type="text"
-                                            value={data.gaji_pokok}
-                                            onChange={e => setData('gaji_pokok', e.target.value)}
+                                            value={formatRupiah(data.gaji_pokok)}
+                                            onChange={e => setData('gaji_pokok', parseRupiah(e.target.value))}
                                             className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
                                             placeholder="0"
                                         />
@@ -274,8 +290,8 @@ export default function EmployeeEdit({ employee }: PageProps) {
                                         <input
                                             id="tunjangan_jabatan"
                                             type="text"
-                                            value={data.tunjangan_jabatan}
-                                            onChange={e => setData('tunjangan_jabatan', e.target.value)}
+                                            value={formatRupiah(data.tunjangan_jabatan)}
+                                            onChange={e => setData('tunjangan_jabatan', parseRupiah(e.target.value))}
                                             className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
                                             placeholder="0"
                                         />
@@ -295,8 +311,8 @@ export default function EmployeeEdit({ employee }: PageProps) {
                                         <input
                                             id="potongan_tidak_masuk"
                                             type="text"
-                                            value={data.potongan_tidak_masuk}
-                                            onChange={e => setData('potongan_tidak_masuk', e.target.value)}
+                                            value={formatRupiah(data.potongan_tidak_masuk)}
+                                            onChange={e => setData('potongan_tidak_masuk', parseRupiah(e.target.value))}
                                             className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
                                             placeholder="0"
                                         />
@@ -316,8 +332,8 @@ export default function EmployeeEdit({ employee }: PageProps) {
                                         <input
                                             id="potongan_terlambat"
                                             type="text"
-                                            value={data.potongan_terlambat}
-                                            onChange={e => setData('potongan_terlambat', e.target.value)}
+                                            value={formatRupiah(data.potongan_terlambat)}
+                                            onChange={e => setData('potongan_terlambat', parseRupiah(e.target.value))}
                                             className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
                                             placeholder="0"
                                         />
