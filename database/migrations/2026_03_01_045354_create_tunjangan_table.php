@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bpjs', function (Blueprint $table) {
+        Schema::create('tunjangans', function (Blueprint $table) {
             $table->id();
-            $table->string('jenis_bpjs');
+            $table->string('jenis_tunjangan');
             $table->decimal('perusahaan', 5, 2)->default(0);
             $table->decimal('karyawan', 5, 2)->default(0);
             $table->decimal('total', 5, 2)->default(0);
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bpjs');
+        Schema::dropIfExists('tunjangans');
     }
 };

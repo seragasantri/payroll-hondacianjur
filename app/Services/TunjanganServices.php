@@ -2,20 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\Bpjs;
+use App\Models\Tunjangan;
 use Illuminate\Support\Facades\DB;
 
-class BpjsServices
+class TunjanganServices
 {
     protected $model;
 
     public function __construct()
     {
-        $this->model = new Bpjs();
+        $this->model = new Tunjangan();
     }
 
     /**
-     * Get all bpjs with optional filtering and sorting
+     * Get all tunjangan with optional filtering and sorting
      */
     public function getAll()
     {
@@ -23,7 +23,7 @@ class BpjsServices
     }
 
     /**
-     * Find bpjs by ID
+     * Find tunjangan by ID
      */
     public function findId($id)
     {
@@ -31,15 +31,15 @@ class BpjsServices
     }
 
     /**
-     * Create new bpjs
+     * Create new tunjangan
      */
     public function create(array $data)
     {
         DB::beginTransaction();
         try {
-            $bpjs = $this->model->create($data);
+            $tunjangan = $this->model->create($data);
             DB::commit();
-            return $bpjs;
+            return $tunjangan;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -47,16 +47,16 @@ class BpjsServices
     }
 
     /**
-     * Update bpjs
+     * Update tunjangan
      */
     public function update($id, array $data)
     {
         DB::beginTransaction();
         try {
-            $bpjs = $this->findId($id);
-            $bpjs->update($data);
+            $tunjangan = $this->findId($id);
+            $tunjangan->update($data);
             DB::commit();
-            return $bpjs;
+            return $tunjangan;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -64,16 +64,16 @@ class BpjsServices
     }
 
     /**
-     * Delete bpjs
+     * Delete tunjangan
      */
     public function delete($id)
     {
         DB::beginTransaction();
         try {
-            $bpjs = $this->findId($id);
-            $bpjs->delete();
+            $tunjangan = $this->findId($id);
+            $tunjangan->delete();
             DB::commit();
-            return $bpjs;
+            return $tunjangan;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

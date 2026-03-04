@@ -16,12 +16,12 @@ import { dashboard } from '@/routes';
 import employees from '@/routes/employees';
 import permissions from '@/routes/permissions';
 import roles from '@/routes/roles';
+import tunjangan from '@/routes/tunjangan';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { NavManajemenUsers } from './nav-manajemen-users';
 import { NavMasterData } from './nav-master-data';
-import bpjs from '@/routes/bpjs';
 
 export function AppSidebar() {
     const can = useCan();
@@ -44,10 +44,10 @@ export function AppSidebar() {
             show: isSuperAdmin || can('employees.view any') || can('employees.view')
         },
         {
-            title: 'BPJS',
-            href: bpjs.index().url,
+            title: 'Tunjangan',
+            href: tunjangan.index().url,
             icon: HeartPulse,
-            show: isSuperAdmin || can('bpjs.view any') || can('bpjs.view')
+            show: isSuperAdmin || can('tunjangan.view any') || can('tunjangan.view')
         },
     ];
 

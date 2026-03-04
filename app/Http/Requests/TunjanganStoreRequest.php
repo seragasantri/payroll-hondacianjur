@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BpjsStoreRequest extends FormRequest
+class TunjanganStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class BpjsStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis_bpjs' => 'required|string|max:255|unique:bpjs,jenis_bpjs',
+            'jenis_tunjangan' => 'required|string|max:255|unique:tunjangan,jenis_tunjangan',
             'perusahaan' => 'required|numeric|min:0|max:100',
             'karyawan' => 'required|numeric|min:0|max:100',
             'total' => 'required|numeric|min:0|max:100',
@@ -37,8 +37,8 @@ class BpjsStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'jenis_bpjs.required' => 'Jenis BPJS wajib diisi',
-            'jenis_bpjs.unique' => 'Jenis BPJS sudah terdaftar',
+            'jenis_tunjangan.required' => 'Jenis Tunjangan wajib diisi',
+            'jenis_tunjangan.unique' => 'Jenis Tunjangan sudah terdaftar',
             'perusahaan.required' => 'Persentase perusahaan wajib diisi',
             'perusahaan.numeric' => 'Persentase perusahaan harus berupa angka',
             'perusahaan.max' => 'Persentase perusahaan maksimal 100%',

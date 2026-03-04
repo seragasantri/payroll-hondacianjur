@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BpjsResource extends JsonResource
+class TunjanganResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,7 @@ class BpjsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'jenis_bpjs' => $this->jenis_bpjs,
+            'jenis_tunjangan' => $this->jenis_tunjangan,
             'perusahaan' => (float) $this->perusahaan,
             'karyawan' => (float) $this->karyawan,
             'total' => (float) $this->total,

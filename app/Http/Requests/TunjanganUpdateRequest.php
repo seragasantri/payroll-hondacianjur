@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BpjsUpdateRequest extends FormRequest
+class TunjanganUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class BpjsUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis_bpjs' => 'sometimes|string|max:255|unique:bpjs,jenis_bpjs,' . $this->route('id'),
+            'jenis_tunjangan' => 'sometimes|string|max:255|unique:tunjangan,jenis_tunjangan,' . $this->route('id'),
             'perusahaan' => 'sometimes|numeric|min:0|max:100',
             'karyawan' => 'sometimes|numeric|min:0|max:100',
             'total' => 'sometimes|numeric|min:0|max:100',
@@ -37,7 +37,7 @@ class BpjsUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'jenis_bpjs.unique' => 'Jenis BPJS sudah terdaftar',
+            'jenis_tunjangan.unique' => 'Jenis Tunjangan sudah terdaftar',
             'perusahaan.numeric' => 'Persentase perusahaan harus berupa angka',
             'perusahaan.max' => 'Persentase perusahaan maksimal 100%',
             'karyawan.numeric' => 'Persentase karyawan harus berupa angka',

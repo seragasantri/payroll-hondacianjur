@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Bpjs extends Model
+class Tunjangan extends Model
 {
     protected $fillable = [
-        'jenis_bpjs',
+        'jenis_tunjangan',
         'perusahaan',
         'karyawan',
         'total',
