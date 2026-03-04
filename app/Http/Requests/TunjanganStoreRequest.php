@@ -22,7 +22,7 @@ class TunjanganStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis_tunjangan' => 'required|string|max:255|unique:tunjangan,jenis_tunjangan',
+            'jenis_tunjangan' => 'required|string|max:255|unique:tunjangans,jenis_tunjangan',
             'perusahaan' => 'required|numeric|min:0|max:100',
             'karyawan' => 'required|numeric|min:0|max:100',
             'total' => 'required|numeric|min:0|max:100',

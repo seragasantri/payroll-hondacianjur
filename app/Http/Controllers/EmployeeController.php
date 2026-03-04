@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use App\Http\Resources\EmployeeResource;
+use App\Services\DivisiServices;
 use App\Services\EmployeeServices;
+use App\Services\JabatanServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -13,10 +15,14 @@ use Inertia\Inertia;
 class EmployeeController extends Controller
 {
     protected $employeeServices;
+    protected $divisiServices;
+    protected $jabatanServices;
 
     public function __construct()
     {
         $this->employeeServices = new EmployeeServices;
+        $this->divisiServices = new DivisiServices;
+        $this->jabatanServices = new JabatanServices;
     }
 
     /**
@@ -31,6 +37,7 @@ class EmployeeController extends Controller
         $searchNama = $request->input('searchNama');
         $searchNIP = $request->input('searchNIP');
         $searchDivisi = $request->input('searchDivisi');
+        $searchJabatan = $request->input('searchJabatan');
         $sortField = $request->input('sortField', 'nama');
         $sortDirection = $request->input('sortDirection', 'asc');
 
@@ -48,7 +55,16 @@ class EmployeeController extends Controller
 
         // Filter by divisi
         if ($searchDivisi) {
-            $query->where('divisi', 'like', "%{$searchDivisi}%");
+            $query->whereHas('divisi', function ($q) use ($searchDivisi) {
+                $q->where('name', 'like', "%{$searchDivisi}%");
+            });
+        }
+
+        // Filter by jabatan
+        if ($searchJabatan) {
+            $query->whereHas('jabatan', function ($q) use ($searchJabatan) {
+                $q->where('name', 'like', "%{$searchJabatan}%");
+            });
         }
 
         // Sorting
@@ -57,7 +73,9 @@ class EmployeeController extends Controller
         $employees = $query->paginate($perPage);
 
         return Inertia::render('employees/index', [
-            'employees' => EmployeeResource::collection($employees)
+            'employees' => EmployeeResource::collection($employees),
+            'divisi' => $this->divisiServices->getAll()->orderBy('name', 'asc')->get(),
+            'jabatan' => $this->jabatanServices->getAll()->orderBy('name', 'asc')->get(),
         ]);
     }
 
@@ -69,7 +87,13 @@ class EmployeeController extends Controller
         // Check authorization
         Gate::authorize('create', \App\Models\Employee::class);
 
-        return Inertia::render('employees/create');
+        $divisi = $this->divisiServices->getAll()->orderBy('name', 'asc')->get();
+        $jabatan = $this->jabatanServices->getAll()->orderBy('name', 'asc')->get();
+
+        return Inertia::render('employees/create', [
+            'divisi' => $divisi,
+            'jabatan' => $jabatan,
+        ]);
     }
 
     /**
@@ -104,8 +128,13 @@ class EmployeeController extends Controller
         // Check authorization
         Gate::authorize('update', $employee);
 
+        $divisi = $this->divisiServices->getAll()->orderBy('name', 'asc')->get();
+        $jabatan = $this->jabatanServices->getAll()->orderBy('name', 'asc')->get();
+
         return Inertia::render('employees/edit', [
-            'employee' => new EmployeeResource($employee)
+            'employee' => new EmployeeResource($employee->load('divisi', 'jabatan')),
+            'divisi' => $divisi,
+            'jabatan' => $jabatan,
         ]);
     }
 

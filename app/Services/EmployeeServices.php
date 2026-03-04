@@ -21,7 +21,7 @@ class EmployeeServices
      */
     public function getAll()
     {
-        return $this->model->with('user')->newQuery();
+        return $this->model->with(['user', 'divisi', 'jabatan'])->newQuery();
     }
 
     /**
@@ -29,7 +29,7 @@ class EmployeeServices
      */
     public function findId($id)
     {
-        return $this->model->with('user')->findOrFail($id);
+        return $this->model->with(['user', 'divisi', 'jabatan'])->findOrFail($id);
     }
 
     /**
@@ -55,8 +55,8 @@ class EmployeeServices
                 'user_id' => $user->id,
                 'nip' => $data['nip'],
                 'nama' => $data['nama'],
-                'divisi' => $data['divisi'],
-                'jabatan' => $data['jabatan'],
+                'divisi_id' => $data['divisi_id'],
+                'jabatan_id' => $data['jabatan_id'],
                 'tanggal_mulai_kerja' => $data['tanggal_mulai_kerja'],
                 'gaji_pokok' => $data['gaji_pokok'],
                 'tunjangan_jabatan' => $data['tunjangan_jabatan'],
@@ -86,8 +86,8 @@ class EmployeeServices
             $employeeData = [
                 'nip' => $data['nip'] ?? $employee->nip,
                 'nama' => $data['nama'] ?? $employee->nama,
-                'divisi' => $data['divisi'] ?? $employee->divisi,
-                'jabatan' => $data['jabatan'] ?? $employee->jabatan,
+                'divisi_id' => $data['divisi_id'] ?? $employee->divisi_id,
+                'jabatan_id' => $data['jabatan_id'] ?? $employee->jabatan_id,
                 'tanggal_mulai_kerja' => $data['tanggal_mulai_kerja'] ?? $employee->tanggal_mulai_kerja,
                 'gaji_pokok' => $data['gaji_pokok'] ?? $employee->gaji_pokok,
                 'tunjangan_jabatan' => $data['tunjangan_jabatan'] ?? $employee->tunjangan_jabatan,

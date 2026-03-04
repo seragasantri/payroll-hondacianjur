@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Briefcase, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users } from 'lucide-react';
+import { Briefcase, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -18,6 +18,8 @@ import permissions from '@/routes/permissions';
 import roles from '@/routes/roles';
 import tunjangan from '@/routes/tunjangan';
 import users from '@/routes/users';
+import divisi from '@/routes/divisi';
+import jabatan from '@/routes/jabatan';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { NavManajemenUsers } from './nav-manajemen-users';
@@ -42,6 +44,18 @@ export function AppSidebar() {
             href: employees.index().url,
             icon: Briefcase,
             show: isSuperAdmin || can('employees.view any') || can('employees.view')
+        },
+        {
+            title: 'Divisi',
+            href: divisi.index().url,
+            icon: Folder,
+            show: isSuperAdmin || can('divisi.view any') || can('divisi.view')
+        },
+        {
+            title: 'Jabatan',
+            href: jabatan.index().url,
+            icon: UserCog,
+            show: isSuperAdmin || can('jabatan.view any') || can('jabatan.view')
         },
         {
             title: 'Tunjangan',

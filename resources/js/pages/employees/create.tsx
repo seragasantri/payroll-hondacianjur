@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import employees from '@/routes/employees';
 import type { BreadcrumbItem } from '@/types';
+import type { Divisi, Jabatan } from '@/types';
 
 // Fungsi helper untuk format mata uang Rupiah dengan separator ribuan
 const formatRupiah = (value: string): string => {
@@ -36,14 +37,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function EmployeeCreate() {
+export default function EmployeeCreate({ divisi, jabatan }: { divisi: Divisi[], jabatan: Jabatan[] }) {
     const { data, setData, errors, post, processing } = useForm<{
         nip: string;
         nama: string;
         password: string;
         password_confirmation: string;
-        divisi: string;
-        jabatan: string;
+        divisi_id: number | '';
+        jabatan_id: number | '';
         tanggal_mulai_kerja: string;
         gaji_pokok: string;
         tunjangan_jabatan: string;
@@ -54,8 +55,8 @@ export default function EmployeeCreate() {
         nama: '',
         password: '',
         password_confirmation: '',
-        divisi: '',
-        jabatan: '',
+        divisi_id: '',
+        jabatan_id: '',
         tanggal_mulai_kerja: '',
         gaji_pokok: '0',
         tunjangan_jabatan: '0',
@@ -179,37 +180,47 @@ export default function EmployeeCreate() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Divisi */}
                                     <div>
-                                        <label htmlFor="divisi" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label htmlFor="divisi_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Divisi <span className="text-red-500">*</span>
                                         </label>
-                                        <input
-                                            id="divisi"
-                                            type="text"
-                                            value={data.divisi}
-                                            onChange={e => setData('divisi', e.target.value)}
+                                        <select
+                                            id="divisi_id"
+                                            value={data.divisi_id}
+                                            onChange={e => setData('divisi_id', e.target.value ? Number(e.target.value) : '')}
                                             className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="Contoh: IT"
-                                        />
-                                        {errors.divisi && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.divisi}</p>
+                                        >
+                                            <option value="">Pilih Divisi</option>
+                                            {divisi.map((d) => (
+                                                <option key={d.id} value={d.id}>
+                                                    {d.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.divisi_id && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.divisi_id}</p>
                                         )}
                                     </div>
 
                                     {/* Jabatan */}
                                     <div>
-                                        <label htmlFor="jabatan" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label htmlFor="jabatan_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Jabatan <span className="text-red-500">*</span>
                                         </label>
-                                        <input
-                                            id="jabatan"
-                                            type="text"
-                                            value={data.jabatan}
-                                            onChange={e => setData('jabatan', e.target.value)}
+                                        <select
+                                            id="jabatan_id"
+                                            value={data.jabatan_id}
+                                            onChange={e => setData('jabatan_id', e.target.value ? Number(e.target.value) : '')}
                                             className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="Contoh: Staff"
-                                        />
-                                        {errors.jabatan && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.jabatan}</p>
+                                        >
+                                            <option value="">Pilih Jabatan</option>
+                                            {jabatan.map((j) => (
+                                                <option key={j.id} value={j.id}>
+                                                    {j.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.jabatan_id && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.jabatan_id}</p>
                                         )}
                                     </div>
                                 </div>

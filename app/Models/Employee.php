@@ -11,8 +11,8 @@ class Employee extends Model
         'user_id',
         'nip',
         'nama',
-        'divisi',
-        'jabatan',
+        'divisi_id',
+        'jabatan_id',
         'tanggal_mulai_kerja',
         'gaji_pokok',
         'tunjangan_jabatan',
@@ -34,6 +34,22 @@ class Employee extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the divisi that belongs to the employee.
+     */
+    public function divisi(): BelongsTo
+    {
+        return $this->belongsTo(Divisi::class);
+    }
+
+    /**
+     * Get the jabatan that belongs to the employee.
+     */
+    public function jabatan(): BelongsTo
+    {
+        return $this->belongsTo(Jabatan::class);
     }
 
     /**

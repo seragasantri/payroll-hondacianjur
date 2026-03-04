@@ -24,7 +24,7 @@ export default function AuthSimpleLayout({ children }: AuthLayoutProps) {
                             >
                                 <div className="flex h-16 items-center justify-center rounded-2xl pt-12">
                                     <img
-                                        src="/assets/images/logo_landscape.png"
+                                        src="/assets/images/logo_1.png"
                                         alt="Logo Login"
                                     />
                                 </div>

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('nip')->unique(); // NIP sama dengan username
             $table->string('nama');
-            $table->string('divisi');
-            $table->string('jabatan');
+            $table->foreignId('divisi_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('jabatan_id')->nullable()->constrained()->nullOnDelete();
             $table->date('tanggal_mulai_kerja');
             $table->decimal('gaji_pokok', 15, 2)->default(0);
             $table->decimal('tunjangan_jabatan', 15, 2)->default(0);
