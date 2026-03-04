@@ -17,14 +17,15 @@ export default function AuthSimpleLayout({ children }: AuthLayoutProps) {
                 <div className="w-full max-w-md">
                     <div className="flex flex-col gap-8">
                         {/* Logo and Header */}
-                        <div className="flex animate-in flex-col items-center gap-4 text-center duration-500 fade-in slide-in-from-bottom-4">
+                        <div className="flex animate-in flex-col items-center gap-4 text-center duration-500 fade-in slide-in-from-bottom-4 ">
                             <Link
                                 href={home()}
                                 className="group flex flex-col items-center gap-4"
                             >
-                                <div className="flex h-16 items-center justify-center rounded-2xl pt-12">
+                                <div className="flex h-16 items-center justify-center rounded-2xl ">
                                     <img
                                         src="/assets/images/logo_1.png"
+                                        className='w-50 mb-10'
                                         alt="Logo Login"
                                     />
                                 </div>
