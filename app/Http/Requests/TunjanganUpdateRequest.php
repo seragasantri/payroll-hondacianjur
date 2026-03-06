@@ -22,7 +22,7 @@ class TunjanganUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis_tunjangan' => 'sometimes|string|max:255|unique:tunjangans,jenis_tunjangan,' . $this->route('id'),
+            'jenis_tunjangan' => 'sometimes|string|max:255|unique:tunjangans,jenis_tunjangan,' . $this->route('tunjangan'),
             'perusahaan' => 'sometimes|numeric|min:0|max:100',
             'karyawan' => 'sometimes|numeric|min:0|max:100',
             'total' => 'sometimes|numeric|min:0|max:100',

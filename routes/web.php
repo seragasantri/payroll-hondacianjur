@@ -3,6 +3,7 @@
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\JabatanController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -19,6 +20,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('divisi', DivisiController::class);
     Route::resource('jabatan', JabatanController::class);
     Route::resource('tunjangan', TunjanganController::class);
+
+    // Payroll routes - using bulan instead of id
+    Route::get('payroll', [PayrollController::class, 'index'])->name('payroll.index');
+    Route::get('payroll/create', [PayrollController::class, 'create'])->name('payroll.create');
+    Route::post('payroll', [PayrollController::class, 'store'])->name('payroll.store');
+    Route::get('payroll/{bulan}/detail', [PayrollController::class, 'show'])->name('payroll.show');
+    Route::get('payroll/{bulan}/edit', [PayrollController::class, 'edit'])->name('payroll.edit');
+    Route::put('payroll/{bulan}', [PayrollController::class, 'update'])->name('payroll.update');
+    Route::delete('payroll/{bulan}', [PayrollController::class, 'destroy'])->name('payroll.destroy');
+    Route::post('payroll/publish', [PayrollController::class, 'publish'])->name('payroll.publish');
+
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
 });

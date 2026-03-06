@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Briefcase, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog } from 'lucide-react';
+import { Briefcase, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog, Wallet } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -20,6 +20,7 @@ import tunjangan from '@/routes/tunjangan';
 import users from '@/routes/users';
 import divisi from '@/routes/divisi';
 import jabatan from '@/routes/jabatan';
+import payroll from '@/routes/payroll';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { NavManajemenUsers } from './nav-manajemen-users';
@@ -62,6 +63,12 @@ export function AppSidebar() {
             href: tunjangan.index().url,
             icon: HeartPulse,
             show: isSuperAdmin || can('tunjangan.view any') || can('tunjangan.view')
+        },
+        {
+            title: 'Payroll',
+            href: payroll.index().url,
+            icon: Wallet,
+            show: isSuperAdmin || can('payroll.view any') || can('payroll.view')
         },
     ];
 
