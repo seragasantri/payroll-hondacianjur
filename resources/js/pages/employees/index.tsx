@@ -1,12 +1,13 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowBigLeftIcon, ArrowBigRight, Pencil, PlusCircle, Trash2, Loader2, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowBigLeftIcon, ArrowBigRight, Pencil, PlusCircle, Trash2, Loader2, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useDebounceSearch } from '@/hooks/use-debounce-search';
 import { useCan } from '@/hooks/useCan';
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { create, destroy, edit, index } from '@/routes/employees';
-import type { BreadcrumbItem, Divisi, Jabatan } from '@/types';
+import type { BreadcrumbItem, KantorCabang, Jabatan } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,16 +24,18 @@ interface Employee {
     id: number;
     nip: string;
     nama: string;
-    divisi?: { id: number; name: string };
+    kantorCabang?: { id: number; name: string };
     jabatan?: { id: number; name: string };
+    nomor_rekening?: string;
+    status_pegawai?: string;
     tanggal_mulai_kerja: string;
+    ptkp?: string;
     gaji_pokok: number;
     tunjangan_jabatan: number;
     potongan_tidak_masuk: number;
     potongan_terlambat: number;
     total_gaji: number;
     total_potongan: number;
-    gaji_bersih: number;
     user?: {
         id: number;
         name: string;
@@ -59,11 +62,12 @@ interface EmployeeList {
     };
 }
 
-export default function EmployeeIndex({ employees, divisi, jabatan }: { employees: EmployeeList, divisi: Divisi[], jabatan: Jabatan[] }) {
+export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { employees: EmployeeList, kantorCabang: KantorCabang[], jabatan: Jabatan[] }) {
     const { debouncedSearch, getSearchValue, isSearching, resetSearch } = useDebounceSearch();
     const can = useCan();
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
     // Cek apakah user punya aksi (edit atau delete)
     const hasActionAccess = isSuperAdmin || can('employees.edit') || can('employees.delete');
@@ -122,11 +126,11 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
 
         const searchNama = getSearchValue('searchNama');
         const searchNIP = getSearchValue('searchNIP');
-        const searchDivisi = getSearchValue('searchDivisi');
+        const searchKantorCabang = getSearchValue('searchKantorCabang');
         const searchJabatan = getSearchValue('searchJabatan');
         if (searchNama) params.set('searchNama', searchNama);
         if (searchNIP) params.set('searchNIP', searchNIP);
-        if (searchDivisi) params.set('searchDivisi', searchDivisi);
+        if (searchKantorCabang) params.set('searchKantorCabang', searchKantorCabang);
         if (searchJabatan) params.set('searchJabatan', searchJabatan);
 
         return `?${params.toString()}`;
@@ -268,11 +272,11 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                 </th>
                                 <th className='px-4 py-4 text-left text-sm font-bold text-white'>
                                     <button
-                                        onClick={() => handleSort('divisi')}
+                                        onClick={() => handleSort('kantorCabang')}
                                         className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
                                     >
-                                        Divisi
-                                        <span className='ml-1'>{getSortIcon('divisi')}</span>
+                                        KantorCabang
+                                        <span className='ml-1'>{getSortIcon('kantorCabang')}</span>
                                     </button>
                                 </th>
                                 <th className='px-4 py-4 text-left text-sm font-bold text-white'>
@@ -284,17 +288,7 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                         <span className='ml-1'>{getSortIcon('jabatan')}</span>
                                     </button>
                                 </th>
-                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>Tgl Mulai</th>
-                                <th className='px-3 py-4 text-right text-sm font-bold text-white'>Gaji Pokok</th>
-                                <th className='px-3 py-4 text-right text-sm font-bold text-white'>Tunjangan</th>
-                                <th className='px-3 py-4 text-right text-sm font-bold text-white'>Total Gaji</th>
-                                <th className='px-3 py-4 text-right text-sm font-bold text-white'>Pot. Tidak Masuk</th>
-                                <th className='px-3 py-4 text-right text-sm font-bold text-white'>Pot. Terlambat</th>
-                                <th className='px-3 py-4 text-right text-sm font-bold text-white'>Total Pot.</th>
-                                <th className='px-4 py-4 text-right text-sm font-bold text-white'>Gaji Bersih</th>
-                                {hasActionAccess && (
-                                    <th className='rounded-tr-2xl px-4 py-4 text-center text-sm font-bold text-white w-28'>Aksi</th>
-                                )}
+                                <th className='rounded-tr-2xl px-4 py-4 text-center text-sm font-bold text-white w-28'>Aksi</th>
                             </tr>
                         </thead>
 
@@ -336,12 +330,12 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                 </th>
                                 <th className='px-4 py-4'>
                                     <select
-                                        value={getSearchValue('searchDivisi')}
-                                        onChange={(e) => debouncedSearch('searchDivisi', e.target.value, index().url)}
+                                        value={getSearchValue('searchKantorCabang')}
+                                        onChange={(e) => debouncedSearch('searchKantorCabang', e.target.value, index().url)}
                                         className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
                                     >
-                                        <option value="">Semua Divisi</option>
-                                        {divisi.map((d) => (
+                                        <option value="">Semua KantorCabang</option>
+                                        {kantorCabang.map((d) => (
                                             <option key={d.id} value={d.name}>
                                                 {d.name}
                                             </option>
@@ -362,28 +356,25 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                         ))}
                                     </select>
                                 </th>
-                                <th className='px-4 py-4' colSpan={hasActionAccess ? 9 : 8}></th>
-                                {hasActionAccess && (
-                                    <th className='px-4 py-4'>
-                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchDivisi') || getSearchValue('searchJabatan')) && (
-                                            <button
-                                                onClick={handleResetSearch}
-                                                className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
-                                                title="Reset pencarian"
-                                            >
-                                                <RotateCcw className='size-4' />
-                                                <span>Reset</span>
-                                            </button>
-                                        )}
-                                    </th>
-                                )}
+                                <th className='px-4 py-4'>
+                                    {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
+                                        <button
+                                            onClick={handleResetSearch}
+                                            className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
+                                            title="Reset pencarian"
+                                        >
+                                            <RotateCcw className='size-4' />
+                                            <span>Reset</span>
+                                        </button>
+                                    )}
+                                </th>
                             </tr>
                         </thead>
 
                         <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
                             {isSearching ? (
                                 <tr>
-                                    <td colSpan={hasActionAccess ? 14 : 13} className="px-4 py-12 text-center">
+                                    <td colSpan={6} className="px-4 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center gap-3">
                                             <div className="relative">
                                                 <div className="size-12 rounded-full border-4 border-orange-200 dark:border-gray-700"></div>
@@ -395,7 +386,7 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                 </tr>
                             ) : !employees?.data || employees.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={hasActionAccess ? 14 : 13} className="px-4 py-12 text-center">
+                                    <td colSpan={6} className="px-4 py-12 text-center">
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
                                                 <svg className="size-8 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -425,7 +416,7 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                                                {employee.divisi?.name}
+                                                {employee.kantorCabang?.name}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
@@ -433,46 +424,28 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                                 {employee.jabatan?.name}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                            {formatDate(employee.tanggal_mulai_kerja)}
-                                        </td>
-                                        <td className="px-3 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            {formatCurrency(employee.gaji_pokok)}
-                                        </td>
-                                        <td className="px-3 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            {formatCurrency(employee.tunjangan_jabatan)}
-                                        </td>
-                                        <td className="px-3 py-3 text-right text-sm font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20">
-                                            {formatCurrency(employee.total_gaji)}
-                                        </td>
-                                        <td className="px-3 py-3 text-right text-sm font-medium text-red-600 dark:text-red-400">
-                                            {formatCurrency(employee.potongan_tidak_masuk)}
-                                        </td>
-                                        <td className="px-3 py-3 text-right text-sm font-medium text-red-600 dark:text-red-400">
-                                            {formatCurrency(employee.potongan_terlambat)}
-                                        </td>
-                                        <td className="px-3 py-3 text-right text-sm font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20">
-                                            {formatCurrency(employee.total_potongan)}
-                                        </td>
-                                        <td className="px-4 py-3 text-right text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">
-                                            {formatCurrency(employee.gaji_bersih)}
-                                        </td>
-                                        {hasActionAccess && (
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center justify-center gap-1.5">
-                                                    {(isSuperAdmin || can('employees.edit')) && (
-                                                        <Link
-                                                            href={edit(employee.id).url}
-                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
-                                                            title="Edit"
-                                                        >
-                                                            <Pencil className="size-3" />
-                                                        </Link>
-                                                    )}
-                                                    {(isSuperAdmin || can('employees.delete')) && (
-                                                        <button
-                                                            onClick={() => handleDelete(employee.id, employee.nama)}
-                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-center gap-1.5">
+                                                <button
+                                                    onClick={() => setSelectedEmployee(employee)}
+                                                    className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                                                    title="Detail"
+                                                >
+                                                    <Eye className="size-3" />
+                                                </button>
+                                                {(hasActionAccess && (isSuperAdmin || can('employees.edit'))) && (
+                                                    <Link
+                                                        href={edit(employee.id).url}
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
+                                                        title="Edit"
+                                                    >
+                                                        <Pencil className="size-3" />
+                                                    </Link>
+                                                )}
+                                                {(hasActionAccess && (isSuperAdmin || can('employees.delete'))) && (
+                                                    <button
+                                                        onClick={() => handleDelete(employee.id, employee.nama)}
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="size-3" />
@@ -480,7 +453,6 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                                                     )}
                                                 </div>
                                             </td>
-                                        )}
                                     </tr>
                                 ))
                             )}
@@ -568,6 +540,97 @@ export default function EmployeeIndex({ employees, divisi, jabatan }: { employee
                     )}
                 </div>
             </div>
+
+            {/* Detail Modal */}
+            {selectedEmployee && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Detail Karyawan</h2>
+                            <button
+                                onClick={() => setSelectedEmployee(null)}
+                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Informasi Pribadi */}
+                            <div>
+                                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Informasi Pribadi</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">NIP</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nip}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Nama</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nama}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">KantorCabang</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.kantorCabang?.name || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Jabatan</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.jabatan?.name || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Nomor Rekening</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nomor_rekening || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Status Pegawai</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.status_pegawai || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Tanggal Mulai Kerja</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{formatDate(selectedEmployee.tanggal_mulai_kerja)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Status PTKP</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.ptkp || '-'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Informasi Gaji */}
+                            <div>
+                                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Informasi Gaji</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Gaji Pokok</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{formatCurrency(selectedEmployee.gaji_pokok)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Tunjangan Jabatan</p>
+                                        <p className="text-sm font-medium text-green-600 dark:text-green-400">{formatCurrency(selectedEmployee.tunjangan_jabatan)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Total Gaji</p>
+                                        <p className="text-sm font-bold text-green-600 dark:text-green-400">{formatCurrency(selectedEmployee.total_gaji)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Potongan Tidak Masuk</p>
+                                        <p className="text-sm font-medium text-red-600 dark:text-red-400">{formatCurrency(selectedEmployee.potongan_tidak_masuk)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Potongan Terlambat</p>
+                                        <p className="text-sm font-medium text-red-600 dark:text-red-400">{formatCurrency(selectedEmployee.potongan_terlambat)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Total Potongan</p>
+                                        <p className="text-sm font-bold text-red-600 dark:text-red-400">{formatCurrency(selectedEmployee.total_potongan)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

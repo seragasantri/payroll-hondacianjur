@@ -2,20 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\Divisi;
+use App\Models\KantorCabang;
 use Illuminate\Support\Facades\DB;
 
-class DivisiServices
+class KantorCabangServices
 {
     protected $model;
 
     public function __construct()
     {
-        $this->model = new Divisi();
+        $this->model = new KantorCabang();
     }
 
     /**
-     * Get all divisi
+     * Get all kantor cabang
      */
     public function getAll()
     {
@@ -23,7 +23,7 @@ class DivisiServices
     }
 
     /**
-     * Find divisi by ID
+     * Find kantor cabang by ID
      */
     public function findId($id)
     {
@@ -31,17 +31,17 @@ class DivisiServices
     }
 
     /**
-     * Create new divisi
+     * Create new kantor cabang
      */
     public function create(array $data)
     {
         DB::beginTransaction();
         try {
-            $divisi = $this->model->create([
+            $kantorCabang = $this->model->create([
                 'name' => $data['name'],
             ]);
             DB::commit();
-            return $divisi;
+            return $kantorCabang;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -49,18 +49,18 @@ class DivisiServices
     }
 
     /**
-     * Update divisi
+     * Update kantor cabang
      */
     public function update($id, array $data)
     {
         DB::beginTransaction();
         try {
-            $divisi = $this->findId($id);
-            $divisi->update([
-                'name' => $data['name'] ?? $divisi->name,
+            $kantorCabang = $this->findId($id);
+            $kantorCabang->update([
+                'name' => $data['name'] ?? $kantorCabang->name,
             ]);
             DB::commit();
-            return $divisi;
+            return $kantorCabang;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -68,16 +68,16 @@ class DivisiServices
     }
 
     /**
-     * Delete divisi
+     * Delete kantor cabang
      */
     public function delete($id)
     {
         DB::beginTransaction();
         try {
-            $divisi = $this->findId($id);
-            $divisi->delete();
+            $kantorCabang = $this->findId($id);
+            $kantorCabang->delete();
             DB::commit();
-            return $divisi;
+            return $kantorCabang;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

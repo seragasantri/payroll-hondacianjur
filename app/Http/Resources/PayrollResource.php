@@ -39,9 +39,9 @@ class PayrollResource extends JsonResource
                 'id' => $this->employee->id,
                 'nip' => $this->employee->nip,
                 'nama' => $this->employee->nama,
-                'divisi' => $this->whenLoaded('employee', fn() => $this->employee->divisi ? [
-                    'id' => $this->employee->divisi->id,
-                    'name' => $this->employee->divisi->name,
+                'kantorCabang' => $this->whenLoaded('employee', fn() => $this->employee->kantorCabang ? [
+                    'id' => $this->employee->kantorCabang->id,
+                    'name' => $this->employee->kantorCabang->name,
                 ] : null),
                 'jabatan' => $this->whenLoaded('employee', fn() => $this->employee->jabatan ? [
                     'id' => $this->employee->jabatan->id,

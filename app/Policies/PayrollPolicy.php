@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Payroll;
+use App\Models\Payrolls;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -15,7 +15,7 @@ class PayrollPolicy
         return $user->hasPermissionTo('payroll.view any') || $user->is_super_admin;
     }
 
-    public function view(User $user, Payroll $payroll): bool
+    public function view(User $user, Payrolls $payroll): bool
     {
         return $user->hasPermissionTo('payroll.view') || $user->is_super_admin;
     }
@@ -25,12 +25,12 @@ class PayrollPolicy
         return $user->hasPermissionTo('payroll.create') || $user->is_super_admin;
     }
 
-    public function update(User $user, Payroll $payroll): bool
+    public function update(User $user, Payrolls $payroll): bool
     {
         return $user->hasPermissionTo('payroll.update') || $user->is_super_admin;
     }
 
-    public function delete(User $user, Payroll $payroll): bool
+    public function delete(User $user, Payrolls $payroll): bool
     {
         return $user->hasPermissionTo('payroll.delete') || $user->is_super_admin;
     }

@@ -18,7 +18,7 @@ class PermissionSeeder extends Seeder
             'roles' => ['view', 'view any', 'create', 'edit', 'delete'],
             'permissions' => ['view', 'view any', 'create', 'edit', 'delete'],
             'tunjangan' => ['view', 'view any', 'create', 'edit', 'delete'],
-            'divisi' => ['view', 'view any', 'create', 'edit', 'delete'],
+            'kantor-cabang' => ['view', 'view any', 'create', 'edit', 'delete'],
             'jabatan' => ['view', 'view any', 'create', 'edit', 'delete'],
             'settings' => ['view', 'edit'],
         ];

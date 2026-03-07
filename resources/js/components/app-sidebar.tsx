@@ -18,7 +18,7 @@ import permissions from '@/routes/permissions';
 import roles from '@/routes/roles';
 import tunjangan from '@/routes/tunjangan';
 import users from '@/routes/users';
-import divisi from '@/routes/divisi';
+import * as KantorCabang from '@/routes/kantor-cabang';
 import jabatan from '@/routes/jabatan';
 import payroll from '@/routes/payroll';
 import type { NavItem } from '@/types';
@@ -47,10 +47,10 @@ export function AppSidebar() {
             show: isSuperAdmin || can('employees.view any') || can('employees.view')
         },
         {
-            title: 'Divisi',
-            href: divisi.index().url,
+            title: 'Kantor Cab',
+            href: KantorCabang.index().url,
             icon: Folder,
-            show: isSuperAdmin || can('divisi.view any') || can('divisi.view')
+            show: isSuperAdmin || can('kantor-cabang.view any') || can('kantor-cabang.view')
         },
         {
             title: 'Jabatan',

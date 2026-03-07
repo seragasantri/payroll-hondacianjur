@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DivisiStoreRequest extends FormRequest
+class KantorCabangUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,15 +14,14 @@ class DivisiStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:divisis,name',
+            'name' => 'sometimes|string|max:255|unique:kantor_cabangs,name,' . $this->route('id'),
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama divisi wajib diisi',
-            'name.unique' => 'Nama divisi sudah terdaftar',
+            'name.unique' => 'Nama Kantor Cab sudah terdaftar',
         ];
     }
 }

@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { PlusCircle, Trash2, Loader2, Pencil, FileText, Send, Calendar, Eye } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Pencil, FileText, Send, Calendar, Eye, Download } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useCan } from '@/hooks/useCan';
 import AppLayout from '@/layouts/app-layout';
@@ -7,10 +7,11 @@ import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
 interface PayrollSummary {
+    id: number;
     bulan: string;
-    total_karyawan: number;
-    total_gaji_bersih: number;
+    status_pegawai: string;
     status: 'draft' | 'published' | 'paid';
+    details_count: number;
 }
 
 interface PayrollList {
@@ -47,15 +48,6 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount || 0);
-    };
-
     const formatBulan = (bulan: string) => {
         const [year, month] = bulan.split('-');
         const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -75,9 +67,10 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
         }
     };
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         const currentBulan = new Date().toISOString().slice(0, 7);
-        Swal.fire({
+
+        const { value: formValues } = await Swal.fire({
             title: 'Buat Payroll',
             text: `Payroll bulan mana yang ingin dibuat?`,
             icon: 'question',
@@ -86,28 +79,97 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
             cancelButtonColor: '#6b7280',
             confirmButtonText: 'Buat',
             cancelButtonText: 'Batal',
-            input: 'text',
-            inputPlaceholder: 'YYYY-MM',
-            inputValue: currentBulan,
-            preConfirm: (bulan) => {
+            html: `
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Bulan</label>
+                    <input type="text" id="swal-bulan" class="swal2-input" placeholder="YYYY-MM" value="${currentBulan}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Status Pegawai</label>
+                    <select id="swal-status" class="swal2-select">
+                        <option value="Pegawai Tetap">Pegawai Tetap</option>
+                        <option value="Pegawai Kontrak">Pegawai Kontrak</option>
+                    </select>
+                </div>
+            `,
+            focusConfirm: false,
+            preConfirm: () => {
+                const bulan = (document.getElementById('swal-bulan') as HTMLInputElement).value;
+                const status = (document.getElementById('swal-status') as HTMLSelectElement).value;
+
                 if (!bulan || !/^\d{4}-\d{2}$/.test(bulan)) {
                     Swal.showValidationMessage('Format harus YYYY-MM');
                     return false;
                 }
-                router.get('/payroll/create', { bulan });
+
+                return { bulan, status };
             }
         });
+
+        if (formValues) {
+            const { bulan, status } = formValues;
+
+            // Check if payroll already exists
+            try {
+                const response = await fetch(`/payroll/check?bulan=${bulan}&status=${encodeURIComponent(status)}`);
+                const data = await response.json();
+
+                if (data.exists) {
+                    // Show warning alert
+                    await Swal.fire({
+                        title: 'Perhatian!',
+                        html: `
+                            <div class="text-left">
+                                <p class="mb-2">${data.message}</p>
+                                <p class="text-sm text-gray-500">Status: <span class="font-semibold">${data.payroll_status === 'draft' ? 'Draft' : 'Published'}</span></p>
+                            </div>
+                        `,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#f97316',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Lanjutkan Edit',
+                        cancelButtonText: 'Batal'
+                    });
+
+                    // Navigate to edit
+                    router.get(`/payroll/${bulan}/edit`);
+                } else {
+                    // Create new payroll
+                    const params: Record<string, string> = { bulan };
+                    if (status) {
+                        params.status = status;
+                    }
+                    router.get('/payroll/create', params);
+                }
+            } catch {
+                // If check fails, just proceed to create
+                const params: Record<string, string> = { bulan };
+                if (status) {
+                    params.status = status;
+                }
+                router.get('/payroll/create', params);
+            }
+        }
     };
 
-    const handleEdit = (bulan: string) => {
-        router.get(`/payroll/${bulan}/edit`);
+    const handleEdit = (bulan: string, statusFilter?: string | null) => {
+        const params: Record<string, string> = {};
+        if (statusFilter) {
+            params.status = statusFilter;
+        }
+        router.get(`/payroll/${bulan}/edit`, params);
     };
 
-    const handleDetail = (bulan: string) => {
-        router.get(`/payroll/${bulan}/detail`);
+    const handleDetail = (bulan: string, statusFilter?: string | null) => {
+        const params: Record<string, string> = {};
+        if (statusFilter) {
+            params.status = statusFilter;
+        }
+        router.get(`/payroll/${bulan}/detail`, params);
     };
 
-    const handleDelete = (bulan: string) => {
+    const handleDelete = (bulan: string, statusPegawai?: string | null) => {
         const bulanFormatted = formatBulan(bulan);
         Swal.fire({
             title: 'Hapus Payroll?',
@@ -119,7 +181,12 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
             confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal',
             preConfirm: () => {
+                const params: Record<string, string> = {};
+                if (statusPegawai) {
+                    params.status = statusPegawai;
+                }
                 return router.delete(`/payroll/${bulan}`, {
+                    data: params,
                     onSuccess: () => {
                         Swal.fire({
                             title: 'Terhapus!',
@@ -134,10 +201,10 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
         });
     };
 
-    const handlePublish = (bulan: string) => {
+    const handlePublish = (bulan: string, statusPegawai?: string | null) => {
         Swal.fire({
             title: 'Publish Payroll',
-            text: `Apakah Anda ingin publish payroll ${formatBulan(bulan)}?`,
+            text: `Apakah Anda ingin publish payroll ${formatBulan(bulan)}${statusPegawai ? ' (' + statusPegawai + ')' : ''}?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#f97316',
@@ -145,7 +212,11 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
             confirmButtonText: 'Ya, publish!',
             cancelButtonText: 'Batal',
             preConfirm: () => {
-                return router.post('/payroll/publish', { bulan }, {
+                const params: Record<string, string> = { bulan };
+                if (statusPegawai) {
+                    params.status = statusPegawai;
+                }
+                return router.post('/payroll/publish', params, {
                     onSuccess: () => {
                         Swal.fire({
                             title: 'Berhasil!',
@@ -158,6 +229,14 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                 });
             }
         });
+    };
+
+    const handleExport = (bulan: string, statusPegawai?: string | null) => {
+        const params = new URLSearchParams({ bulan });
+        if (statusPegawai) {
+            params.append('status', statusPegawai);
+        }
+        window.open(`/payroll/${bulan}/export?${params.toString()}`, '_blank');
     };
 
     return (
@@ -194,11 +273,10 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                 <th className='px-4 py-4 text-left text-sm font-bold text-white'>
                                     <button className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'>
                                         <Calendar className="size-4" />
-                                        <span>Bulan</span>
+                                        <span>Bulan Payroll</span>
                                     </button>
                                 </th>
-                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>Total Karyawan</th>
-                                <th className='px-4 py-4 text-right text-sm font-bold text-white'>Total Gaji</th>
+                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>Status Pegawai</th>
                                 <th className='px-4 py-4 text-left text-sm font-bold text-white'>Status</th>
                                 <th className='rounded-tr-2xl px-4 py-4 text-center text-sm font-bold text-white w-40'>Aksi</th>
                             </tr>
@@ -207,7 +285,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                         <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
                             {!payrollSummary?.data || payrollSummary.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-12 text-center">
+                                    <td colSpan={5} className="px-4 py-12 text-center">
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
                                                 <FileText className="size-8 text-orange-500 dark:text-orange-400" />
@@ -234,12 +312,15 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                             </div>
                                         </td>
                                         <td className="px-4 py-4">
-                                            <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300">
-                                                {item.total_karyawan} Karyawan
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-4 text-right">
-                                            <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(item.total_gaji_bersih)}</span>
+                                            {item.status_pegawai ? (
+                                                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                                    {item.status_pegawai}
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-900/30 px-3 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                    -
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-4 py-4">
                                             {getStatusBadge(item.status)}
@@ -247,7 +328,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                         <td className="px-4 py-4">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button
-                                                    onClick={() => handleDetail(item.bulan)}
+                                                    onClick={() => handleDetail(item.bulan, item.status_pegawai)}
                                                     className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
                                                 >
                                                     <Eye className="size-3" />
@@ -255,7 +336,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                                 </button>
                                                 {(isSuperAdmin || can('payroll.update')) && item.status === 'draft' && (
                                                     <button
-                                                        onClick={() => handleEdit(item.bulan)}
+                                                        onClick={() => handleEdit(item.bulan, item.status_pegawai)}
                                                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
                                                     >
                                                         <Pencil className="size-3" />
@@ -264,16 +345,25 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                                 )}
                                                 {(isSuperAdmin || can('payroll.publish')) && item.status === 'draft' && (
                                                     <button
-                                                        onClick={() => handlePublish(item.bulan)}
+                                                        onClick={() => handlePublish(item.bulan, item.status_pegawai)}
                                                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
                                                     >
                                                         <Send className="size-3" />
                                                         <span>Publish</span>
                                                     </button>
                                                 )}
+                                                {item.status === 'published' && (
+                                                    <button
+                                                        onClick={() => handleExport(item.bulan, item.status_pegawai)}
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                                                    >
+                                                        <Download className="size-3" />
+                                                        <span>Export</span>
+                                                    </button>
+                                                )}
                                                 {(isSuperAdmin || can('payroll.delete')) && item.status === 'draft' && (
                                                     <button
-                                                        onClick={() => handleDelete(item.bulan)}
+                                                        onClick={() => handleDelete(item.bulan, item.status_pegawai)}
                                                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                                                     >
                                                         <Trash2 className="size-3" />
@@ -291,7 +381,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                     {payrollSummary?.meta && payrollSummary.data.length > 0 && (
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-orange-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                Menampilkan <span className='font-bold text-orange-600 dark:text-orange-400'>{payrollSummary.meta?.from}</span> sampai <span className='font-bold text-orange-600 dark:text-orange-400'>{payrollSummary.meta?.to}</span> dari <span className='font-bold text-orange-600 dark:text-orange-400'>{payrollSummary.meta?.total}</span> bulan
+                                Menampilkan <span className='font-bold text-orange-600 dark:text-orange-400'>{payrollSummary.meta?.from}</span> sampai <span className='font-bold text-orange-600 dark:text-orange-400'>{payrollSummary.meta?.to}</span> dari <span className='font-bold text-orange-600 dark:text-orange-400'>{payrollSummary.meta?.total}</span> data
                             </div>
                         </div>
                     )}

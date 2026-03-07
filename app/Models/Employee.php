@@ -11,13 +11,16 @@ class Employee extends Model
         'user_id',
         'nip',
         'nama',
-        'divisi_id',
+        'kantor_cabang_id',
         'jabatan_id',
         'tanggal_mulai_kerja',
         'gaji_pokok',
         'tunjangan_jabatan',
         'potongan_tidak_masuk',
         'potongan_terlambat',
+        'nomor_rekening',
+        'status_pegawai',
+        'ptkp',
     ];
 
     protected $casts = [
@@ -37,11 +40,11 @@ class Employee extends Model
     }
 
     /**
-     * Get the divisi that belongs to the employee.
+     * Get the Kantor Cab that belongs to the employee.
      */
-    public function divisi(): BelongsTo
+    public function kantorCabang(): BelongsTo
     {
-        return $this->belongsTo(Divisi::class);
+        return $this->belongsTo(KantorCabang::class, 'kantor_cabang_id');
     }
 
     /**

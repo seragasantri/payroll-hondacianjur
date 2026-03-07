@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import employees from '@/routes/employees';
 import type { BreadcrumbItem } from '@/types';
-import type { Divisi, Jabatan } from '@/types';
+import type { KantorCabang, Jabatan } from '@/types';
 
 // Fungsi helper untuk format mata uang Rupiah dengan separator ribuan
 const formatRupiah = (value: string): string => {
@@ -37,15 +37,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function EmployeeCreate({ divisi, jabatan }: { divisi: Divisi[], jabatan: Jabatan[] }) {
+export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang: KantorCabang[], jabatan: Jabatan[] }) {
     const { data, setData, errors, post, processing } = useForm<{
         nip: string;
         nama: string;
         password: string;
         password_confirmation: string;
-        divisi_id: number | '';
+        kantor_cabang_id: number | '';
         jabatan_id: number | '';
+        nomor_rekening: string;
+        status_pegawai: string;
         tanggal_mulai_kerja: string;
+        ptkp: string;
         gaji_pokok: string;
         tunjangan_jabatan: string;
         potongan_tidak_masuk: string;
@@ -55,9 +58,12 @@ export default function EmployeeCreate({ divisi, jabatan }: { divisi: Divisi[], 
         nama: '',
         password: '',
         password_confirmation: '',
-        divisi_id: '',
+        kantor_cabang_id: '',
         jabatan_id: '',
+        nomor_rekening: '',
+        status_pegawai: '',
         tanggal_mulai_kerja: '',
+        ptkp: '',
         gaji_pokok: '0',
         tunjangan_jabatan: '0',
         potongan_tidak_masuk: '0',
@@ -178,26 +184,26 @@ export default function EmployeeCreate({ divisi, jabatan }: { divisi: Divisi[], 
 
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Divisi */}
+                                    {/* KantorCabang */}
                                     <div>
-                                        <label htmlFor="divisi_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Divisi <span className="text-red-500">*</span>
+                                        <label htmlFor="kantor_cabang_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            KantorCabang <span className="text-red-500">*</span>
                                         </label>
                                         <select
-                                            id="divisi_id"
-                                            value={data.divisi_id}
-                                            onChange={e => setData('divisi_id', e.target.value ? Number(e.target.value) : '')}
+                                            id="kantor_cabang_id"
+                                            value={data.kantor_cabang_id}
+                                            onChange={e => setData('kantor_cabang_id', e.target.value ? Number(e.target.value) : '')}
                                             className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
                                         >
-                                            <option value="">Pilih Divisi</option>
-                                            {divisi.map((d) => (
+                                            <option value="">Pilih KantorCabang</option>
+                                            {kantorCabang.map((d) => (
                                                 <option key={d.id} value={d.id}>
                                                     {d.name}
                                                 </option>
                                             ))}
                                         </select>
-                                        {errors.divisi_id && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.divisi_id}</p>
+                                        {errors.kantor_cabang_id && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.kantor_cabang_id}</p>
                                         )}
                                     </div>
 
@@ -225,21 +231,91 @@ export default function EmployeeCreate({ divisi, jabatan }: { divisi: Divisi[], 
                                     </div>
                                 </div>
 
-                                {/* Tanggal Mulai Kerja */}
-                                <div>
-                                    <label htmlFor="tanggal_mulai_kerja" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Tanggal Mulai Kerja <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        id="tanggal_mulai_kerja"
-                                        type="date"
-                                        value={data.tanggal_mulai_kerja}
-                                        onChange={e => setData('tanggal_mulai_kerja', e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                    />
-                                    {errors.tanggal_mulai_kerja && (
-                                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.tanggal_mulai_kerja}</p>
-                                    )}
+                                {/* Nomor Rekening dan Status Pegawai */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Nomor Rekening */}
+                                    <div>
+                                        <label htmlFor="nomor_rekening" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Nomor Rekening
+                                        </label>
+                                        <input
+                                            id="nomor_rekening"
+                                            type="text"
+                                            value={data.nomor_rekening}
+                                            onChange={e => setData('nomor_rekening', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            placeholder="Contoh: 1234567890"
+                                        />
+                                        {errors.nomor_rekening && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.nomor_rekening}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Status Pegawai */}
+                                    <div>
+                                        <label htmlFor="status_pegawai" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Status Pegawai
+                                        </label>
+                                        <select
+                                            id="status_pegawai"
+                                            value={data.status_pegawai}
+                                            onChange={e => setData('status_pegawai', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                        >
+                                            <option value="">Pilih Status</option>
+                                            <option value="Pegawai Tetap">Pegawai Tetap</option>
+                                            <option value="Pegawai Kontrak">Pegawai Kontrak</option>
+                                        </select>
+                                        {errors.status_pegawai && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.status_pegawai}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Tanggal Mulai Kerja dan PTKP */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Tanggal Mulai Kerja */}
+                                    <div>
+                                        <label htmlFor="tanggal_mulai_kerja" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Tanggal Mulai Kerja <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            id="tanggal_mulai_kerja"
+                                            type="date"
+                                            value={data.tanggal_mulai_kerja}
+                                            onChange={e => setData('tanggal_mulai_kerja', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                        />
+                                        {errors.tanggal_mulai_kerja && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.tanggal_mulai_kerja}</p>
+                                        )}
+                                    </div>
+
+                                    {/* PTKP */}
+                                    <div>
+                                        <label htmlFor="ptkp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Status PTKP
+                                        </label>
+                                        <select
+                                            id="ptkp"
+                                            value={data.ptkp}
+                                            onChange={e => setData('ptkp', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                        >
+                                            <option value="">Pilih PTKP</option>
+                                            <option value="TK/0">TK/0 - Tidak Kawin Tanpa Tanggungan</option>
+                                            <option value="TK/1">TK/1 - Tidak Kawin 1 Tanggungan</option>
+                                            <option value="TK/2">TK/2 - Tidak Kawin 2 Tanggungan</option>
+                                            <option value="TK/3">TK/3 - Tidak Kawin 3 Tanggungan</option>
+                                            <option value="K/0">K/0 - Kawin Tanpa Tanggungan</option>
+                                            <option value="K/1">K/1 - Kawin 1 Tanggungan</option>
+                                            <option value="K/2">K/2 - Kawin 2 Tanggungan</option>
+                                            <option value="K/3">K/3 - Kawin 3 Tanggungan</option>
+                                        </select>
+                                        {errors.ptkp && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.ptkp}</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

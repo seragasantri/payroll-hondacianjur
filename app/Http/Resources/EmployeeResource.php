@@ -19,9 +19,12 @@ class EmployeeResource extends JsonResource
             'user_id' => $this->user_id,
             'nip' => $this->nip,
             'nama' => $this->nama,
-            'divisi_id' => $this->divisi_id,
+            'kantor_cabang_id' => $this->kantor_cabang_id,
             'jabatan_id' => $this->jabatan_id,
+            'nomor_rekening' => $this->nomor_rekening,
+            'status_pegawai' => $this->status_pegawai,
             'tanggal_mulai_kerja' => $this->tanggal_mulai_kerja,
+            'ptkp' => $this->ptkp,
             'gaji_pokok' => (float) $this->gaji_pokok,
             'tunjangan_jabatan' => (float) $this->tunjangan_jabatan,
             'potongan_tidak_masuk' => (float) $this->potongan_tidak_masuk,
@@ -38,10 +41,10 @@ class EmployeeResource extends JsonResource
                 'username' => $this->user->username,
                 'email' => $this->user->email,
             ]),
-            // Include divisi data
-            'divisi' => $this->whenLoaded('divisi', fn() => [
-                'id' => $this->divisi->id,
-                'name' => $this->divisi->name,
+            // Include KantorCabang data
+            'kantorCabang' => $this->whenLoaded('kantorCabang', fn() => [
+                'id' => $this->kantorCabang->id,
+                'name' => $this->kantorCabang->name,
             ]),
             // Include jabatan data
             'jabatan' => $this->whenLoaded('jabatan', fn() => [

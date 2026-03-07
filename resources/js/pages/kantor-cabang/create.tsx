@@ -3,17 +3,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
-
-interface Divisi {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface PageProps {
-    divisi: Divisi;
-}
+import { index } from '@/routes/kantor-cabang';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,62 +11,62 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard(),
     },
     {
-        title: 'Divisi',
-        href: '#'
+        title: 'KantorCabang',
+        href: index().url
     },
     {
-        title: 'Edit Divisi',
+        title: 'Tambah KantorCabang',
         href: '#'
     }
 ];
 
-export default function DivisiEdit({ divisi }: PageProps) {
-    const { data, setData, errors, put, processing } = useForm<{
+export default function KantorCabangCreate() {
+    const { data, setData, errors, post, processing } = useForm<{
         name: string;
     }>({
-        name: divisi.name || '',
+        name: '',
     });
 
-    const divisiIndex = () => ({
-        url: '/divisi',
+    const kantorCabangIndex = () => ({
+        url: '/kantor-cabang',
     });
 
-    const divisiUpdate = () => ({
-        url: `/divisi/${divisi.id}`,
+    const kantorCabangStore = () => ({
+        url: '/kantor-cabang',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(divisiUpdate().url);
+        post(kantorCabangStore().url);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit Divisi" />
+            <Head title="Tambah KantorCabang" />
 
             <div className="max-w-2xl mx-auto p-6">
                 {/* Header */}
                 <div className="mb-6">
                     <Link
-                        href={divisiIndex().url}
+                        href={kantorCabangIndex().url}
                         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors mb-4"
                     >
                         <ArrowLeft className="size-5" />
                         <span>Kembali</span>
                     </Link>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300">
-                        Edit Divisi
+                        Tambah KantorCabang Baru
                     </h1>
-                    <p className="text-muted-foreground mt-2">Edit informasi divisi di bawah ini</p>
+                    <p className="text-muted-foreground mt-2">Isi form di bawah untuk menambahkan data kantorCabang</p>
                 </div>
 
                 {/* Form Card */}
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                        {/* Nama Divisi */}
+                        {/* Nama KantorCabang */}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nama Divisi <span className="text-red-500">*</span>
+                                Nama KantorCabang <span className="text-red-500">*</span>
                             </label>
                             <input
                                 id="name"
@@ -100,7 +90,7 @@ export default function DivisiEdit({ divisi }: PageProps) {
                                 <div className="text-sm text-blue-800 dark:text-blue-300">
                                     <p className="font-medium mb-1">Informasi:</p>
                                     <ul className="space-y-1 text-xs">
-                                        <li>• Nama divisi harus unik</li>
+                                        <li>• Nama kantorCabang harus unik</li>
                                         <li>• Gunakan nama yang mudah dipahami</li>
                                         <li>• Contoh: IT, HRD, Keuangan, Operasional</li>
                                     </ul>
@@ -111,7 +101,7 @@ export default function DivisiEdit({ divisi }: PageProps) {
                         {/* Action Buttons */}
                         <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-800">
                             <Link
-                                href={divisiIndex().url}
+                                href={kantorCabangIndex().url}
                                 className="px-6 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors"
                             >
                                 Batal
@@ -131,7 +121,7 @@ export default function DivisiEdit({ divisi }: PageProps) {
                                         <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span>Update Divisi</span>
+                                        <span>Simpan KantorCabang</span>
                                     </>
                                 )}
                             </button>

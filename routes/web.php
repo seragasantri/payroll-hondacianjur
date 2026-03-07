@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\KantorCabangController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\PayrollController;
@@ -17,7 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
     Route::resource('users', UserController::class);
     Route::resource('employees', EmployeeController::class);
-    Route::resource('divisi', DivisiController::class);
+    Route::resource('kantor-cabang', KantorCabangController::class);
     Route::resource('jabatan', JabatanController::class);
     Route::resource('tunjangan', TunjanganController::class);
 
@@ -26,10 +26,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('payroll/create', [PayrollController::class, 'create'])->name('payroll.create');
     Route::post('payroll', [PayrollController::class, 'store'])->name('payroll.store');
     Route::get('payroll/{bulan}/detail', [PayrollController::class, 'show'])->name('payroll.show');
+    Route::get('payroll/{bulan}/export', [PayrollController::class, 'export'])->name('payroll.export');
     Route::get('payroll/{bulan}/edit', [PayrollController::class, 'edit'])->name('payroll.edit');
     Route::put('payroll/{bulan}', [PayrollController::class, 'update'])->name('payroll.update');
     Route::delete('payroll/{bulan}', [PayrollController::class, 'destroy'])->name('payroll.destroy');
     Route::post('payroll/publish', [PayrollController::class, 'publish'])->name('payroll.publish');
+    Route::get('payroll/check', [PayrollController::class, 'check'])->name('payroll.check');
 
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);

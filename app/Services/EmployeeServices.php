@@ -21,7 +21,7 @@ class EmployeeServices
      */
     public function getAll()
     {
-        return $this->model->with(['user', 'divisi', 'jabatan'])->newQuery();
+        return $this->model->with(['user', 'kantorCabang', 'jabatan'])->newQuery();
     }
 
     /**
@@ -29,7 +29,7 @@ class EmployeeServices
      */
     public function findId($id)
     {
-        return $this->model->with(['user', 'divisi', 'jabatan'])->findOrFail($id);
+        return $this->model->with(['user', 'kantorCabang', 'jabatan'])->findOrFail($id);
     }
 
     /**
@@ -55,9 +55,12 @@ class EmployeeServices
                 'user_id' => $user->id,
                 'nip' => $data['nip'],
                 'nama' => $data['nama'],
-                'divisi_id' => $data['divisi_id'],
+                'kantor_cabang_id' => $data['kantor_cabang_id'],
                 'jabatan_id' => $data['jabatan_id'],
+                'nomor_rekening' => $data['nomor_rekening'] ?? null,
+                'status_pegawai' => $data['status_pegawai'] ?? null,
                 'tanggal_mulai_kerja' => $data['tanggal_mulai_kerja'],
+                'ptkp' => $data['ptkp'] ?? null,
                 'gaji_pokok' => $data['gaji_pokok'],
                 'tunjangan_jabatan' => $data['tunjangan_jabatan'],
                 'potongan_tidak_masuk' => $data['potongan_tidak_masuk'],
@@ -86,9 +89,12 @@ class EmployeeServices
             $employeeData = [
                 'nip' => $data['nip'] ?? $employee->nip,
                 'nama' => $data['nama'] ?? $employee->nama,
-                'divisi_id' => $data['divisi_id'] ?? $employee->divisi_id,
+                'kantor_cabang_id' => $data['kantor_cabang_id'] ?? $employee->kantor_cabang_id,
                 'jabatan_id' => $data['jabatan_id'] ?? $employee->jabatan_id,
+                'nomor_rekening' => $data['nomor_rekening'] ?? $employee->nomor_rekening,
+                'status_pegawai' => $data['status_pegawai'] ?? $employee->status_pegawai,
                 'tanggal_mulai_kerja' => $data['tanggal_mulai_kerja'] ?? $employee->tanggal_mulai_kerja,
+                'ptkp' => $data['ptkp'] ?? $employee->ptkp,
                 'gaji_pokok' => $data['gaji_pokok'] ?? $employee->gaji_pokok,
                 'tunjangan_jabatan' => $data['tunjangan_jabatan'] ?? $employee->tunjangan_jabatan,
                 'potongan_tidak_masuk' => $data['potongan_tidak_masuk'] ?? $employee->potongan_tidak_masuk,
