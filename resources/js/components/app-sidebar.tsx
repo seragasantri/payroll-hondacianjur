@@ -31,6 +31,10 @@ export function AppSidebar() {
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
 
+    // Check if user has users role
+    const userRoles = auth.user?.roles || [];
+    const isKaryawan = userRoles.includes('users');
+
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
@@ -39,7 +43,16 @@ export function AppSidebar() {
             show: true
         }
     ];
-    const masterDataNavItems: NavItem[] = [
+
+    // If user is users (karyawan), show limited menu
+    const masterDataNavItems: NavItem[] = isKaryawan ? [
+        {
+            title: 'Payroll',
+            href: payroll.index().url,
+            icon: Wallet,
+            show: true
+        },
+    ] : [
         {
             title: 'Karyawan',
             href: employees.index().url,
@@ -72,7 +85,8 @@ export function AppSidebar() {
         },
     ];
 
-    const settingNavItems: NavItem[] = [
+    // Hide settings for users (karyawan)
+    const settingNavItems: NavItem[] = isKaryawan ? [] : [
         {
             title: 'Users',
             href: users.index().url,
@@ -91,8 +105,8 @@ export function AppSidebar() {
             icon: KeyRoundIcon,
             show: isSuperAdmin || can('permissions.view any') || can('permissions.view')
         },
+    ];
 
-    ]
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -110,8 +124,8 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} />
 
-                <NavMasterData items={masterDataNavItems} />
-                <NavManajemenUsers items={settingNavItems} />
+                {masterDataNavItems.length > 0 && <NavMasterData items={masterDataNavItems} />}
+                {settingNavItems.length > 0 && <NavManajemenUsers items={settingNavItems} />}
             </SidebarContent>
 
             <SidebarFooter>

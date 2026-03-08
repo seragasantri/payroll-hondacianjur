@@ -7,11 +7,15 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Employee;
 use App\Models\Bpjs;
+use App\Models\Payrolls;
+use App\Models\Tunjangan;
 use App\Policies\UserPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\BpjsPolicy;
+use App\Policies\PayrollPolicy;
+use App\Policies\TunjanganPolicy;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -27,7 +31,8 @@ class AuthServiceProvider extends ServiceProvider
         Role::class => RolePolicy::class,
         Permission::class => PermissionPolicy::class,
         Employee::class => EmployeePolicy::class,
-        Bpjs::class => BpjsPolicy::class,
+        Tunjangan::class => TunjanganPolicy::class,
+        Payrolls::class => PayrollPolicy::class
     ];
 
     /**

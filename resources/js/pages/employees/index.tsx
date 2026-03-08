@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowBigLeftIcon, ArrowBigRight, Pencil, PlusCircle, Trash2, Loader2, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react';
+import { ArrowBigLeftIcon, ArrowBigRight, Pencil, PlusCircle, Trash2, Loader2, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown, Eye, FileSpreadsheet, FileText } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useDebounceSearch } from '@/hooks/use-debounce-search';
 import { useCan } from '@/hooks/useCan';
@@ -227,225 +227,246 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                 {/* Table Card */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
 
-                    {/* Show Data Per Page */}
-                    <div className="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Tampilkan:
-                            </label>
-                            <select
-                                value={currentPerPage}
-                                onChange={(e) => handlePerPageChange(e.target.value)}
-                                className="border-2 border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900"
+                    <div className="flex justify-between">
+
+                        {/* Show Data Per Page */}
+                        <div className="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Tampilkan:
+                                </label>
+                                <select
+                                    value={currentPerPage}
+                                    onChange={(e) => handlePerPageChange(e.target.value)}
+                                    className="border-2 border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900"
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">data per halaman</span>
+                            </div>
+                        </div>
+
+                        {/* tombol export */}
+                        <div className="flex justify-center items-center gap-2 px-4">
+                            <button
+                                onClick={() => window.open('/employees/export/pdf', '_blank')}
+                                className='inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-2 px-4 shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95'
                             >
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">data per halaman</span>
+                                <FileText className='size-4' />
+                                <span>Export PDF</span>
+                            </button>
+                            <button
+                                onClick={() => window.open('/employees/export/excel', '_blank')}
+                                className='inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-4 shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95'
+                            >
+                                <FileSpreadsheet className='size-4' />
+                                <span>Export Excel</span>
+                            </button>
                         </div>
                     </div>
 
                     <div className="overflow-x-auto">
-                    <table className='w-full min-w-[1800px]'>
-                        <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
-                            <tr>
-                                <th className='rounded-tl-2xl px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
-                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>
-                                    <button
-                                        onClick={() => handleSort('nama')}
-                                        className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
-                                    >
-                                        Nama
-                                        <span className='ml-1'>{getSortIcon('nama')}</span>
-                                    </button>
-                                </th>
-                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>
-                                    <button
-                                        onClick={() => handleSort('nip')}
-                                        className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
-                                    >
-                                        NIP
-                                        <span className='ml-1'>{getSortIcon('nip')}</span>
-                                    </button>
-                                </th>
-                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>
-                                    <button
-                                        onClick={() => handleSort('kantorCabang')}
-                                        className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
-                                    >
-                                        KantorCabang
-                                        <span className='ml-1'>{getSortIcon('kantorCabang')}</span>
-                                    </button>
-                                </th>
-                                <th className='px-4 py-4 text-left text-sm font-bold text-white'>
-                                    <button
-                                        onClick={() => handleSort('jabatan')}
-                                        className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
-                                    >
-                                        Jabatan
-                                        <span className='ml-1'>{getSortIcon('jabatan')}</span>
-                                    </button>
-                                </th>
-                                <th className='rounded-tr-2xl px-4 py-4 text-center text-sm font-bold text-white w-28'>Aksi</th>
-                            </tr>
-                        </thead>
-
-                        {/* Search Row */}
-                        <thead className='bg-orange-50 dark:bg-gray-800/50'>
-                            <tr>
-                                <th className='px-4 py-4'></th>
-                                <th className='px-4 py-4'>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
-                                            value={getSearchValue('searchNama')}
-                                            onChange={(e) => debouncedSearch('searchNama', e.target.value, index().url)}
-                                            placeholder='Cari nama...'
-                                        />
-                                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-orange-400">
-                                            <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className='px-4 py-4'>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
-                                            placeholder='Cari NIP...'
-                                            value={getSearchValue('searchNIP')}
-                                            onChange={(e) => debouncedSearch('searchNIP', e.target.value, index().url)}
-                                        />
-                                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-orange-400">
-                                            <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className='px-4 py-4'>
-                                    <select
-                                        value={getSearchValue('searchKantorCabang')}
-                                        onChange={(e) => debouncedSearch('searchKantorCabang', e.target.value, index().url)}
-                                        className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
-                                    >
-                                        <option value="">Semua KantorCabang</option>
-                                        {kantorCabang.map((d) => (
-                                            <option key={d.id} value={d.name}>
-                                                {d.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </th>
-                                <th className='px-4 py-4'>
-                                    <select
-                                        value={getSearchValue('searchJabatan')}
-                                        onChange={(e) => debouncedSearch('searchJabatan', e.target.value, index().url)}
-                                        className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
-                                    >
-                                        <option value="">Semua Jabatan</option>
-                                        {jabatan.map((j) => (
-                                            <option key={j.id} value={j.name}>
-                                                {j.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </th>
-                                <th className='px-4 py-4'>
-                                    {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
+                        <table className='w-full min-w-[600px]'>
+                            <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
+                                <tr>
+                                    <th className='rounded-tl-2xl w-16 px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
+                                    <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
-                                            onClick={handleResetSearch}
-                                            className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
-                                            title="Reset pencarian"
+                                            onClick={() => handleSort('nama')}
+                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
                                         >
-                                            <RotateCcw className='size-4' />
-                                            <span>Reset</span>
+                                            Nama
+                                            <span className='ml-1'>{getSortIcon('nama')}</span>
                                         </button>
-                                    )}
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
-                            {isSearching ? (
-                                <tr>
-                                    <td colSpan={6} className="px-4 py-12 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-3">
-                                            <div className="relative">
-                                                <div className="size-12 rounded-full border-4 border-orange-200 dark:border-gray-700"></div>
-                                                <Loader2 className="absolute top-0 left-0 size-12 animate-spin text-orange-500 dark:text-orange-400" />
-                                            </div>
-                                            <span className="text-muted-foreground font-medium">Mencari data...</span>
-                                        </div>
-                                    </td>
+                                    </th>
+                                    <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
+                                        <button
+                                            onClick={() => handleSort('nip')}
+                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                        >
+                                            NIP
+                                            <span className='ml-1'>{getSortIcon('nip')}</span>
+                                        </button>
+                                    </th>
+                                    <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
+                                        <button
+                                            onClick={() => handleSort('kantorCabang')}
+                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                        >
+                                            KantorCabang
+                                            <span className='ml-1'>{getSortIcon('kantorCabang')}</span>
+                                        </button>
+                                    </th>
+                                    <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
+                                        <button
+                                            onClick={() => handleSort('jabatan')}
+                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                        >
+                                            Jabatan
+                                            <span className='ml-1'>{getSortIcon('jabatan')}</span>
+                                        </button>
+                                    </th>
+                                    <th className='rounded-tr-2xl px-4 py-4 text-center text-sm font-bold text-white w-28'>Aksi</th>
                                 </tr>
-                            ) : !employees?.data || employees.data.length === 0 ? (
+                            </thead>
+
+                            {/* Search Row */}
+                            <thead className='bg-orange-50 dark:bg-gray-800/50'>
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-12 text-center">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
-                                                <svg className="size-8 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <th className='px-4 py-4'></th>
+                                    <th className='px-4 py-4'>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                                value={getSearchValue('searchNama')}
+                                                onChange={(e) => debouncedSearch('searchNama', e.target.value, index().url)}
+                                                placeholder='Cari nama...'
+                                            />
+                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-orange-400">
+                                                <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                 </svg>
                                             </div>
-                                            <p className="text-muted-foreground font-medium">Data tidak ditemukan</p>
-                                            <p className="text-sm text-muted-foreground">Coba kata kunci pencarian lain</p>
                                         </div>
-                                    </td>
+                                    </th>
+                                    <th className='px-4 py-4'>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                                placeholder='Cari NIP...'
+                                                value={getSearchValue('searchNIP')}
+                                                onChange={(e) => debouncedSearch('searchNIP', e.target.value, index().url)}
+                                            />
+                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-orange-400">
+                                                <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th className='px-4 py-4'>
+                                        <select
+                                            value={getSearchValue('searchKantorCabang')}
+                                            onChange={(e) => debouncedSearch('searchKantorCabang', e.target.value, index().url)}
+                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                        >
+                                            <option value="">Semua KantorCabang</option>
+                                            {kantorCabang.map((d) => (
+                                                <option key={d.id} value={d.name}>
+                                                    {d.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </th>
+                                    <th className='px-4 py-4'>
+                                        <select
+                                            value={getSearchValue('searchJabatan')}
+                                            onChange={(e) => debouncedSearch('searchJabatan', e.target.value, index().url)}
+                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                        >
+                                            <option value="">Semua Jabatan</option>
+                                            {jabatan.map((j) => (
+                                                <option key={j.id} value={j.name}>
+                                                    {j.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </th>
+                                    <th className='px-4 py-4'>
+                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
+                                            <button
+                                                onClick={handleResetSearch}
+                                                className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
+                                                title="Reset pencarian"
+                                            >
+                                                <RotateCcw className='size-4' />
+                                                <span>Reset</span>
+                                            </button>
+                                        )}
+                                    </th>
                                 </tr>
-                            ) : (
-                                employees.data.map((employee, index) => (
-                                    <tr key={employee.id} className="hover:bg-orange-50/50 dark:hover:bg-gray-800/50 transition-colors">
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="inline-flex items-center justify-center size-7 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 text-orange-600 dark:text-orange-400 font-bold text-xs">
-                                                {index + 1}
-                                            </span>
+                            </thead>
+
+                            <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
+                                {isSearching ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-4 py-12 text-center">
+                                            <div className="flex flex-col items-center justify-center gap-3">
+                                                <div className="relative">
+                                                    <div className="size-12 rounded-full border-4 border-orange-200 dark:border-gray-700"></div>
+                                                    <Loader2 className="absolute top-0 left-0 size-12 animate-spin text-orange-500 dark:text-orange-400" />
+                                                </div>
+                                                <span className="text-muted-foreground font-medium">Mencari data...</span>
+                                            </div>
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
+                                    </tr>
+                                ) : !employees?.data || employees.data.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-4 py-12 text-center">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
+                                                    <svg className="size-8 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <p className="text-muted-foreground font-medium">Data tidak ditemukan</p>
+                                                <p className="text-sm text-muted-foreground">Coba kata kunci pencarian lain</p>
+                                            </div>
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <code className="rounded bg-orange-100 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
-                                                {employee.nip}
-                                            </code>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                                                {employee.kantorCabang?.name}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
-                                                {employee.jabatan?.name}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center justify-center gap-1.5">
-                                                <button
-                                                    onClick={() => setSelectedEmployee(employee)}
-                                                    className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
-                                                    title="Detail"
-                                                >
-                                                    <Eye className="size-3" />
-                                                </button>
-                                                {(hasActionAccess && (isSuperAdmin || can('employees.edit'))) && (
-                                                    <Link
-                                                        href={edit(employee.id).url}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
-                                                        title="Edit"
-                                                    >
-                                                        <Pencil className="size-3" />
-                                                    </Link>
-                                                )}
-                                                {(hasActionAccess && (isSuperAdmin || can('employees.delete'))) && (
+                                    </tr>
+                                ) : (
+                                    employees.data.map((employee, index) => (
+                                        <tr key={employee.id} className="hover:bg-orange-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <td className="px-4 py-3 text-center">
+                                                <span className="inline-flex items-center justify-center size-7 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 text-orange-600 dark:text-orange-400 font-bold text-xs">
+                                                    {index + 1}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <code className="rounded bg-orange-100 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
+                                                    {employee.nip}
+                                                </code>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                                    {employee.kantorCabang?.name}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
+                                                    {employee.jabatan?.name}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center justify-center gap-1.5">
                                                     <button
-                                                        onClick={() => handleDelete(employee.id, employee.nama)}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
+                                                        onClick={() => setSelectedEmployee(employee)}
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                                                        title="Detail"
+                                                    >
+                                                        <Eye className="size-3" />
+                                                    </button>
+                                                    {(hasActionAccess && (isSuperAdmin || can('employees.edit'))) && (
+                                                        <Link
+                                                            href={edit(employee.id).url}
+                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
+                                                            title="Edit"
+                                                        >
+                                                            <Pencil className="size-3" />
+                                                        </Link>
+                                                    )}
+                                                    {(hasActionAccess && (isSuperAdmin || can('employees.delete'))) && (
+                                                        <button
+                                                            onClick={() => handleDelete(employee.id, employee.nama)}
+                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="size-3" />
@@ -453,11 +474,11 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                                     )}
                                                 </div>
                                             </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
 
                     {/* Pagination */}

@@ -69,7 +69,10 @@ const formatRupiah = (value: number) => {
 };
 
 const formatBulan = (bulan: string) => {
-    const [year, month] = bulan.split('-');
+    if (!bulan) return '-';
+    const parts = bulan.split('-');
+    if (parts.length !== 2) return bulan;
+    const [year, month] = parts;
     const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     return `${monthNames[parseInt(month) - 1]} ${year}`;
 };

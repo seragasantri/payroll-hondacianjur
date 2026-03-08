@@ -12,12 +12,12 @@ class PayrollPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('payroll.view any') || $user->is_super_admin;
+        return $user->hasPermissionTo('payroll.view any') || $user->is_super_admin || $user->hasRole('users');
     }
 
     public function view(User $user, Payrolls $payroll): bool
     {
-        return $user->hasPermissionTo('payroll.view') || $user->is_super_admin;
+        return $user->hasPermissionTo('payroll.view') || $user->is_super_admin || $user->hasRole('users');
     }
 
     public function create(User $user): bool

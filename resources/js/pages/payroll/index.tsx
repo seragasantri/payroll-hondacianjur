@@ -43,7 +43,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function PayrollIndex({ payrollSummary }: { payrollSummary: PayrollList }) {
+export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { payrollSummary: PayrollList; isKaryawan?: boolean }) {
     const can = useCan();
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
@@ -247,12 +247,12 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
-                            Manajemen Payroll
+                            {isKaryawan ? 'Payroll Saya' : 'Manajemen Payroll'}
                         </h1>
-                        <p className="text-muted-foreground text-sm mt-1">Kelola data payroll karyawan per bulan</p>
+                        <p className="text-muted-foreground text-sm mt-1">{isKaryawan ? 'Riwayat gaji Anda' : 'Kelola data payroll karyawan per bulan'}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        {(isSuperAdmin || can('payroll.create')) && (
+                        {(isSuperAdmin || can('payroll.create')) && !isKaryawan && (
                             <button
                                 onClick={handleCreate}
                                 className='inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-orange-500/30 dark:shadow-orange-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-105 active:scale-95'
@@ -266,7 +266,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
 
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
                     <div className="overflow-x-auto">
-                    <table className='w-full min-w-[800px]'>
+                    <table className='w-full min-w-[600px]'>
                         <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
                             <tr>
                                 <th className='rounded-tl-2xl px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
@@ -290,8 +290,8 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                             <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
                                                 <FileText className="size-8 text-orange-500 dark:text-orange-400" />
                                             </div>
-                                            <p className="text-muted-foreground font-medium">Belum ada payroll</p>
-                                            <p className="text-sm text-muted-foreground">Klik "Buat Payroll" untuk memulai</p>
+                                            <p className="text-muted-foreground font-medium">{isKaryawan ? 'Belum ada riwayat gaji' : 'Belum ada payroll'}</p>
+                                            <p className="text-sm text-muted-foreground">{isKaryawan ? 'Gaji akan muncul di sini setelah di publish' : 'Klik "Buat Payroll" untuk memulai'}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -334,7 +334,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                                     <Eye className="size-3" />
                                                     <span>Detail</span>
                                                 </button>
-                                                {(isSuperAdmin || can('payroll.update')) && item.status === 'draft' && (
+                                                {(isSuperAdmin || can('payroll.update')) && item.status === 'draft' && !isKaryawan && (
                                                     <button
                                                         onClick={() => handleEdit(item.bulan, item.status_pegawai)}
                                                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
@@ -343,7 +343,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                                         <span>Edit</span>
                                                     </button>
                                                 )}
-                                                {(isSuperAdmin || can('payroll.publish')) && item.status === 'draft' && (
+                                                {(isSuperAdmin || can('payroll.publish')) && item.status === 'draft' && !isKaryawan && (
                                                     <button
                                                         onClick={() => handlePublish(item.bulan, item.status_pegawai)}
                                                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
@@ -361,7 +361,7 @@ export default function PayrollIndex({ payrollSummary }: { payrollSummary: Payro
                                                         <span>Export</span>
                                                     </button>
                                                 )}
-                                                {(isSuperAdmin || can('payroll.delete')) && item.status === 'draft' && (
+                                                {(isSuperAdmin || can('payroll.delete')) && item.status === 'draft' && !isKaryawan && (
                                                     <button
                                                         onClick={() => handleDelete(item.bulan, item.status_pegawai)}
                                                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"

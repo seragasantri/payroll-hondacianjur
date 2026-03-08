@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PayrollStoreRequest;
 use App\Http\Requests\PayrollUpdateRequest;
 use App\Http\Resources\PayrollResource;
+use App\Models\Employee;
 use App\Models\Payrolls;
 use App\Models\PayrollDetail;
 use App\Services\PayrollServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PayrollController extends Controller
@@ -26,8 +28,53 @@ class PayrollController extends Controller
      */
     public function index(Request $request)
     {
-        Gate::authorize('viewAny', Payrolls::class);
+        $user = Auth::user();
 
+        // Manual authorization check
+        $roleNames = $user->getRoleNames()->toArray();
+        $hasAccess = $user->hasPermissionTo('payroll.view any')
+            || in_array('Super Admin', $roleNames)
+            || in_array('users', $roleNames);
+
+        if (!$hasAccess) {
+            abort(403, 'Unauthorized');
+        }
+
+        $isUsersRole = in_array('users', $roleNames);
+
+        // If user has 'users' role, only show their own payroll data
+        if ($isUsersRole) {
+            // Get employee data associated with this user
+            $employee = Employee::where('user_id', $user->id)->first();
+
+            if (!$employee) {
+                return Inertia::render('payroll/index', [
+                    'payrollSummary' => [
+                        'data' => [],
+                        'links' => [],
+                        'meta' => []
+                    ]
+                ]);
+            }
+
+            // Get published payrolls that contain this employee's data
+            $payrollSummary = Payrolls::select('id', 'bulan', 'status_pegawai', 'status')
+                ->where('status', 'published')
+                ->whereHas('details', function ($query) use ($employee) {
+                    $query->where('employee_id', $employee->id);
+                })
+                ->withCount('details')
+                ->orderBy('bulan', 'desc')
+                ->orderBy('status_pegawai', 'asc')
+                ->paginate(12);
+
+            return Inertia::render('payroll/index', [
+                'payrollSummary' => $payrollSummary,
+                'isKaryawan' => true
+            ]);
+        }
+
+        // Admin/Super Admin sees all payrolls
         $payrollSummary = Payrolls::select('id', 'bulan', 'status_pegawai', 'status')
             ->withCount('details')
             ->orderBy('bulan', 'desc')
@@ -35,7 +82,8 @@ class PayrollController extends Controller
             ->paginate(12);
 
         return Inertia::render('payroll/index', [
-            'payrollSummary' => $payrollSummary
+            'payrollSummary' => $payrollSummary,
+            'isKaryawan' => false
         ]);
     }
 
@@ -98,7 +146,7 @@ class PayrollController extends Controller
                 'tunjangan_jabatan' => $tunjanganJabatan,
                 'potongan_tidak_masuk' => (float) $employee->potongan_tidak_masuk,
                 'potongan_terlambat' => (float) $employee->potongan_terlambat,
-                'tunjangan' => $tunjanganList->map(function($tunjangan) use ($existingTunjangan, $employee) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
                     $tunjanganId = (string) $tunjangan->id;
 
                     // Check if existing value in payroll
@@ -290,7 +338,18 @@ class PayrollController extends Controller
      */
     public function show($bulan, Request $request)
     {
-        Gate::authorize('viewAny', Payrolls::class);
+        $user = Auth::user();
+        $isUsersRole = $user->hasRole('users');
+
+        // For users role, check if they have permission
+        if ($isUsersRole) {
+            $roleNames = $user->getRoleNames()->toArray();
+            if (!in_array('users', $roleNames) && !in_array('Super Admin', $roleNames)) {
+                abort(403, 'Unauthorized');
+            }
+        } else {
+            Gate::authorize('viewAny', Payrolls::class);
+        }
 
         $status = $request->get('status');
 
@@ -304,6 +363,78 @@ class PayrollController extends Controller
         if (!$payrollHeader) {
             return redirect()->route('payroll.index')
                 ->with('error', 'Payroll tidak ditemukan!');
+        }
+
+        // For users role, only show their own data
+        if ($isUsersRole) {
+            $employee = Employee::where('user_id', $user->id)->first();
+            if (!$employee) {
+                return redirect()->route('payroll.index')
+                    ->with('error', 'Data karyawan tidak ditemukan!');
+            }
+
+            // Get only this employee's payroll detail
+            $payrollDetail = PayrollDetail::where('payroll_id', $payrollHeader->id)
+                ->where('employee_id', $employee->id)
+                ->with(['employee', 'employee.kantorCabang', 'employee.jabatan'])
+                ->first();
+
+            $tunjanganList = \App\Models\Tunjangan::orderBy('jenis_tunjangan', 'asc')->get();
+
+            $existingTunjangan = [];
+            if ($payrollDetail && $payrollDetail->tunjangan_lain) {
+                $existingTunjangan = json_decode($payrollDetail->tunjangan_lain, true) ?? [];
+            }
+
+            $employeeData = $employee->toArray();
+            $employeeData['kantorCabang'] = $employee->kantorCabang?->name;
+            $employeeData['jabatan'] = $employee->jabatan?->name;
+            $employeeData['payroll'] = $payrollDetail ? [
+                'id' => $payrollDetail->id,
+                'hari_kerja' => (int) $payrollDetail->hari_kerja,
+                'hari_masuk' => (int) $payrollDetail->hari_masuk,
+                'jam_terlambat' => (int) $payrollDetail->jam_terlambat,
+                'insentif' => (float) $payrollDetail->insentif,
+                'uang_hadir' => (float) $payrollDetail->uang_hadir,
+                'lembur' => (float) $payrollDetail->lembur,
+                'reward' => (float) $payrollDetail->reward,
+                'lain_lain' => (float) $payrollDetail->lain_lain,
+                'tunjangan_lain' => $payrollDetail->tunjangan_lain,
+                'potongan_tidak_masuk' => (float) $payrollDetail->potongan_tidak_masuk,
+                'potongan_terlambat' => (float) $payrollDetail->potongan_terlambat,
+                'potongan_lain' => (float) $payrollDetail->potongan_lain,
+                'total_gaji' => (float) $payrollDetail->total_gaji,
+                'total_potongan' => (float) $payrollDetail->total_potongan,
+                'gaji_bersih' => (float) $payrollDetail->gaji_bersih,
+                'status' => $payrollHeader->status,
+            ] : null;
+            $employeeData['tunjangan'] = $tunjanganList->map(function($tunjangan) use ($existingTunjangan, $employee) {
+                $tunjanganId = (string) $tunjangan->id;
+                if (isset($existingTunjangan[$tunjanganId])) {
+                    $nilaiPerusahaan = $existingTunjangan[$tunjanganId]['perusahaan'] ?? 0;
+                    $nilaiKaryawan = $existingTunjangan[$tunjanganId]['karyawan'] ?? 0;
+                } else {
+                    $nilaiPerusahaan = $tunjangan->perusahaan > 0
+                        ? round($tunjangan->perusahaan / 100 * $employee->gaji_pokok)
+                        : 0;
+                    $nilaiKaryawan = $tunjangan->karyawan > 0
+                        ? round($tunjangan->karyawan / 100 * $employee->gaji_pokok)
+                        : 0;
+                }
+                return [
+                    'id' => $tunjangan->id,
+                    'jenis' => $tunjangan->jenis_tunjangan,
+                    'perusahaan' => (float) $nilaiPerusahaan,
+                    'karyawan' => (float) $nilaiKaryawan,
+                ];
+            });
+
+            return Inertia::render('payroll/detail', [
+                'bulan' => $payrollHeader->bulan,
+                'status_pegawai' => $payrollHeader->status_pegawai,
+                'status' => $payrollHeader->status,
+                'employees' => [$employeeData],
+            ]);
         }
 
         // Get employees based on status filter
@@ -320,7 +451,7 @@ class PayrollController extends Controller
 
         $tunjanganList = \App\Models\Tunjangan::orderBy('jenis_tunjangan', 'asc')->get();
 
-        $employeesWithPayroll = $employees->map(function ($employee) use ($payrollDetails, $bulan, $tunjanganList) {
+        $employeesWithPayroll = $employees->map(function ($employee) use ($payrollDetails, $bulan, $tunjanganList, $payrollHeader) {
             $existing = $payrollDetails->get($employee->id);
 
             $existingTunjangan = [];
@@ -342,7 +473,7 @@ class PayrollController extends Controller
                 'tunjangan_jabatan' => $tunjanganJabatan,
                 'potongan_tidak_masuk' => (float) $employee->potongan_tidak_masuk,
                 'potongan_terlambat' => (float) $employee->potongan_terlambat,
-                'tunjangan' => $tunjanganList->map(function($tunjangan) use ($existingTunjangan, $employee) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
                     $tunjanganId = (string) $tunjangan->id;
 
                     if (isset($existingTunjangan[$tunjanganId])) {
@@ -381,6 +512,7 @@ class PayrollController extends Controller
                     'total_gaji' => (float) $existing->total_gaji,
                     'total_potongan' => (float) $existing->total_potongan,
                     'gaji_bersih' => (float) $existing->gaji_bersih,
+                    'status' => $payrollHeader->status,
                 ] : null
             ];
         });
@@ -399,7 +531,18 @@ class PayrollController extends Controller
      */
     public function export($bulan, Request $request)
     {
-        Gate::authorize('viewAny', Payrolls::class);
+        $user = Auth::user();
+        $isUsersRole = $user->hasRole('users');
+
+        // Manual authorization check
+        $roleNames = $user->getRoleNames()->toArray();
+        $hasAccess = $user->hasPermissionTo('payroll.view any')
+            || in_array('Super Admin', $roleNames)
+            || in_array('users', $roleNames);
+
+        if (!$hasAccess) {
+            abort(403, 'Unauthorized');
+        }
 
         $status = $request->get('status');
 
@@ -416,9 +559,20 @@ class PayrollController extends Controller
         }
 
         // Get payroll details
-        $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
-            ->with(['employee', 'employee.kantorCabang', 'employee.jabatan'])
-            ->get();
+        $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
+            ->with(['employee', 'employee.kantorCabang', 'employee.jabatan']);
+
+        // If user has 'users' role, only export their own data
+        if ($isUsersRole) {
+            $employee = Employee::where('user_id', $user->id)->first();
+            if (!$employee) {
+                return redirect()->route('payroll.index')
+                    ->with('error', 'Data karyawan tidak ditemukan!');
+            }
+            $payrollDetailsQuery->where('employee_id', $employee->id);
+        }
+
+        $payrollDetails = $payrollDetailsQuery->get();
 
         // Generate Excel-like CSV data
         $filename = 'payroll_' . $bulan . '_' . str_replace(' ', '_', $status) . '.csv';

@@ -9,7 +9,7 @@ export type User = {
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
-    roles?: Role[];
+    roles?: string[]; // Array of role names from backend
     can: Record<string, boolean>;
     is_super_admin?: boolean; // Whether user has Super Admin role
 };
