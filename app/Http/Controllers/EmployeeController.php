@@ -214,7 +214,7 @@ class EmployeeController extends Controller
         $sheet->getStyle('A1:O1')->applyFromArray($headerStyle);
 
         // Headers
-        $headers = ['No', 'NIP', 'Nama', 'Kantor Cabanga', 'Jabatan', 'Status Pegawai', 'Tanggal Mulai Kerja', 'No. Rekening', 'PTKP', 'Gaji Pokok', 'Tunjangan Jabatan', 'Total Gaji', 'Potongan Tidak Masuk', 'Potongan Terlambat', 'Total Potongan'];
+        $headers = ['No', 'NIP', 'Nama', 'Cabang', 'Jabatan', 'Status Pegawai', 'Tanggal Mulai Kerja', 'No. Rekening', 'PTKP', 'Gaji Pokok', 'Tunjangan Jabatan', 'Total Gaji', 'Potongan Tidak Masuk', 'Potongan Terlambat', 'Total Potongan'];
         $column = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($column . '1', $header);
@@ -294,7 +294,7 @@ class EmployeeController extends Controller
         $employees = $query->with(['kantorCabang', 'jabatan'])->get();
 
         // Format number Indonesian style
-        $formatRupiah = function($value) {
+        $formatRupiah = function ($value) {
             return number_format($value, 0, ',', '.');
         };
 

@@ -71,6 +71,15 @@ export default function Dashboard(props: DashboardProps) {
         return `${monthNames[parseInt(month) - 1]} ${year}`;
     };
 
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
     // Dashboard for Karyawan
     if (userRole === 'karyawan') {
         return (
@@ -116,12 +125,12 @@ export default function Dashboard(props: DashboardProps) {
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.jabatan || '-'}</p>
                                         </div>
                                         <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Kantor Cabanga</p>
+                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Cabang</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.kantor_cabang || '-'}</p>
                                         </div>
                                         <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
                                             <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Tanggal Mulai Kerja</p>
-                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.tanggal_mulai_kerja}</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{formatDate(employee.tanggal_mulai_kerja)}</p>
                                         </div>
                                         <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
                                             <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Status Pegawai</p>
@@ -220,7 +229,7 @@ export default function Dashboard(props: DashboardProps) {
                     <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
                         <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-white font-semibold">Kantor Cabanga</h3>
+                                <h3 className="text-white font-semibold">Cabang</h3>
                                 <Building2 className="size-6 text-white/80" />
                             </div>
                         </div>
@@ -249,7 +258,7 @@ export default function Dashboard(props: DashboardProps) {
                     <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800 px-6 py-4">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2">
                             <Building2 className="size-5" />
-                            Kantor Cabanga & Jumlah Karyawan
+                            Cabang & Jumlah Karyawan
                         </h2>
                     </div>
                     <div className="p-6">
@@ -272,7 +281,7 @@ export default function Dashboard(props: DashboardProps) {
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-gray-500 col-span-full text-center py-4">Belum ada kantor cabang</p>
+                                <p className="text-gray-500 col-span-full text-center py-4">Belum ada cabang</p>
                             )}
                         </div>
                     </div>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Slip Gaji - ${employee.nama}</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            @media print {
+                body {
+                    padding: 0;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="">
+            <div style="display: block">
+                <img src="/assets/images/logo_2.png" alt="Logo" />
+                <br />
+                <b>PUSAKA MOTOR UTAMA</b><br />
+                <b>SLIP GAJI</b><br />
+                <b>PERIODE </b>
+            </div>
+        </div>
+
+        <div class="info">
+            <div style="display: flex">
+                <!-- kiri -->
+                <table style="width: max-content; margin-right: 20px">
+                    <tr style="justify-content: space-between">
+                        <th class="text-left">NAMA</th>
+                        <th>:</th>
+                        <th class="text-left">${employee.nama || '-'}</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <th class="text-left">NIP</th>
+                        <th>:</th>
+                        <th class="text-left">${employee.nama || '-'}</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <th class="text-left">TANGGAL MASUK KERJA</th>
+                        <th>:</th>
+                        <th class="text-left">${employee.nama || '-'}</th>
+                    </tr>
+                </table>
+                <!-- kanan -->
+                <table style="width: max-content">
+                    <tr style="justify-content: space-between">
+                        <th class="text-left">NAMA</th>
+                        <th>:</th>
+                        <th class="text-left">${employee.nama || '-'}</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <th class="text-left">NIP</th>
+                        <th>:</th>
+                        <th class="text-left">${employee.nama || '-'}</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <th class="text-left">TANGGAL MASUK KERJA</th>
+                        <th>:</th>
+                        <th class="text-left">${employee.nama || '-'}</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="info" style="margin-top: 30px">
+            <div style="display: flex">
+                <!-- kiri -->
+                <table style="width: max-content; margin-right: 20px">
+                    <tr>
+                        <th>PENDAPATAN</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">GAJI POKOK</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">TUNAJANGAN JABATAN</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">INSENTIF BULANAN</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">UANG HADIR</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">LEMBUAR</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">REWARD</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">REWARD</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr>
+                        <th>TUNJANGAN PERUSAHAAN</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        INI UNTUK SEMUA TUNJANGAN PERUSAHAAN
+                        <td class="text-left"></td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                </table>
+                <!-- kanan -->
+                <table style="width: max-content">
+                    <tr>
+                        <th>POTONGAN</th>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">
+                            TIDAK MASUK KERJA ( ini dari payroll yang berapa
+                            hari dia tidak masuk)
+                        </td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">
+                            TERLAMBAT ABSEN ( ini dari payroll yang berapa menit
+                            dia terlambat)
+                        </td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr style="justify-content: space-between">
+                        INI UNTUK SEMUA TUNJANGAN KARYAWAN
+                        <td class="text-left"></td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="info" style="margin-top: 30px">
+            <div style="display: flex">
+                <table style="width: max-content">
+                    <tr style="justify-content: space-between">
+                        <td class="text-left">GAJI DITERIMA</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        SEBELAH KANAN INI ADA YANE MENERIMA DAN DIBAWHNYA NAMA PENERIMA
+
+        <!-- <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script> -->
+    </body>
+</html>

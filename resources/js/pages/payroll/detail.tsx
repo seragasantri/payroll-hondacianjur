@@ -18,6 +18,10 @@ interface PayrollData {
     hari_masuk: number;
     jam_terlambat: number;
     insentif: number;
+    uang_hadir: number;
+    lembur: number;
+    reward: number;
+    lain_lain: number;
     tunjangan_lain: string;
     potongan_tidak_masuk: number;
     potongan_terlambat: number;
@@ -38,6 +42,7 @@ interface Employee {
     tunjangan_jabatan: number;
     potongan_tidak_masuk: number;
     potongan_terlambat: number;
+    tanggal_mulai_kerja: string;
     tunjangan: Tunjangan[];
     payroll: PayrollData | null;
 }
@@ -66,6 +71,14 @@ const formatRupiah = (value: number) => {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
     }).format(value || 0);
+};
+const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
 };
 
 const formatBulan = (bulan: string) => {
@@ -123,145 +136,219 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
         });
 
         const html = `
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <title>Slip Gaji - ${employee.nama}</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 24px; }
-        .header p { margin: 5px 0; color: #666; }
-        .info { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .info-box { width: 48%; }
-        .info-box h3 { background: #f0f0f0; padding: 8px; margin: 0 0 10px 0; font-size: 14px; }
-        .info-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f5f5f5; }
-        .text-right { text-align: right; }
-        .total-section { background: #f9f9f9; padding: 15px; border-radius: 5px; }
-        .total-row { display: flex; justify-content: space-between; padding: 5px 0; }
-        .total-final { font-size: 18px; font-weight: bold; color: #2563eb; border-top: 2px solid #333; padding-top: 10px; margin-top: 10px; }
-        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
-        @media print { body { padding: 0; } }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>SLIP GAJI</h1>
-        <p>PT. Contoh Perusahaan</p>
-        <p>Bulan: ${formatBulan(bulan)}</p>
-    </div>
-
-    <div class="info">
-        <div class="info-box">
-            <h3>Data Karyawan</h3>
-            <div class="info-row"><span>NIP:</span> <span>${employee.nip}</span></div>
-            <div class="info-row"><span>Nama:</span> <span>${employee.nama}</span></div>
-            <div class="info-row"><span>KantorCabang:</span> <span>${employee.kantorCabang || '-'}</span></div>
-            <div class="info-row"><span>Jabatan:</span> <span>${employee.jabatan || '-'}</span></div>
+    <head>
+        <title>Slip Gaji - ${employee.nama}</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            .row { display: flex; }
+            .col-left { width: 50%; padding-right: 20px; }
+            .col-right { width: 50%; padding-left: 20px; }
+            table { border-collapse: collapse; width: 100%; }
+            td, th { padding: 3px 5px; }
+            .text-left { text-align: left; }
+            .text-right { text-align: right; }
+            .bold { font-weight: bold; }
+            .border-top { border-top: 1px solid #000; }
+            }
+            @page {
+                size: portrait;
+                margin: 10mm;
+            }
+            @media print {
+                body { padding: 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin-bottom: 20px;">
+            <div style="display: block">
+                <img src="/assets/images/logo_2.png" width="250" alt="Logo" />
+                <br />
+                <b>PUSAKA MOTOR UTAMA</b><br />
+                <b>SLIP GAJI</b><br />
+                <b>PERIODE </b>${formatBulan(bulan)}
+            </div>
         </div>
-        <div class="info-box">
-            <h3>Kehadiran</h3>
-            <div class="info-row"><span>Hari Kerja:</span> <span>${employee.payroll?.hari_kerja || 0} hari</span></div>
-            <div class="info-row"><span>Hari Masuk:</span> <span>${employee.payroll?.hari_masuk || 0} hari</span></div>
-            <div class="info-row"><span>Jam Terlambat:</span> <span>${employee.payroll?.jam_terlambat || 0} jam</span></div>
-            <div class="info-row"><span>Status:</span> <span>${employee.payroll?.status || 'draft'}</span></div>
+
+        <div class="row" style="margin-bottom: 20px;">
+            <div class="col-left">
+                <table style="width: 100%">
+                    <tr>
+                        <td class="text-left">NAMA</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nama || '-'}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">NIP</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.nip || '-'}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">JABATAN</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.jabatan || '-'}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">KANTOR</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.kantorCabang || '-'}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-right">
+                <table style="width: 100%">
+                    <tr>
+                        <td class="text-left">TGL MASUK</td>
+                        <td>:</td>
+                        <td class="text-left">${formatDate(employee.tanggal_mulai_kerja)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">STATUS</td>
+                        <td>:</td>
+                        <td class="text-left">${status_pegawai || '-'}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">HARI KERJA</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.payroll?.hari_kerja || 22}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">HARI MASUK</td>
+                        <td>:</td>
+                        <td class="text-left">${employee.payroll?.hari_masuk || 0}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th colspan="2">PENGHASILAN</th>
-                <th class="text-right">NOMINAL</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td colspan="2">Gaji Pokok</td>
-                <td class="text-right">${formatCurrency(employee.gaji_pokok)}</td>
-            </tr>
-            <tr>
-                <td colspan="2">Tunjangan Jabatan</td>
-                <td class="text-right">${formatCurrency(employee.tunjangan_jabatan)}</td>
-            </tr>
-            ${employee.payroll?.insentif ? `
-            <tr>
-                <td colspan="2">Insentif</td>
-                <td class="text-right">${formatCurrency(employee.payroll.insentif)}</td>
-            </tr>
-            ` : ''}
-            ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0).map((t: Tunjangan) => `
-            <tr>
-                <td colspan="2">${t.jenis}</td>
-                <td class="text-right">${formatCurrency(t.perusahaan)}</td>
-            </tr>
-            `).join('')}
-        </tbody>
-    </table>
-
-    <table>
-        <thead>
-            <tr>
-                <th colspan="2">POTONGAN</th>
-                <th class="text-right">NOMINAL</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${employee.payroll?.potongan_tidak_masuk ? `
-            <tr>
-                <td colspan="2">Potongan Tidak Masuk</td>
-                <td class="text-right">${formatCurrency(employee.payroll.potongan_tidak_masuk)}</td>
-            </tr>
-            ` : ''}
-            ${employee.payroll?.potongan_terlambat ? `
-            <tr>
-                <td colspan="2">Potongan Terlambat</td>
-                <td class="text-right">${formatCurrency(employee.payroll.potongan_terlambat)}</td>
-            </tr>
-            ` : ''}
-            ${tunjanganList.filter((t: Tunjangan) => t.karyawan > 0).map((t: Tunjangan) => `
-            <tr>
-                <td colspan="2">${t.jenis} (Potongan)</td>
-                <td class="text-right">${formatCurrency(t.karyawan)}</td>
-            </tr>
-            `).join('')}
-            ${employee.payroll?.potongan_lain ? `
-            <tr>
-                <td colspan="2">Potongan Lain</td>
-                <td class="text-right">${formatCurrency(employee.payroll.potongan_lain)}</td>
-            </tr>
-            ` : ''}
-        </tbody>
-    </table>
-
-    <div class="total-section">
-        <div class="total-row">
-            <span>Total Gaji:</span>
-            <span>${formatCurrency(employee.payroll?.total_gaji || 0)}</span>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-left">
+                <table style="width: 100%">
+                    <tr>
+                        <th class="text-left" colspan="3">PENDAPATAN</th>
+                    </tr>
+                    <tr>
+                        <td class="text-left">GAJI POKOK</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.gaji_pokok)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">TUNJANGAN JABATAN</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.tunjangan_jabatan)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">INSENTIF BULANAN</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.insentif || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">UANG HADIR</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.uang_hadir || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">LEMBUR</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.lembur || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">REWARD</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.reward || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">LAIN-LAIN</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.lain_lain || 0)}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-left" colspan="3">TUNJANGAN PERUSAHAAN</th>
+                    </tr>
+                    ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0).map((t: Tunjangan) => `
+                    <tr>
+                        <td class="text-left">${t.jenis}</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(t.perusahaan)}</td>
+                    </tr>
+                    `).join('')}
+                </table>
+            </div>
+            <div class="col-right">
+                <table style="width: 100%">
+                    <tr>
+                        <th class="text-left" colspan="3">POTONGAN</th>
+                    </tr>
+                    <tr>
+                        <td class="text-left">TIDAK MASUK (${employee.payroll?.hari_kerja - employee.payroll?.hari_masuk || 0} hari)</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.potongan_tidak_masuk || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">TERLAMBAT (${employee.payroll?.jam_terlambat || 0} jam)</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.potongan_terlambat || 0)}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-left" colspan="3">TUNJANGAN KARYAWAN</th>
+                    </tr>
+                    ${tunjanganList.filter((t: Tunjangan) => t.karyawan > 0).map((t: Tunjangan) => `
+                    <tr>
+                        <td class="text-left">${t.jenis}</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(t.karyawan)}</td>
+                    </tr>
+                    `).join('')}
+                    ${employee.payroll?.potongan_lain ? `
+                    <tr>
+                        <td class="text-left">POTONGAN LAIN</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll.potongan_lain)}</td>
+                    </tr>
+                    ` : ''}
+                </table>
+            </div>
         </div>
-        <div class="total-row">
-            <span>Total Potongan:</span>
-            <span>${formatCurrency(employee.payroll?.total_potongan || 0)}</span>
-        </div>
-        <div class="total-row total-final">
-            <span>GAJI BERSIH:</span>
-            <span>${formatCurrency(employee.payroll?.gaji_bersih || 0)}</span>
-        </div>
-    </div>
 
-    <div class="footer">
-        <p>Dicetak pada: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-    </div>
+        <div style="margin-top: 30px;">
+            <table style="width: 100%;">
+                <tr>
+                    <td class="text-left bold">TOTAL PENDAPATAN</td>
+                    <td>:</td>
+                    <td class="text-right">${formatCurrency(employee.payroll?.total_gaji || 0)}</td>
+                </tr>
+                <tr>
+                    <td class="text-left bold">TOTAL POTONGAN</td>
+                    <td>:</td>
+                    <td class="text-right">${formatCurrency(employee.payroll?.total_potongan || 0)}</td>
+                </tr>
+                <tr class="border-top">
+                    <td class="text-left bold">GAJI DITERIMA</td>
+                    <td>:</td>
+                    <td class="text-right bold">${formatCurrency(employee.payroll?.gaji_bersih || 0)}</td>
+                </tr>
+            </table>
+        </div>
 
-    <script>
+        <div style="margin-top: 40px; text-align: right;">
+            <p>Diterima oleh,</p>
+            <br /><br /><br />
+            <p>${employee.nama}</p>
+        </div>
+
+        <script>
         window.onload = function() {
             window.print();
         }
     </script>
-</body>
+    </body>
 </html>
         `;
 
@@ -332,7 +419,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                 <tr>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>Karyawan</th>
-                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Kantor Cabang</th>
+                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Kantor Cabbang</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>Jabatan</th>
                                     <th className='px-4 py-4 text-right text-sm font-bold text-white'>Gaji Pokok</th>
                                     <th className='px-4 py-4 text-right text-sm font-bold text-white'>Total Gaji</th>
