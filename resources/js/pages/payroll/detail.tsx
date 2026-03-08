@@ -332,7 +332,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                 <tr>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>Karyawan</th>
-                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Divisi</th>
+                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Kantor Cabang</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>Jabatan</th>
                                     <th className='px-4 py-4 text-right text-sm font-bold text-white'>Gaji Pokok</th>
                                     <th className='px-4 py-4 text-right text-sm font-bold text-white'>Total Gaji</th>
