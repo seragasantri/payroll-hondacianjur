@@ -60,7 +60,7 @@ export function AppSidebar() {
             show: isSuperAdmin || can('employees.view any') || can('employees.view')
         },
         {
-            title: 'Kantor Cab',
+            title: 'Cabang',
             href: KantorCabang.index().url,
             icon: Folder,
             show: isSuperAdmin || can('kantor-cabang.view any') || can('kantor-cabang.view')

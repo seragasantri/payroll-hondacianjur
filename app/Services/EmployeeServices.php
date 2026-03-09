@@ -39,12 +39,15 @@ class EmployeeServices
     {
         DB::beginTransaction();
         try {
+            // Use NIP as default password if not provided
+            $password = !empty($data['password']) ? $data['password'] : $data['nip'];
+
             // Create user account first
             $user = User::create([
                 'name' => $data['nama'],
                 'username' => $data['nip'],
                 'email' => $data['nip'] . '@employee.local', // Generate email from NIP
-                'password' => Hash::make($data['password']),
+                'password' => Hash::make($password),
             ]);
 
             // Assign default role (optional)

@@ -297,7 +297,7 @@ export default function PayrollCreate({
                     </Link>
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300">
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300">
                                 Payroll {formatBulan(bulan)}
                             </h1>
                             <div className="flex items-center gap-3 mt-2">
@@ -313,7 +313,7 @@ export default function PayrollCreate({
                             <button
                                 onClick={() => handleSubmit(false)}
                                 disabled={saving}
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium shadow-lg shadow-orange-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium shadow-lg shadow-blue-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
                             >
                                 {saving ? <Loader2 className="size-5 animate-spin" /> : <Save className="size-5" />}
                                 <span>Simpan Draft</span>
@@ -333,7 +333,7 @@ export default function PayrollCreate({
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
                     <div className="overflow-x-auto">
                         <table className='w-full'>
-                            <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
+                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                 <tr>
                                     <th className='px-2 py-3 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
                                     <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[180px]' rowSpan={2}>Nama</th>
@@ -353,7 +353,7 @@ export default function PayrollCreate({
                                 </tr>
                                 <tr>
                                     {tunjanganCols.map((t: TunjanganList) => (
-                                        <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-orange-400 dark:bg-orange-600 min-w-[80px]'>
+                                        <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-blue-400 dark:bg-blue-600 min-w-[80px]'>
                                             {t.jenis_tunjangan}
                                         </th>
                                     ))}
@@ -370,9 +370,9 @@ export default function PayrollCreate({
                                     const empGajiBersih = getGajiBersih(employee.id);
 
                                     return (
-                                        <tr key={employee.id} className="hover:bg-orange-50/50 dark:hover:bg-gray-800/50">
+                                        <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
                                             <td className="px-2 py-3 text-center">
-                                                <span className="inline-flex items-center justify-center size-6 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-bold text-xs">
+                                                <span className="inline-flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
                                                     {index + 1}
                                                 </span>
                                             </td>
@@ -396,7 +396,7 @@ export default function PayrollCreate({
                                                             }
                                                         });
                                                     }}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-orange-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -432,7 +432,7 @@ export default function PayrollCreate({
                                                             }
                                                         });
                                                     }}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-orange-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -547,7 +547,7 @@ export default function PayrollCreate({
                                                             hari_tidak_masuk: parseInt(e.target.value) || 0
                                                         }
                                                     })}
-                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-orange-500"
+                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                 />
                                                 <div className="text-xs text-red-500">
                                                     {formatCurrency(getPotonganTidakMasuk(employee.id))}
@@ -565,7 +565,7 @@ export default function PayrollCreate({
                                                             jam_terlambat: parseInt(e.target.value) || 0
                                                         }
                                                     })}
-                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-orange-500"
+                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                 />
                                                 <div className="text-xs text-red-500">
                                                     {formatCurrency(getPotonganTerlambat(employee.id))}
@@ -585,7 +585,7 @@ export default function PayrollCreate({
                                                             }
                                                         });
                                                     }}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-orange-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                     placeholder="0"
                                                 />
                                             </td>

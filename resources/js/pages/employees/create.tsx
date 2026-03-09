@@ -64,11 +64,21 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
         status_pegawai: '',
         tanggal_mulai_kerja: '',
         ptkp: '',
-        gaji_pokok: '0',
-        tunjangan_jabatan: '0',
-        potongan_tidak_masuk: '0',
-        potongan_terlambat: '0',
+        gaji_pokok: '',
+        tunjangan_jabatan: '',
+        potongan_tidak_masuk: '',
+        potongan_terlambat: '',
     });
+
+    const handleNipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const nip = e.target.value;
+        setData('nip', nip);
+        // Auto-fill password with NIP if password is empty
+        if (!data.password && nip) {
+            setData('password', nip);
+            setData('password_confirmation', nip);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -89,7 +99,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                         <ArrowLeft className="size-5" />
                         <span>Kembali</span>
                     </Link>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300">
                         Tambah Karyawan Baru
                     </h1>
                     <p className="text-muted-foreground mt-2">Isi form di bawah untuk menambahkan data karyawan</p>
@@ -101,7 +111,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                         {/* Section: Informasi Pribadi */}
                         <div>
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white font-bold text-sm">1</span>
+                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-sm">1</span>
                                 Informasi Pribadi
                             </h2>
 
@@ -116,8 +126,8 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="nip"
                                             type="text"
                                             value={data.nip}
-                                            onChange={e => setData('nip', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            onChange={handleNipChange}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                             placeholder="Contoh: 12345678"
                                         />
                                         {errors.nip && (
@@ -135,7 +145,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             type="text"
                                             value={data.nama}
                                             onChange={e => setData('nama', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                             placeholder="Contoh: John Doe"
                                         />
                                         {errors.nama && (
@@ -144,40 +154,34 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                     </div>
                                 </div>
 
-                                {/* Password */}
+                                {/* Password - Auto-filled from NIP */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Password <span className="text-red-500">*</span>
+                                            Password
                                         </label>
                                         <input
                                             id="password"
-                                            type="password"
+                                            type="hidden"
                                             value={data.password}
-                                            onChange={e => setData('password', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="Minimal 8 karakter"
                                         />
-                                        {errors.password && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
-                                        )}
+                                        <div className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                                            Password akan otomatis menggunakan NIP
+                                        </div>
                                     </div>
 
                                     <div>
                                         <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Konfirmasi Password <span className="text-red-500">*</span>
+                                            Konfirmasi Password
                                         </label>
                                         <input
                                             id="password_confirmation"
-                                            type="password"
+                                            type="hidden"
                                             value={data.password_confirmation}
-                                            onChange={e => setData('password_confirmation', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="Ulangi password"
                                         />
-                                        {errors.password_confirmation && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.password_confirmation}</p>
-                                        )}
+                                        <div className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                                            Konfirmasi password akan otomatis menggunakan NIP
+                                        </div>
                                     </div>
                                 </div>
 
@@ -193,7 +197,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="kantor_cabang_id"
                                             value={data.kantor_cabang_id}
                                             onChange={e => setData('kantor_cabang_id', e.target.value ? Number(e.target.value) : '')}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         >
                                             <option value="">Pilih KantorCabang</option>
                                             {kantorCabang.map((d) => (
@@ -216,7 +220,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="jabatan_id"
                                             value={data.jabatan_id}
                                             onChange={e => setData('jabatan_id', e.target.value ? Number(e.target.value) : '')}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         >
                                             <option value="">Pilih Jabatan</option>
                                             {jabatan.map((j) => (
@@ -243,7 +247,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             type="text"
                                             value={data.nomor_rekening}
                                             onChange={e => setData('nomor_rekening', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                             placeholder="Contoh: 1234567890"
                                         />
                                         {errors.nomor_rekening && (
@@ -260,7 +264,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="status_pegawai"
                                             value={data.status_pegawai}
                                             onChange={e => setData('status_pegawai', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         >
                                             <option value="">Pilih Status</option>
                                             <option value="Pegawai Tetap">Pegawai Tetap</option>
@@ -284,7 +288,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             type="date"
                                             value={data.tanggal_mulai_kerja}
                                             onChange={e => setData('tanggal_mulai_kerja', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         />
                                         {errors.tanggal_mulai_kerja && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.tanggal_mulai_kerja}</p>
@@ -300,7 +304,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="ptkp"
                                             value={data.ptkp}
                                             onChange={e => setData('ptkp', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         >
                                             <option value="">Pilih PTKP</option>
                                             <option value="TK/0">TK/0 - Tidak Kawin Tanpa Tanggungan</option>
@@ -339,9 +343,21 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="gaji_pokok"
                                             type="text"
                                             value={formatRupiah(data.gaji_pokok)}
-                                            onChange={e => setData('gaji_pokok', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="0"
+                                            onChange={e => {
+                                                let val = parseRupiah(e.target.value);
+                                                // Jika user mulai ketik dan nilai sebelumnya 0/habiskan leading zero
+                                                if (data.gaji_pokok === '0' || data.gaji_pokok === '') {
+                                                    val = val.replace(/^0+/, '');
+                                                }
+                                                setData('gaji_pokok', val || '');
+                                            }}
+                                            onFocus={() => {
+                                                // Jika fokus dan nilainya '0', kosongkan
+                                                if (data.gaji_pokok === '0') {
+                                                    setData('gaji_pokok', '');
+                                                }
+                                            }}
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         />
                                     </div>
                                     {errors.gaji_pokok && (
@@ -360,9 +376,19 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="tunjangan_jabatan"
                                             type="text"
                                             value={formatRupiah(data.tunjangan_jabatan)}
-                                            onChange={e => setData('tunjangan_jabatan', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="0"
+                                            onChange={e => {
+                                                let val = parseRupiah(e.target.value);
+                                                if (data.tunjangan_jabatan === '0' || data.tunjangan_jabatan === '') {
+                                                    val = val.replace(/^0+/, '');
+                                                }
+                                                setData('tunjangan_jabatan', val || '');
+                                            }}
+                                            onFocus={() => {
+                                                if (data.tunjangan_jabatan === '0') {
+                                                    setData('tunjangan_jabatan', '');
+                                                }
+                                            }}
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         />
                                     </div>
                                     {errors.tunjangan_jabatan && (
@@ -381,9 +407,19 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="potongan_tidak_masuk"
                                             type="text"
                                             value={formatRupiah(data.potongan_tidak_masuk)}
-                                            onChange={e => setData('potongan_tidak_masuk', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
-                                            placeholder="0"
+                                            onChange={e => {
+                                                let val = parseRupiah(e.target.value);
+                                                if (data.potongan_tidak_masuk === '0' || data.potongan_tidak_masuk === '') {
+                                                    val = val.replace(/^0+/, '');
+                                                }
+                                                setData('potongan_tidak_masuk', val || '');
+                                            }}
+                                            onFocus={() => {
+                                                if (data.potongan_tidak_masuk === '0') {
+                                                    setData('potongan_tidak_masuk', '');
+                                                }
+                                            }}
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         />
                                     </div>
                                     {errors.potongan_tidak_masuk && (
@@ -402,8 +438,19 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                             id="potongan_terlambat"
                                             type="text"
                                             value={formatRupiah(data.potongan_terlambat)}
-                                            onChange={e => setData('potongan_terlambat', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                            onChange={e => {
+                                                let val = parseRupiah(e.target.value);
+                                                if (data.potongan_terlambat === '0' || data.potongan_terlambat === '') {
+                                                    val = val.replace(/^0+/, '');
+                                                }
+                                                setData('potongan_terlambat', val || '');
+                                            }}
+                                            onFocus={() => {
+                                                if (data.potongan_terlambat === '0') {
+                                                    setData('potongan_terlambat', '');
+                                                }
+                                            }}
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                             placeholder="0"
                                         />
                                     </div>
@@ -442,7 +489,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium shadow-lg shadow-orange-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium shadow-lg shadow-blue-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {processing ? (
                                     <>

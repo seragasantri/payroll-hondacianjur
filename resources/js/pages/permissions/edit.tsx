@@ -99,10 +99,10 @@ export default function PermissionEdit({ permission }: PermissionEditProps) {
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-amber-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-amber-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-amber-300'>
                             Edit Permission
                         </h1>
-                        <p className="text-muted-foreground text-sm mt-1">Ubah data permission: <span className="font-semibold text-orange-600 dark:text-orange-400">{permission.name}</span></p>
+                        <p className="text-muted-foreground text-sm mt-1">Ubah data permission: <span className="font-semibold text-blue-600 dark:text-blue-400">{permission.name}</span></p>
                     </div>
                     <Link
                         href={index().url}
@@ -114,11 +114,11 @@ export default function PermissionEdit({ permission }: PermissionEditProps) {
                 </div>
 
                 {/* Form Card */}
-                <div className="border-2 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-xl shadow-orange-100/50 dark:shadow-none max-w-4xl mx-auto">
+                <div className="border-2 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-xl shadow-blue-100/50 dark:shadow-none max-w-4xl mx-auto">
                     {/* Form Header */}
-                    <div className='bg-gradient-to-r from-orange-500 to-amber-500 dark:from-orange-700 dark:to-amber-800 px-6 py-4'>
+                    <div className='bg-gradient-to-r from-blue-500 to-amber-500 dark:from-blue-700 dark:to-amber-800 px-6 py-4'>
                         <h2 className='text-xl font-bold text-white'>Informasi Permission</h2>
-                        <p className='text-orange-50 text-sm'>Perbarui data permission di bawah ini</p>
+                        <p className='text-blue-50 text-sm'>Perbarui data permission di bawah ini</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
@@ -126,7 +126,7 @@ export default function PermissionEdit({ permission }: PermissionEditProps) {
                         {/* Nama Module - Custom Input */}
                         <div className="space-y-2">
                             <label htmlFor="moduleName" className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <div className="flex items-center justify-center size-6 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                                <div className="flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                                     <Layers className="size-3.5" />
                                 </div>
                                 Nama Module
@@ -137,7 +137,7 @@ export default function PermissionEdit({ permission }: PermissionEditProps) {
                                 type="text"
                                 value={moduleName}
                                 onChange={(e) => handleModuleChange(e.target.value)}
-                                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-800 transition-colors"
+                                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-800 transition-colors"
                                 placeholder="Contoh: Pembelian, Pembelian Baju, Penjualan"
                             />
                             {errors.module && (
@@ -225,7 +225,7 @@ export default function PermissionEdit({ permission }: PermissionEditProps) {
                                 type="text"
                                 value={data.guard_name}
                                 onChange={(e) => setData('guard_name', e.target.value)}
-                                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-800 transition-colors"
+                                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-800 transition-colors"
                                 placeholder="web"
                             />
                             {errors.guard_name && (
@@ -275,7 +275,7 @@ export default function PermissionEdit({ permission }: PermissionEditProps) {
                             <button
                                 type="submit"
                                 disabled={processing || !data.name}
-                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 dark:from-orange-600 dark:to-amber-500 dark:hover:from-orange-700 dark:hover:to-amber-600 disabled:from-orange-300 disabled:to-amber-400 text-white font-medium px-8 py-3 rounded-xl shadow-lg shadow-orange-500/30 dark:shadow-orange-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-105 active:scale-95"
+                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-amber-500 hover:from-blue-600 hover:to-amber-600 dark:from-blue-600 dark:to-amber-500 dark:hover:from-blue-700 dark:hover:to-amber-600 disabled:from-blue-300 disabled:to-amber-400 text-white font-medium px-8 py-3 rounded-xl shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95"
                             >
                                 <Save className="size-5" />
                                 {processing ? 'Menyimpan...' : 'Simpan Perubahan'}

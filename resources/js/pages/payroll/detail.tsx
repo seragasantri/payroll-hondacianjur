@@ -190,7 +190,23 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td>:</td>
                         <td class="text-left">${employee.nip || '-'}</td>
                     </tr>
+                     <tr>
+                        <td class="text-left">TGL MASUK</td>
+                        <td>:</td>
+                        <td class="text-left">${formatDate(employee.tanggal_mulai_kerja)}</td>
+                    </tr>
+                   
+                </table>
+            </div>
+            <div class="col-right">
+                <table style="width: 100%">
+                   
                     <tr>
+                        <td class="text-left">STATUS</td>
+                        <td>:</td>
+                        <td class="text-left">${status_pegawai || '-'}</td>
+                    </tr>
+                   <tr>
                         <td class="text-left">JABATAN</td>
                         <td>:</td>
                         <td class="text-left">${employee.jabatan || '-'}</td>
@@ -199,30 +215,6 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td class="text-left">KANTOR</td>
                         <td>:</td>
                         <td class="text-left">${employee.kantorCabang || '-'}</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-right">
-                <table style="width: 100%">
-                    <tr>
-                        <td class="text-left">TGL MASUK</td>
-                        <td>:</td>
-                        <td class="text-left">${formatDate(employee.tanggal_mulai_kerja)}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">STATUS</td>
-                        <td>:</td>
-                        <td class="text-left">${status_pegawai || '-'}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">HARI KERJA</td>
-                        <td>:</td>
-                        <td class="text-left">${employee.payroll?.hari_kerja || 22}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">HARI MASUK</td>
-                        <td>:</td>
-                        <td class="text-left">${employee.payroll?.hari_masuk || 0}</td>
                     </tr>
                 </table>
             </div>
@@ -269,16 +261,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td>:</td>
                         <td class="text-right">${formatCurrency(employee.payroll?.lain_lain || 0)}</td>
                     </tr>
-                    <tr>
-                        <th class="text-left" colspan="3">TUNJANGAN PERUSAHAAN</th>
-                    </tr>
-                    ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0).map((t: Tunjangan) => `
-                    <tr>
-                        <td class="text-left">${t.jenis}</td>
-                        <td>:</td>
-                        <td class="text-right">${formatCurrency(t.perusahaan)}</td>
-                    </tr>
-                    `).join('')}
+                   
                 </table>
             </div>
             <div class="col-right">
@@ -296,16 +279,6 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td>:</td>
                         <td class="text-right">${formatCurrency(employee.payroll?.potongan_terlambat || 0)}</td>
                     </tr>
-                    <tr>
-                        <th class="text-left" colspan="3">TUNJANGAN KARYAWAN</th>
-                    </tr>
-                    ${tunjanganList.filter((t: Tunjangan) => t.karyawan > 0).map((t: Tunjangan) => `
-                    <tr>
-                        <td class="text-left">${t.jenis}</td>
-                        <td>:</td>
-                        <td class="text-right">${formatCurrency(t.karyawan)}</td>
-                    </tr>
-                    `).join('')}
                     ${employee.payroll?.potongan_lain ? `
                     <tr>
                         <td class="text-left">POTONGAN LAIN</td>
@@ -313,6 +286,41 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td class="text-right">${formatCurrency(employee.payroll.potongan_lain)}</td>
                     </tr>
                     ` : ''}
+                </table>
+            </div>
+        </div>
+
+          <div class="row" style="margin-top: 20px;">
+
+            <div class="col-left">
+                <table style="width: 100%">
+                  
+                    <tr>
+                        <th class="text-left" colspan="3">TUNJANGAN PERUSAHAAN</th>
+                    </tr>
+                    ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0).map((t: Tunjangan) => `
+                    <tr>
+                        <td class="text-left">${t.jenis}</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(t.perusahaan)}</td>
+                    </tr>
+                    `).join('')}
+                </table>
+            </div>
+            <div class="col-right">
+                <table style="width: 100%">
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+
+                    ${tunjanganList.filter((t: Tunjangan) => t.karyawan > 0).map((t: Tunjangan) => `
+                    <tr>
+                        <td class="text-left">${t.jenis}</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(t.karyawan)}</td>
+                    </tr>
+                    `).join('')}
+
                 </table>
             </div>
         </div>
@@ -379,7 +387,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                             Kembali
                         </button>
                         <div>
-                            <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
+                            <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
                                 Payroll {formatBulan(bulan)}
                             </h1>
                             <div className="flex items-center gap-3 mt-1">
@@ -412,10 +420,10 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     )}
                 </div>
 
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
                     <div className="overflow-x-auto">
                         <table className='w-full min-w-[1000px]'>
-                            <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
+                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                 <tr>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>Karyawan</th>
@@ -447,8 +455,8 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                     <tr>
                                         <td colSpan={10} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
-                                                    <FileText className="size-8 text-orange-500 dark:text-orange-400" />
+                                                <div className="size-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                                                    <FileText className="size-8 text-blue-500 dark:text-blue-400" />
                                                 </div>
                                                 <p className="text-muted-foreground font-medium">Belum ada payroll untuk bulan ini</p>
                                             </div>
@@ -457,9 +465,9 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                 ) : (
                                     employeesWithPayroll.map((employee, index) => (
                                         <>
-                                            <tr key={employee.id} className="hover:bg-orange-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50 transition-colors">
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="inline-flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 text-orange-600 dark:text-orange-400 font-bold text-sm">
+                                                    <span className="inline-flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 font-bold text-sm">
                                                         {index + 1}
                                                     </span>
                                                 </td>
@@ -525,9 +533,9 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     </div>
 
                     {employeesWithPayroll.length > 0 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-orange-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-blue-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                Menampilkan <span className='font-bold text-orange-600 dark:text-orange-400'>{employeesWithPayroll.length}</span> karyawan dengan payroll
+                                Menampilkan <span className='font-bold text-blue-600 dark:text-blue-400'>{employeesWithPayroll.length}</span> karyawan dengan payroll
                             </div>
                         </div>
                     )}

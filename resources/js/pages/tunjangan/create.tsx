@@ -77,7 +77,7 @@ export default function TunjanganCreate() {
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
                             Tambah Tunjangan
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Form tambah data Tunjangan baru</p>
@@ -92,10 +92,10 @@ export default function TunjanganCreate() {
                 </div>
 
                 {/* Form Card */}
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800 px-6 py-4">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4">
                         <h2 className="text-xl font-bold text-white">Informasi Tunjangan</h2>
-                        <p className="text-orange-100 text-sm">Isi data Tunjangan dengan lengkap dan benar</p>
+                        <p className="text-blue-100 text-sm">Isi data Tunjangan dengan lengkap dan benar</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6">
@@ -110,7 +110,7 @@ export default function TunjanganCreate() {
                                     id="jenis_tunjangan"
                                     value={data.jenis_tunjangan}
                                     onChange={(e) => setData('jenis_tunjangan', e.target.value)}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors"
                                     placeholder="Contoh: Tunjangan Kesehatan"
                                 />
                                 {errors.jenis_tunjangan && (
@@ -131,7 +131,7 @@ export default function TunjanganCreate() {
                                     max="100"
                                     value={data.perusahaan}
                                     onChange={handlePerusahaanChange}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors"
                                     placeholder="0.00"
                                 />
                                 {errors.perusahaan && (
@@ -153,7 +153,7 @@ export default function TunjanganCreate() {
                                     max="100"
                                     value={data.karyawan}
                                     onChange={handleKaryawanChange}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors"
                                     placeholder="0.00"
                                 />
                                 {errors.karyawan && (
@@ -205,7 +205,7 @@ export default function TunjanganCreate() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className='inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
+                                className='inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
                             >
                                 {processing ? (
                                     <>

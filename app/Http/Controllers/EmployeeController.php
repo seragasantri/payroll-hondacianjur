@@ -207,7 +207,7 @@ class EmployeeController extends Controller
         // Set header styles
         $headerStyle = [
             'font' => ['bold' => true],
-            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'f97316']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '2777ff']],
             'font' => ['color' => ['rgb' => 'FFFFFF']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ];
@@ -308,19 +308,29 @@ class EmployeeController extends Controller
         body { font-family: Arial, sans-serif; font-size: 9px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 4px; text-align: left; font-size: 8px; }
-        th { background-color: #f97316; color: white; }
+        th { background-color: #2777ff; color: white; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        .header { text-align: center; margin-bottom: 15px; }
-        .header h1 { margin: 0; color: #f97316; font-size: 16px; }
-        .header p { margin: 3px 0; color: #666; font-size: 10px; }
+        .header { display: flex; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #2777ff; padding-bottom: 10px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-left img { height: 40px; }
+        .header-left h1 { margin: 0; color: #2777ff; font-size: 16px; }
+        .header-left p { margin: 2px 0; color: #666; font-size: 10px; }
+        .header-right { margin-left: auto; text-align: right; }
+        .header-right p { margin: 2px 0; color: #666; font-size: 10px; }
         .text-right { text-align: right; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Daftar Karyawan</h1>
-        <p>Tanggal: ' . date('d-m-Y') . '</p>
-        <p>Total Karyawan: ' . count($employees) . '</p>
+        <div class="header-left">
+            <img src="data:image/png;base64,' . base64_encode(file_get_contents(public_path('assets/images/logo_2.png'))) . '" alt="Logo" />
+        </div>
+        <div class="header-right">
+            <h1>PUSAKA MOTOR UTAMA</h1>
+            <p>Daftar Karyawan</p>
+            <p>Tanggal: ' . date('d-m-Y') . '</p>
+            <p>Total Karyawan: ' . count($employees) . '</p>
+        </div>
     </div>
     <table>
         <thead>
@@ -328,7 +338,7 @@ class EmployeeController extends Controller
                 <th style="width: 20px; text-align: center;">No</th>
                 <th style="width: 60px;">NIP</th>
                 <th>Nama</th>
-                <th>Kantor Cabanga</th>
+                <th>Cabang</th>
                 <th>Jabatan</th>
                 <th style="width: 50px;">Status</th>
                 <th style="width: 60px;">Tgl Mulai</th>

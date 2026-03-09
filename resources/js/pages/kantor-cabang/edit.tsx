@@ -21,11 +21,11 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard(),
     },
     {
-        title: 'KantorCabang',
+        title: 'Cabang',
         href: '#'
     },
     {
-        title: 'Edit KantorCabang',
+        title: 'Edit Cabang',
         href: '#'
     }
 ];
@@ -52,7 +52,7 @@ export default function KantorCabangEdit({ kantorCabang }: PageProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit KantorCabang" />
+            <Head title="Edit Cabang" />
 
             <div className="max-w-2xl mx-auto p-6">
                 {/* Header */}
@@ -64,10 +64,10 @@ export default function KantorCabangEdit({ kantorCabang }: PageProps) {
                         <ArrowLeft className="size-5" />
                         <span>Kembali</span>
                     </Link>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300">
-                        Edit KantorCabang
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300">
+                        Edit Cabang
                     </h1>
-                    <p className="text-muted-foreground mt-2">Edit informasi kantorCabang di bawah ini</p>
+                    <p className="text-muted-foreground mt-2">Edit informasi Cabang di bawah ini</p>
                 </div>
 
                 {/* Form Card */}
@@ -76,14 +76,14 @@ export default function KantorCabangEdit({ kantorCabang }: PageProps) {
                         {/* Nama KantorCabang */}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nama KantorCabang <span className="text-red-500">*</span>
+                                Nama Cabang <span className="text-red-500">*</span>
                             </label>
                             <input
                                 id="name"
                                 type="text"
                                 value={data.name}
                                 onChange={e => setData('name', e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
+                                className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                 placeholder="Contoh: IT, HRD, Keuangan"
                             />
                             {errors.name && (
@@ -100,9 +100,8 @@ export default function KantorCabangEdit({ kantorCabang }: PageProps) {
                                 <div className="text-sm text-blue-800 dark:text-blue-300">
                                     <p className="font-medium mb-1">Informasi:</p>
                                     <ul className="space-y-1 text-xs">
-                                        <li>• Nama kantorCabang harus unik</li>
+                                        <li>• Nama Cabang harus unik</li>
                                         <li>• Gunakan nama yang mudah dipahami</li>
-                                        <li>• Contoh: IT, HRD, Keuangan, Operasional</li>
                                     </ul>
                                 </div>
                             </div>
@@ -119,7 +118,7 @@ export default function KantorCabangEdit({ kantorCabang }: PageProps) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium shadow-lg shadow-orange-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium shadow-lg shadow-blue-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {processing ? (
                                     <>
@@ -131,7 +130,7 @@ export default function KantorCabangEdit({ kantorCabang }: PageProps) {
                                         <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span>Update KantorCabang</span>
+                                        <span>Update Cabang</span>
                                     </>
                                 )}
                             </button>

@@ -205,7 +205,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
                             Manajemen Karyawan
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Kelola data karyawan dengan mudah</p>
@@ -215,7 +215,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                         {(isSuperAdmin || can('employees.create')) && (
                             <Link
                                 href={create().url}
-                                className='inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-orange-500/30 dark:shadow-orange-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-105 active:scale-95'
+                                className='inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95'
                             >
                                 <PlusCircle className='size-5' />
                                 <span>Tambah Karyawan</span>
@@ -225,7 +225,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                 </div>
 
                 {/* Table Card */}
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-orange-100 dark:shadow-none">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
 
                     <div className="flex justify-between">
 
@@ -238,7 +238,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                 <select
                                     value={currentPerPage}
                                     onChange={(e) => handlePerPageChange(e.target.value)}
-                                    className="border-2 border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900"
+                                    className="border-2 border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900"
                                 >
                                     <option value="10">10</option>
                                     <option value="25">25</option>
@@ -252,14 +252,38 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                         {/* tombol export */}
                         <div className="flex justify-center items-center gap-2 px-4">
                             <button
-                                onClick={() => window.open('/employees/export/pdf', '_blank')}
+                                onClick={() => {
+                                    const params = new URLSearchParams();
+                                    const sNama = getSearchValue('searchNama');
+                                    const sNIP = getSearchValue('searchNIP');
+                                    const sKantor = getSearchValue('searchKantorCabang');
+                                    const sJabatan = getSearchValue('searchJabatan');
+                                    if (sNama) params.set('searchNama', sNama);
+                                    if (sNIP) params.set('searchNIP', sNIP);
+                                    if (sKantor) params.set('searchKantorCabang', sKantor);
+                                    if (sJabatan) params.set('searchJabatan', sJabatan);
+                                    const query = params.toString() ? `?${params.toString()}` : '';
+                                    window.open(`/employees/export/pdf${query}`, '_blank');
+                                }}
                                 className='inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-2 px-4 shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95'
                             >
                                 <FileText className='size-4' />
                                 <span>Export PDF</span>
                             </button>
                             <button
-                                onClick={() => window.open('/employees/export/excel', '_blank')}
+                                onClick={() => {
+                                    const params = new URLSearchParams();
+                                    const sNama = getSearchValue('searchNama');
+                                    const sNIP = getSearchValue('searchNIP');
+                                    const sKantor = getSearchValue('searchKantorCabang');
+                                    const sJabatan = getSearchValue('searchJabatan');
+                                    if (sNama) params.set('searchNama', sNama);
+                                    if (sNIP) params.set('searchNIP', sNIP);
+                                    if (sKantor) params.set('searchKantorCabang', sKantor);
+                                    if (sJabatan) params.set('searchJabatan', sJabatan);
+                                    const query = params.toString() ? `?${params.toString()}` : '';
+                                    window.open(`/employees/export/excel${query}`, '_blank');
+                                }}
                                 className='inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-4 shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95'
                             >
                                 <FileSpreadsheet className='size-4' />
@@ -270,13 +294,13 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
 
                     <div className="overflow-x-auto">
                         <table className='w-full min-w-[600px]'>
-                            <thead className='bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800'>
+                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                 <tr>
                                     <th className='rounded-tl-2xl w-16 px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('nama')}
-                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                            className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'
                                         >
                                             Nama
                                             <span className='ml-1'>{getSortIcon('nama')}</span>
@@ -285,7 +309,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('nip')}
-                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                            className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'
                                         >
                                             NIP
                                             <span className='ml-1'>{getSortIcon('nip')}</span>
@@ -294,16 +318,16 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('kantorCabang')}
-                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                            className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'
                                         >
-                                            KantorCabang
+                                            Cabang
                                             <span className='ml-1'>{getSortIcon('kantorCabang')}</span>
                                         </button>
                                     </th>
                                     <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('jabatan')}
-                                            className='flex items-center gap-2 hover:text-orange-100 transition-colors cursor-pointer'
+                                            className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'
                                         >
                                             Jabatan
                                             <span className='ml-1'>{getSortIcon('jabatan')}</span>
@@ -314,19 +338,19 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                             </thead>
 
                             {/* Search Row */}
-                            <thead className='bg-orange-50 dark:bg-gray-800/50'>
+                            <thead className='bg-blue-50 dark:bg-gray-800/50'>
                                 <tr>
                                     <th className='px-4 py-4'></th>
                                     <th className='px-4 py-4'>
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                                className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
                                                 value={getSearchValue('searchNama')}
                                                 onChange={(e) => debouncedSearch('searchNama', e.target.value, index().url)}
                                                 placeholder='Cari nama...'
                                             />
-                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-orange-400">
+                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-blue-400">
                                                 <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                 </svg>
@@ -337,12 +361,12 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                                className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
                                                 placeholder='Cari NIP...'
                                                 value={getSearchValue('searchNIP')}
                                                 onChange={(e) => debouncedSearch('searchNIP', e.target.value, index().url)}
                                             />
-                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-orange-400">
+                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-blue-400">
                                                 <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                 </svg>
@@ -353,9 +377,9 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         <select
                                             value={getSearchValue('searchKantorCabang')}
                                             onChange={(e) => debouncedSearch('searchKantorCabang', e.target.value, index().url)}
-                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                            className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
                                         >
-                                            <option value="">Semua KantorCabang</option>
+                                            <option value="">Semua Cabang</option>
                                             {kantorCabang.map((d) => (
                                                 <option key={d.id} value={d.name}>
                                                     {d.name}
@@ -367,7 +391,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         <select
                                             value={getSearchValue('searchJabatan')}
                                             onChange={(e) => debouncedSearch('searchJabatan', e.target.value, index().url)}
-                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                            className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
                                         >
                                             <option value="">Semua Jabatan</option>
                                             {jabatan.map((j) => (
@@ -398,8 +422,8 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         <td colSpan={6} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center justify-center gap-3">
                                                 <div className="relative">
-                                                    <div className="size-12 rounded-full border-4 border-orange-200 dark:border-gray-700"></div>
-                                                    <Loader2 className="absolute top-0 left-0 size-12 animate-spin text-orange-500 dark:text-orange-400" />
+                                                    <div className="size-12 rounded-full border-4 border-blue-200 dark:border-gray-700"></div>
+                                                    <Loader2 className="absolute top-0 left-0 size-12 animate-spin text-blue-500 dark:text-blue-400" />
                                                 </div>
                                                 <span className="text-muted-foreground font-medium">Mencari data...</span>
                                             </div>
@@ -409,8 +433,8 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     <tr>
                                         <td colSpan={6} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
-                                                    <svg className="size-8 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div className="size-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                                                    <svg className="size-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                 </div>
@@ -421,9 +445,9 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     </tr>
                                 ) : (
                                     employees.data.map((employee, index) => (
-                                        <tr key={employee.id} className="hover:bg-orange-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50 transition-colors">
                                             <td className="px-4 py-3 text-center">
-                                                <span className="inline-flex items-center justify-center size-7 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 text-orange-600 dark:text-orange-400 font-bold text-xs">
+                                                <span className="inline-flex items-center justify-center size-7 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
                                                     {index + 1}
                                                 </span>
                                             </td>
@@ -431,7 +455,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                                 <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
                                             </td>
                                             <td className="px-4 py-3">
-                                                <code className="rounded bg-orange-100 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
+                                                <code className="rounded bg-blue-100 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                                                     {employee.nip}
                                                 </code>
                                             </td>
@@ -483,10 +507,10 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
 
                     {/* Pagination */}
                     {employees?.meta && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-orange-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-blue-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
                             {/* Info Data */}
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                Menampilkan <span className='font-bold text-orange-600 dark:text-orange-400'>{employees.meta.from}</span> sampai <span className='font-bold text-orange-600 dark:text-orange-400'>{employees.meta.to}</span> dari <span className='font-bold text-orange-600 dark:text-orange-400'>{employees.meta.total}</span> data
+                                Menampilkan <span className='font-bold text-blue-600 dark:text-blue-400'>{employees.meta.from}</span> sampai <span className='font-bold text-blue-600 dark:text-blue-400'>{employees.meta.to}</span> dari <span className='font-bold text-blue-600 dark:text-blue-400'>{employees.meta.total}</span> data
                             </div>
 
                             {/* Pagination Buttons */}
@@ -495,7 +519,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     href={buildUrl(1)}
                                     className={employees.meta.current_page === 1
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-4 py-2 text-sm font-medium'
-                                        : 'inline-flex items-center gap-1 border-2 border-orange-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 dark:hover:bg-orange-600 dark:hover:border-orange-600 transition-all duration-200'
+                                        : 'inline-flex items-center gap-1 border-2 border-blue-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
                                     }
                                 >
                                     <span>Awal</span>
@@ -505,7 +529,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     href={employees.links.prev ? buildUrl(employees.meta.current_page - 1) : '#'}
                                     className={!employees.links.prev
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-3 py-2'
-                                        : 'inline-flex items-center border-2 border-orange-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 dark:hover:bg-orange-600 dark:hover:border-orange-600 transition-all duration-200'
+                                        : 'inline-flex items-center border-2 border-blue-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
                                     }
                                 >
                                     <ArrowBigLeftIcon className="size-4" />
@@ -528,8 +552,8 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             key={pageNum}
                                             href={buildUrl(pageNum)}
                                             className={`min-w-[2.5rem] h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 ${pageNum === employees.meta.current_page
-                                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30'
-                                                : 'border-2 border-orange-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-700 hover:border-orange-400 dark:hover:border-gray-600'
+                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/30'
+                                                : 'border-2 border-blue-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-gray-600'
                                                 }`}
                                         >
                                             {pageNum}
@@ -541,7 +565,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     href={employees.links.next ? buildUrl(employees.meta.current_page + 1) : '#'}
                                     className={!employees.links.next
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-3 py-2'
-                                        : 'inline-flex items-center border-2 border-orange-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 dark:hover:bg-orange-600 dark:hover:border-orange-600 transition-all duration-200'
+                                        : 'inline-flex items-center border-2 border-blue-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
                                     }
                                 >
                                     <ArrowBigRight className="size-4" />
@@ -551,7 +575,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     href={buildUrl(employees.meta.last_page)}
                                     className={employees.meta.current_page === employees.meta.last_page
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-4 py-2 text-sm font-medium'
-                                        : 'inline-flex items-center gap-1 border-2 border-orange-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 dark:hover:bg-orange-600 dark:hover:border-orange-600 transition-all duration-200'
+                                        : 'inline-flex items-center gap-1 border-2 border-blue-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
                                     }
                                 >
                                     <span>Akhir</span>

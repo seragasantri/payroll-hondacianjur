@@ -88,7 +88,7 @@ export default function Dashboard(props: DashboardProps) {
                 <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                     {/* Header */}
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
                             Dashboard Karyawan
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Selamat datang, {employee?.nama || 'Karyawan'}</p>
@@ -104,7 +104,7 @@ export default function Dashboard(props: DashboardProps) {
                         <>
                             {/* Employee Info Card */}
                             <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                                <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800 px-6 py-4">
+                                <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4">
                                     <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                         <User className="size-5" />
                                         Data Karyawan
@@ -112,36 +112,36 @@ export default function Dashboard(props: DashboardProps) {
                                 </div>
                                 <div className="p-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Nama</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Nama</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.nama}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">NIP</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">NIP</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.nip}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Jabatan</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Jabatan</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.jabatan || '-'}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Cabang</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Cabang</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.kantor_cabang || '-'}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Tanggal Mulai Kerja</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Tanggal Mulai Kerja</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{formatDate(employee.tanggal_mulai_kerja)}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Status Pegawai</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Status Pegawai</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.status_pegawai || '-'}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Status PTKP</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Status PTKP</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.ptkp || '-'}</p>
                                         </div>
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 uppercase font-semibold">Nomor Rekening</p>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Nomor Rekening</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.nomor_rekening || '-'}</p>
                                         </div>
                                     </div>
@@ -150,7 +150,7 @@ export default function Dashboard(props: DashboardProps) {
 
                             {/* Payroll History */}
                             <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                                <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800 px-6 py-4 flex items-center justify-between">
+                                <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4 flex items-center justify-between">
                                     <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                         <Wallet className="size-5" />
                                         Riwayat Gaji
@@ -205,7 +205,7 @@ export default function Dashboard(props: DashboardProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                 {/* Header */}
                 <div>
-                    <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
+                    <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
                         Dashboard Admin
                     </h1>
                     <p className="text-muted-foreground text-sm mt-1">Ringkasan data perusahaan</p>
@@ -255,7 +255,7 @@ export default function Dashboard(props: DashboardProps) {
 
                 {/* Kantor Cabang dengan Jumlah Karyawan */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-800 px-6 py-4">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2">
                             <Building2 className="size-5" />
                             Cabang & Jumlah Karyawan
@@ -267,15 +267,15 @@ export default function Dashboard(props: DashboardProps) {
                                 kantorCabangs.map((kc) => (
                                     <div key={kc.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                                         <div className="flex items-center gap-3">
-                                            <div className="size-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                                                <Building2 className="size-5 text-orange-600 dark:text-orange-400" />
+                                            <div className="size-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                                <Building2 className="size-5 text-blue-600 dark:text-blue-400" />
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-gray-900 dark:text-white">{kc.name}</p>
                                                 <p className="text-xs text-gray-500">{kc.employees_count} karyawan</p>
                                             </div>
                                         </div>
-                                        <span className="inline-flex items-center rounded-full bg-orange-100 dark:bg-orange-900/30 px-3 py-1 text-xs font-semibold text-orange-700 dark:text-orange-300">
+                                        <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300">
                                             {kc.employees_count} orang
                                         </span>
                                     </div>
