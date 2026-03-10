@@ -26,6 +26,7 @@ class PayrollDetail extends Model
         'lembur',
         'reward',
         'lain_lain',
+        'kasbon',
         'potongan_tidak_masuk',
         'potongan_terlambat',
         'potongan_lain',
@@ -44,6 +45,7 @@ class PayrollDetail extends Model
         'lembur' => 'decimal:2',
         'reward' => 'decimal:2',
         'lain_lain' => 'decimal:2',
+        'kasbon' => 'decimal:2',
         'potongan_tidak_masuk' => 'decimal:2',
         'potongan_terlambat' => 'decimal:2',
         'potongan_lain' => 'decimal:2',
@@ -107,10 +109,12 @@ class PayrollDetail extends Model
             + ($this->lain_lain ?? 0)
             + $totalTunjanganPerusahaan;
 
-        // total_potongan = potongan_tidak_masuk + potongan_terlambat + potongan_lain + total_potongan_karyawan
-        $this->total_potongan = $this->potongan_tidak_masuk
+        // total_potongan = kasbon + potongan_tidak_masuk + potongan_terlambat + potongan_lain + total_tunjangan_perusahaan + total_potongan_karyawan
+        $this->total_potongan = ($this->kasbon ?? 0)
+            + $this->potongan_tidak_masuk
             + $this->potongan_terlambat
             + ($this->potongan_lain ?? 0)
+            + $totalTunjanganPerusahaan
             + $totalPotonganKaryawan;
 
         // gaji_bersih = total_gaji - total_potongan

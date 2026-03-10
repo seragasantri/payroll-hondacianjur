@@ -121,7 +121,7 @@ class PayrollController extends Controller
             ->orderBy('nama', 'asc')
             ->get();
 
-        $tunjanganList = \App\Models\Tunjangan::orderBy('jenis_tunjangan', 'asc')->get();
+        $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
 
         $employeesWithPayroll = $employees->map(function ($employee) use ($payrollDetails, $bulan, $tunjanganList) {
             $existing = $payrollDetails->get($employee->id);
@@ -180,6 +180,7 @@ class PayrollController extends Controller
                     'lembur' => (float) $existing->lembur,
                     'reward' => (float) $existing->reward,
                     'lain_lain' => (float) $existing->lain_lain,
+                    'kasbon' => (float) $existing->kasbon,
                     'tunjangan_lain' => $existing->tunjangan_lain,
                     'potongan_tidak_masuk' => (float) $existing->potongan_tidak_masuk,
                     'potongan_terlambat' => (float) $existing->potongan_terlambat,
@@ -267,13 +268,23 @@ class PayrollController extends Controller
             $lainLain = isset($data['lain_lain']) && is_numeric($data['lain_lain'])
                 ? (float) $data['lain_lain']
                 : 0;
+            $kasbon = isset($data['kasbon']) && is_numeric($data['kasbon'])
+                ? (float) $data['kasbon']
+                : 0;
 
             // Calculate total tunjangan perusahaan and karyawan
-            $tunjanganLain = $data['tunjangan'] ?? [];
+            $tunjanganLainInput = $data['tunjangan'] ?? [];
             $totalTunjanganPerusahaan = 0;
             $totalPotonganKaryawan = 0;
 
-            foreach ($tunjanganLain as $t) {
+            // Convert array to object with string keys for proper storage
+            $tunjanganLain = [];
+            foreach ($tunjanganLainInput as $t) {
+                $tunjanganId = (string) ($t['id'] ?? 0);
+                $tunjanganLain[$tunjanganId] = [
+                    'perusahaan' => (float) ($t['perusahaan'] ?? 0),
+                    'karyawan' => (float) ($t['karyawan'] ?? 0),
+                ];
                 $totalTunjanganPerusahaan += (float) ($t['perusahaan'] ?? 0);
                 $totalPotonganKaryawan += (float) ($t['karyawan'] ?? 0);
             }
@@ -295,6 +306,7 @@ class PayrollController extends Controller
                     'lembur' => $lembur,
                     'reward' => $reward,
                     'lain_lain' => $lainLain,
+                    'kasbon' => $kasbon,
                     'tunjangan_lain' => json_encode($tunjanganLain),
                     'potongan_tidak_masuk' => $potonganTidakMasuk,
                     'potongan_terlambat' => $potonganTerlambat,
@@ -315,6 +327,7 @@ class PayrollController extends Controller
                     'lembur' => $lembur,
                     'reward' => $reward,
                     'lain_lain' => $lainLain,
+                    'kasbon' => $kasbon,
                     'tunjangan_lain' => json_encode($tunjanganLain),
                     'potongan_tidak_masuk' => $potonganTidakMasuk,
                     'potongan_terlambat' => $potonganTerlambat,
@@ -379,7 +392,7 @@ class PayrollController extends Controller
                 ->with(['employee', 'employee.kantorCabang', 'employee.jabatan'])
                 ->first();
 
-            $tunjanganList = \App\Models\Tunjangan::orderBy('jenis_tunjangan', 'asc')->get();
+            $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
 
             $existingTunjangan = [];
             if ($payrollDetail && $payrollDetail->tunjangan_lain) {
@@ -399,6 +412,7 @@ class PayrollController extends Controller
                 'lembur' => (float) $payrollDetail->lembur,
                 'reward' => (float) $payrollDetail->reward,
                 'lain_lain' => (float) $payrollDetail->lain_lain,
+                'kasbon' => (float) $payrollDetail->kasbon,
                 'tunjangan_lain' => $payrollDetail->tunjangan_lain,
                 'potongan_tidak_masuk' => (float) $payrollDetail->potongan_tidak_masuk,
                 'potongan_terlambat' => (float) $payrollDetail->potongan_terlambat,
@@ -449,7 +463,7 @@ class PayrollController extends Controller
             ->get()
             ->keyBy('employee_id');
 
-        $tunjanganList = \App\Models\Tunjangan::orderBy('jenis_tunjangan', 'asc')->get();
+        $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
 
         $employeesWithPayroll = $employees->map(function ($employee) use ($payrollDetails, $bulan, $tunjanganList, $payrollHeader) {
             $existing = $payrollDetails->get($employee->id);

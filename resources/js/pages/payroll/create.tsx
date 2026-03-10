@@ -33,6 +33,7 @@ interface EmployeePayroll {
         lembur: number;
         reward: number;
         lain_lain: number;
+        kasbon: number;
         potongan_tidak_masuk: number;
         potongan_terlambat: number;
         potongan_lain: number;
@@ -107,7 +108,8 @@ export default function PayrollCreate({
         lembur: string;
         reward: string;
         lain_lain: string;
-        tunjangan: Record<number, { perusahaan: number; karyawan: number }>;
+        kasbon: string;
+        tunjangan: Record<string, { perusahaan: number; karyawan: number }>;
         potongan_lain: string;
         status: string;
         gaji_pokok: string;
@@ -115,11 +117,13 @@ export default function PayrollCreate({
     }>>(() => {
         const initial: Record<number, any> = {};
         employees.forEach(emp => {
-            const tunjanganObj: Record<number, { perusahaan: number; karyawan: number }> = {};
+            const tunjanganObj: Record<string, { perusahaan: number; karyawan: number }> = {};
             emp.tunjangan?.forEach((t: TunjanganItem) => {
-                tunjanganObj[t.id] = {
-                    perusahaan: t.perusahaan,
-                    karyawan: t.karyawan
+                // Ensure id is converted to string for consistent key access
+                const key = String(Number(t.id));
+                tunjanganObj[key] = {
+                    perusahaan: Number(t.perusahaan) || 0,
+                    karyawan: Number(t.karyawan) || 0
                 };
             });
 
@@ -145,6 +149,9 @@ export default function PayrollCreate({
             const existingPotonganLain = emp.payroll?.potongan_lain ?? 0;
             const formattedPotonganLain = existingPotonganLain ? formatRupiahInput(String(existingPotonganLain)) : '';
 
+            const existingKasbon = emp.payroll?.kasbon ?? 0;
+            const formattedKasbon = existingKasbon ? formatRupiahInput(String(existingKasbon)) : '';
+
             initial[emp.id] = {
                 hari_kerja: existingHariKerja,
                 hari_tidak_masuk: hariTidakMasuk,
@@ -154,6 +161,7 @@ export default function PayrollCreate({
                 lembur: formattedLembur,
                 reward: formattedReward,
                 lain_lain: formattedLainLain,
+                kasbon: formattedKasbon,
                 tunjangan: tunjanganObj,
                 potongan_lain: formattedPotonganLain,
                 status: emp.payroll?.status ?? 'draft',
@@ -210,18 +218,21 @@ export default function PayrollCreate({
         const emp = employees.find(e => e.id === empId);
         if (!emp) return 0;
 
-        let totalPotonganKaryawan = 0;
+        // Potongan = Tunjangan Perusahaan + Tunjangan Karyawan
+        let totalTunjangan = 0;
         const tunjangan = formData[empId]?.tunjangan;
         if (tunjangan) {
             Object.values(tunjangan).forEach((t: { perusahaan: number; karyawan: number }) => {
-                totalPotonganKaryawan += Number(t.karyawan) || 0;
+                totalTunjangan += Number(t.perusahaan) || 0;
+                totalTunjangan += Number(t.karyawan) || 0;
             });
         }
 
         return getPotonganTidakMasuk(empId) +
             getPotonganTerlambat(empId) +
+            parseRupiah(String(formData[empId]?.kasbon || 0)) +
             parseRupiah(String(formData[empId]?.potongan_lain || 0)) +
-            totalPotonganKaryawan;
+            totalTunjangan;
     };
 
     const getGajiBersih = (empId: number) => {
@@ -258,6 +269,7 @@ export default function PayrollCreate({
                 reward: parseRupiah(String(data?.reward || 0)),
                 lain_lain: parseRupiah(String(data?.lain_lain || 0)),
                 tunjangan: tunjanganArray,
+                kasbon: parseRupiah(String(data?.kasbon || 0)),
                 potongan_lain: parseRupiah(String(data?.potongan_lain || 0)),
                 status: publish ? 'published' : (data?.status || 'draft'),
                 gaji_pokok: parseRupiah(String(data?.gaji_pokok || 0)),
@@ -276,6 +288,7 @@ export default function PayrollCreate({
 
     const totalGajiPokok = employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.gaji_pokok || 0)), 0);
     const totalInsentif = employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.insentif || 0)), 0);
+
     const totalTunjangan = employees.reduce((sum, e) => sum + getTotalTunjangan(e.id), 0);
     const totalPotongan = employees.reduce((sum, e) => sum + getTotalPotongan(e.id), 0);
     const totalGajiBersih = employees.reduce((sum, e) => sum + getGajiBersih(e.id), 0);
@@ -348,6 +361,7 @@ export default function PayrollCreate({
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Mangkir</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
                                     <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>POTONGAN</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
                                 </tr>
@@ -508,11 +522,13 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            {tunjanganCols.map((t: TunjanganList) => (
+                                            {tunjanganCols.map((t: TunjanganList) => {
+                                                const tunjanganKey = String(Number(t.id));
+                                                return (
                                                 <td key={t.id} className="px-2 py-3">
                                                     <input
                                                         type="text"
-                                                        value={formData[employee.id]?.tunjangan?.[t.id]?.perusahaan ? formatRupiahInput(String(formData[employee.id]?.tunjangan?.[t.id]?.perusahaan)) : ''}
+                                                        value={formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan !== undefined ? formatRupiahInput(String(formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan)) : ''}
                                                         onChange={(e) => {
                                                             const formatted = formatRupiahInput(e.target.value);
                                                             const value = parseRupiah(formatted);
@@ -522,8 +538,8 @@ export default function PayrollCreate({
                                                                     ...formData[employee.id],
                                                                     tunjangan: {
                                                                         ...formData[employee.id]?.tunjangan,
-                                                                        [t.id]: {
-                                                                            ...formData[employee.id]?.tunjangan?.[t.id],
+                                                                        [tunjanganKey]: {
+                                                                            ...formData[employee.id]?.tunjangan?.[tunjanganKey],
                                                                             perusahaan: value
                                                                         }
                                                                     }
@@ -534,19 +550,27 @@ export default function PayrollCreate({
                                                         placeholder="0"
                                                     />
                                                 </td>
-                                            ))}
+                                                );
+                                            })}
                                             <td className="px-3 py-3">
                                                 <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={formData[employee.id]?.hari_tidak_masuk ?? 0}
-                                                    onChange={(e) => setFormData({
-                                                        ...formData,
-                                                        [employee.id]: {
-                                                            ...formData[employee.id],
-                                                            hari_tidak_masuk: parseInt(e.target.value) || 0
-                                                        }
-                                                    })}
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    pattern="[0-9]*"
+                                                    value={formData[employee.id]?.hari_tidak_masuk === 0 ? '' : (formData[employee.id]?.hari_tidak_masuk ?? '')}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/[^0-9]/g, '');
+                                                        setFormData({
+                                                            ...formData,
+                                                            [employee.id]: {
+                                                                ...formData[employee.id],
+                                                                hari_tidak_masuk: val === '' ? 0 : parseInt(val) || 0
+                                                            }
+                                                        });
+                                                    }}
+                                                    onFocus={(e) => {
+                                                        e.target.select();
+                                                    }}
                                                     className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                 />
                                                 <div className="text-xs text-red-500">
@@ -555,21 +579,46 @@ export default function PayrollCreate({
                                             </td>
                                             <td className="px-3 py-3 text-right">
                                                 <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={formData[employee.id]?.jam_terlambat ?? 0}
-                                                    onChange={(e) => setFormData({
-                                                        ...formData,
-                                                        [employee.id]: {
-                                                            ...formData[employee.id],
-                                                            jam_terlambat: parseInt(e.target.value) || 0
-                                                        }
-                                                    })}
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    pattern="[0-9]*"
+                                                    value={formData[employee.id]?.jam_terlambat === 0 ? '' : (formData[employee.id]?.jam_terlambat ?? '')}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/[^0-9]/g, '');
+                                                        setFormData({
+                                                            ...formData,
+                                                            [employee.id]: {
+                                                                ...formData[employee.id],
+                                                                jam_terlambat: val === '' ? 0 : parseInt(val) || 0
+                                                            }
+                                                        });
+                                                    }}
+                                                    onFocus={(e) => {
+                                                        e.target.select();
+                                                    }}
                                                     className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
                                                 />
                                                 <div className="text-xs text-red-500">
                                                     {formatCurrency(getPotonganTerlambat(employee.id))}
                                                 </div>
+                                            </td>
+                                            <td className="px-3 py-3">
+                                                <input
+                                                    type="text"
+                                                    value={formData[employee.id]?.kasbon ?? ''}
+                                                    onChange={(e) => {
+                                                        const formatted = formatRupiahInput(e.target.value);
+                                                        setFormData({
+                                                            ...formData,
+                                                            [employee.id]: {
+                                                                ...formData[employee.id],
+                                                                kasbon: formatted
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    placeholder="0"
+                                                />
                                             </td>
                                             <td className="px-3 py-3">
                                                 <input
@@ -589,11 +638,13 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            {tunjanganCols.map((t: TunjanganList) => (
+                                            {tunjanganCols.map((t: TunjanganList) => {
+                                                const tunjanganKey = String(Number(t.id));
+                                                return (
                                                 <td key={t.id} className="px-2 py-3">
                                                     <input
                                                         type="text"
-                                                        value={formData[employee.id]?.tunjangan?.[t.id]?.karyawan ? formatRupiahInput(String(formData[employee.id]?.tunjangan?.[t.id]?.karyawan)) : ''}
+                                                        value={formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan !== undefined ? formatRupiahInput(String(formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan)) : ''}
                                                         onChange={(e) => {
                                                             const formatted = formatRupiahInput(e.target.value);
                                                             const value = parseRupiah(formatted);
@@ -603,8 +654,8 @@ export default function PayrollCreate({
                                                                     ...formData[employee.id],
                                                                     tunjangan: {
                                                                         ...formData[employee.id]?.tunjangan,
-                                                                        [t.id]: {
-                                                                            ...formData[employee.id]?.tunjangan?.[t.id],
+                                                                        [tunjanganKey]: {
+                                                                            ...formData[employee.id]?.tunjangan?.[tunjanganKey],
                                                                             karyawan: value
                                                                         }
                                                                     }
@@ -615,7 +666,8 @@ export default function PayrollCreate({
                                                         placeholder="0"
                                                     />
                                                 </td>
-                                            ))}
+                                                );
+                                            })}
                                             <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">
                                                 {formatCurrency(empGajiBersih)}
                                             </td>
@@ -650,8 +702,9 @@ export default function PayrollCreate({
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lain_lain || 0)), 0))}
                                     </td>
                                     {tunjanganCols.map((t: TunjanganList) => {
+                                        const tunjanganKey = String(Number(t.id));
                                         const colTotal = employees.reduce((sum, e) => {
-                                            return sum + (Number(formData[e.id]?.tunjangan?.[t.id]?.perusahaan) || 0);
+                                            return sum + (Number(formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan) || 0);
                                         }, 0);
                                         return (
                                             <td key={t.id} className="px-2 py-4 text-right font-bold text-green-600 text-sm">
@@ -662,9 +715,13 @@ export default function PayrollCreate({
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
+                                    <td className="px-3 py-4"></td>
                                     {tunjanganCols.map((t: TunjanganList) => {
+                                        const tunjanganKey = String(Number(t.id));
                                         const colTotal = employees.reduce((sum, e) => {
-                                            return sum + (Number(formData[e.id]?.tunjangan?.[t.id]?.karyawan) || 0);
+                                            const perusahaan = Number(formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan) || 0;
+                                            const karyawan = Number(formData[e.id]?.tunjangan?.[tunjanganKey]?.karyawan) || 0;
+                                            return sum + perusahaan + karyawan;
                                         }, 0);
                                         return (
                                             <td key={t.id} className="px-2 py-4 text-right font-bold text-red-600 text-sm">

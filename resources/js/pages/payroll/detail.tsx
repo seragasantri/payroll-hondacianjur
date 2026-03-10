@@ -22,6 +22,7 @@ interface PayrollData {
     lembur: number;
     reward: number;
     lain_lain: number;
+    kasbon: number;
     tunjangan_lain: string;
     potongan_tidak_masuk: number;
     potongan_terlambat: number;
@@ -125,9 +126,19 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
         const printWindow = window.open('', '_blank', 'width=800,height=600');
         if (!printWindow) return;
 
-        const tunjanganLain = employee.payroll?.tunjangan_lain ? JSON.parse(employee.payroll.tunjangan_lain) : [];
+        // Parse tunjangan_lain - handle both array (old format) and object (new format)
+        const tunjanganLainParsed = employee.payroll?.tunjangan_lain ? JSON.parse(employee.payroll.tunjangan_lain) : [];
+        // Convert to object with string keys if it's an array
+        const tunjanganLainRaw: Record<string, any> = Array.isArray(tunjanganLainParsed)
+            ? tunjanganLainParsed.reduce((acc: Record<string, any>, item: any) => {
+                acc[String(item.id)] = item;
+                return acc;
+            }, {})
+            : tunjanganLainParsed;
+
         const tunjanganList = employee.tunjangan.map(t => {
-            const existing = tunjanganLain.find((x: any) => x.id === t.id);
+            const key = String(t.id);
+            const existing = tunjanganLainRaw[key];
             return {
                 ...t,
                 perusahaan: existing?.perusahaan ?? t.perusahaan,
@@ -279,6 +290,13 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td>:</td>
                         <td class="text-right">${formatCurrency(employee.payroll?.potongan_terlambat || 0)}</td>
                     </tr>
+                    ${employee.payroll?.kasbon ? `
+                    <tr>
+                        <td class="text-left">KASBON</td>
+                        <td>:</td>
+                        <td class="text-right">${formatCurrency(employee.payroll?.kasbon || 0)}</td>
+                    </tr>
+                    ` : ''}
                     ${employee.payroll?.potongan_lain ? `
                     <tr>
                         <td class="text-left">POTONGAN LAIN</td>
@@ -313,11 +331,11 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td colspan="3">&nbsp;</td>
                     </tr>
 
-                    ${tunjanganList.filter((t: Tunjangan) => t.karyawan > 0).map((t: Tunjangan) => `
+                    ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0 || t.karyawan > 0).map((t: Tunjangan) => `
                     <tr>
                         <td class="text-left">${t.jenis}</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(t.karyawan)}</td>
+                        <td class="text-right">${formatCurrency((t.perusahaan || 0) + (t.karyawan || 0))}</td>
                     </tr>
                     `).join('')}
 
