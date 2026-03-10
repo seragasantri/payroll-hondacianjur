@@ -349,7 +349,7 @@ class EmployeeController extends Controller
                 <th class="text-right">Total Gaji</th>
                 <th class="text-right">Pot. Tidak Masuk</th>
                 <th class="text-right">Pot. Terlambat</th>
-                <th class="text-right">Total Potongan</th>
+
             </tr>
         </thead>
         <tbody>';
@@ -371,7 +371,6 @@ class EmployeeController extends Controller
                 <td class="text-right">' . $formatRupiah($employee->total_gaji) . '</td>
                 <td class="text-right">' . $formatRupiah($employee->potongan_tidak_masuk) . '</td>
                 <td class="text-right">' . $formatRupiah($employee->potongan_terlambat) . '</td>
-                <td class="text-right">' . $formatRupiah($employee->total_potongan) . '</td>
             </tr>';
         }
 

@@ -14,7 +14,7 @@ class KantorCabangUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255|unique:kantor_cabangs,name,' . $this->route('id'),
+            'name' => 'sometimes|string|max:255|unique:kantor_cabangs,name,' . $this->route('kantor-cabang'),
         ];
     }
 
