@@ -20,6 +20,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::get('employees/export/excel', [EmployeeController::class, 'exportExcel'])->name('employees.export.excel');
     Route::get('employees/export/pdf', [EmployeeController::class, 'exportPdf'])->name('employees.export.pdf');
+
+    // Retired employees routes
+    Route::get('employees/list/retired', [EmployeeController::class, 'retiredIndex'])->name('employees.retired.index');
+    Route::post('employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');
+    Route::delete('employees/{id}/permanent', [EmployeeController::class, 'permanentDelete'])->name('employees.permanent-delete');
+
     Route::resource('kantor-cabang', KantorCabangController::class);
     Route::resource('jabatan', JabatanController::class);
     Route::resource('tunjangan', TunjanganController::class);

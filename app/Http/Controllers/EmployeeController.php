@@ -155,7 +155,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (soft delete).
      */
     public function destroy($id)
     {
@@ -166,7 +166,76 @@ class EmployeeController extends Controller
 
         $this->employeeServices->delete($id);
 
-        return to_route('employees.index');
+        return to_route('employees.index')
+            ->with('success', 'Karyawan berhasil dipensiunkan!');
+    }
+
+    /**
+     * Display a listing of retired (soft deleted) employees.
+     */
+    public function retiredIndex(Request $request)
+    {
+        // Check authorization
+        Gate::authorize('viewAny', \App\Models\Employee::class);
+
+        $perPage = $request->get('perPage', 10);
+        $searchNama = $request->input('searchNama');
+        $searchNIP = $request->input('searchNIP');
+        $sortField = $request->input('sortField', 'nama');
+        $sortDirection = $request->input('sortDirection', 'asc');
+
+        $query = $this->employeeServices->getAllRetired();
+
+        // Filter by nama
+        if ($searchNama) {
+            $query->where('nama', 'like', "%{$searchNama}%");
+        }
+
+        // Filter by NIP
+        if ($searchNIP) {
+            $query->where('nip', 'like', "%{$searchNIP}%");
+        }
+
+        // Sorting
+        $query->orderBy($sortField, $sortDirection);
+
+        $employees = $query->paginate($perPage);
+
+        return Inertia::render('employees/retired', [
+            'employees' => EmployeeResource::collection($employees),
+        ]);
+    }
+
+    /**
+     * Restore retired employee.
+     */
+    public function restore($id)
+    {
+        $employee = $this->employeeServices->findIdTrashed($id);
+
+        // Check authorization
+        Gate::authorize('restore', $employee);
+
+        $this->employeeServices->restore($id);
+
+        return to_route('employees.retired.index')
+            ->with('success', 'Karyawan berhasil diaktifkan kembali!');
+    }
+
+    /**
+     * Permanently delete retired employee.
+     */
+    public function permanentDelete($id)
+    {
+        $employee = $this->employeeServices->findIdTrashed($id);
+
+        // Check authorization
+        Gate::authorize('forceDelete', $employee);
+
+        $this->employeeServices->forceDelete($id);
+
+        return to_route('employees.retired.index')
+            ->with('success', 'Karyawan berhasil dihapus permanen!');
     }
 
     /**

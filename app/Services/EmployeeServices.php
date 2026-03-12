@@ -17,11 +17,21 @@ class EmployeeServices
     }
 
     /**
-     * Get all employees with optional filtering and sorting
+     * Get all employees with optional filtering and sorting (excluding soft deleted)
      */
     public function getAll()
     {
         return $this->model->with(['user', 'kantorCabang', 'jabatan'])->newQuery();
+    }
+
+    /**
+     * Get all soft deleted (retired) employees
+     */
+    public function getAllRetired()
+    {
+        return $this->model->with(['user' => function ($query) {
+            $query->withTrashed();
+        }, 'kantorCabang', 'jabatan'])->onlyTrashed()->newQuery();
     }
 
     /**
@@ -30,6 +40,16 @@ class EmployeeServices
     public function findId($id)
     {
         return $this->model->with(['user', 'kantorCabang', 'jabatan'])->findOrFail($id);
+    }
+
+    /**
+     * Find soft deleted employee by ID
+     */
+    public function findIdTrashed($id)
+    {
+        return $this->model->with(['user' => function ($query) {
+            $query->withTrashed();
+        }, 'kantorCabang', 'jabatan'])->onlyTrashed()->findOrFail($id);
     }
 
     /**
@@ -131,14 +151,72 @@ class EmployeeServices
     }
 
     /**
-     * Delete employee
+     * Delete (retire) employee - soft deletes both employee and user
      */
     public function delete($id)
     {
         DB::beginTransaction();
         try {
             $employee = $this->findId($id);
+
+            // Soft delete associated user first
+            if ($employee->user) {
+                $employee->user->delete();
+            }
+
+            // Soft delete employee
             $employee->delete();
+
+            DB::commit();
+            return $employee;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Restore retired employee and user
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+        try {
+            $employee = $this->findIdTrashed($id);
+
+            // Restore associated user
+            if ($employee->user) {
+                $employee->user->restore();
+            }
+
+            // Restore employee
+            $employee->restore();
+
+            DB::commit();
+            return $employee;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Permanently delete retired employee and user
+     */
+    public function forceDelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            $employee = $this->findIdTrashed($id);
+
+            // Permanently delete associated user
+            if ($employee->user) {
+                $employee->user->forceDelete();
+            }
+
+            // Permanently delete employee
+            $employee->forceDelete();
+
             DB::commit();
             return $employee;
         } catch (\Exception $e) {

@@ -1,13 +1,14 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowBigLeftIcon, ArrowBigRight, Pencil, PlusCircle, Trash2, Loader2, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown, Eye, FileSpreadsheet, FileText } from 'lucide-react';
+import { ArrowBigLeftIcon, ArrowBigRight, Pencil, PlusCircle, Trash2, Loader2, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown, Eye, FileSpreadsheet, FileText, UserMinus } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useDebounceSearch } from '@/hooks/use-debounce-search';
 import { useCan } from '@/hooks/useCan';
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { create, destroy, edit, index } from '@/routes/employees';
+import employees, { create, destroy, edit, index } from '@/routes/employees';
 import type { BreadcrumbItem, KantorCabang, Jabatan } from '@/types';
+import retired from '@/routes/employees/retired';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Karyawan',
-        href: index().url
+        href: employees.index().url
     }
 ];
 
@@ -138,21 +139,21 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
 
     const handleDelete = (employeeId: number, employeeName: string) => {
         Swal.fire({
-            title: 'Hapus Karyawan?',
-            text: `Apakah Anda yakin ingin menghapus karyawan "${employeeName}"?`,
+            title: 'Pensiunkan Karyawan?',
+            text: `Apakah Anda yakin ingin memensiunkan karyawan "${employeeName}"? Karyawan tidak akan dapat login kembali kecuali diaktifkan kembali.`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#ef4444',
+            confirmButtonColor: '#f97316',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Ya, hapus!',
+            confirmButtonText: 'Ya, pensionsikan!',
             cancelButtonText: 'Batal',
             showLoaderOnConfirm: true,
             preConfirm: () => {
                 return router.delete(destroy(employeeId).url, {
                     onSuccess: () => {
                         Swal.fire({
-                            title: 'Terhapus!',
-                            text: `Karyawan "${employeeName}" berhasil dihapus.`,
+                            title: 'Berhasil!',
+                            text: `Karyawan "${employeeName}" berhasil dipensiunkan.`,
                             icon: 'success',
                             timer: 2000,
                             showConfirmButton: false,
@@ -161,7 +162,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                     onError: () => {
                         Swal.fire({
                             title: 'Gagal!',
-                            text: 'Gagal menghapus karyawan.',
+                            text: 'Gagal memensiunkan karyawan.',
                             icon: 'error',
                             confirmButtonColor: '#3b82f6',
                         });
@@ -221,6 +222,14 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                 <span>Tambah Karyawan</span>
                             </Link>
                         )}
+
+                        <Link
+                            href={retired.index().url}
+                            className='inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-orange-500/30 dark:shadow-orange-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-105 active:scale-95'
+                        >
+                            <UserMinus className='size-5' />
+                            <span>Karyawan Pensiun</span>
+                        </Link>
                     </div>
                 </div>
 

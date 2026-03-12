@@ -91,6 +91,13 @@ class FortifyServiceProvider extends ServiceProvider
 
             $user = User::where('username', $request->username)->first();
 
+            // Check if user is soft deleted
+            if ($user && $user->deleted_at) {
+                throw ValidationException::withMessages([
+                    'username' => 'Akun ini telah dinonaktifkan. Silakan hubungi administrator untuk mengaktifkan kembali.',
+                ]);
+            }
+
             if (!$user || !Hash::check($request->password, $user->password)) {
                 throw ValidationException::withMessages([
                     'username' => 'Username atau password salah.',
