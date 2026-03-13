@@ -14,7 +14,7 @@ class JabatanUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255|unique:jabatans,name,' . $this->route('id'),
+            'name' => 'sometimes|string|max:255|unique:jabatans,name,' . $this->route('jabatan'),
         ];
     }
 

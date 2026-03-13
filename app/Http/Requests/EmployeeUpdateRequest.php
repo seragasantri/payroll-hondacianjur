@@ -35,7 +35,7 @@ class EmployeeUpdateRequest extends FormRequest
                 Rule::unique('users', 'username')->ignore($employee?->user_id),
             ],
             'nama' => 'sometimes|string|max:255',
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:6|confirmed',
             'kantor_cabang_id' => 'sometimes|exists:kantor_cabangs,id',
             'jabatan_id' => 'sometimes|exists:jabatans,id',
             'nomor_rekening' => 'nullable|string|max:255',
@@ -95,7 +95,7 @@ class EmployeeUpdateRequest extends FormRequest
     {
         return [
             'nip.string' => 'NIP harus berupa string',
-            'password.min' => 'Password minimal 8 karakter',
+            'password.min' => 'Password minimal 6 karakter',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
             'kantor_cabang_id.exists' => 'Kantor Cab tidak valid',
             'jabatan_id.exists' => 'Jabatan tidak valid',

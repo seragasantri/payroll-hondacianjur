@@ -10,6 +10,7 @@ use App\Services\EmployeeServices;
 use App\Services\JabatanServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Carbon\Carbon;
 use Inertia\Inertia;
 
 class EmployeeController extends Controller
@@ -68,7 +69,17 @@ class EmployeeController extends Controller
         }
 
         // Sorting
-        $query->orderBy($sortField, $sortDirection);
+        if ($sortField === 'kantorCabang') {
+            $query->join('kantor_cabangs', 'employees.kantor_cabang_id', '=', 'kantor_cabangs.id')
+                  ->orderBy('kantor_cabangs.name', $sortDirection)
+                  ->select('employees.*');
+        } elseif ($sortField === 'jabatan') {
+            $query->join('jabatans', 'employees.jabatan_id', '=', 'jabatans.id')
+                  ->orderBy('jabatans.name', $sortDirection)
+                  ->select('employees.*');
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
 
         $employees = $query->paginate($perPage);
 
@@ -181,6 +192,8 @@ class EmployeeController extends Controller
         $perPage = $request->get('perPage', 10);
         $searchNama = $request->input('searchNama');
         $searchNIP = $request->input('searchNIP');
+        $searchKantorCabang = $request->input('searchKantorCabang');
+        $searchJabatan = $request->input('searchJabatan');
         $sortField = $request->input('sortField', 'nama');
         $sortDirection = $request->input('sortDirection', 'asc');
 
@@ -196,13 +209,39 @@ class EmployeeController extends Controller
             $query->where('nip', 'like', "%{$searchNIP}%");
         }
 
+        // Filter by kantorCabang
+        if ($searchKantorCabang) {
+            $query->whereHas('kantorCabang', function ($q) use ($searchKantorCabang) {
+                $q->where('name', 'like', "%{$searchKantorCabang}%");
+            });
+        }
+
+        // Filter by jabatan
+        if ($searchJabatan) {
+            $query->whereHas('jabatan', function ($q) use ($searchJabatan) {
+                $q->where('name', 'like', "%{$searchJabatan}%");
+            });
+        }
+
         // Sorting
-        $query->orderBy($sortField, $sortDirection);
+        if ($sortField === 'kantorCabang') {
+            $query->join('kantor_cabangs', 'employees.kantor_cabang_id', '=', 'kantor_cabangs.id')
+                  ->orderBy('kantor_cabangs.name', $sortDirection)
+                  ->select('employees.*');
+        } elseif ($sortField === 'jabatan') {
+            $query->join('jabatans', 'employees.jabatan_id', '=', 'jabatans.id')
+                  ->orderBy('jabatans.name', $sortDirection)
+                  ->select('employees.*');
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
 
         $employees = $query->paginate($perPage);
 
         return Inertia::render('employees/retired', [
             'employees' => EmployeeResource::collection($employees),
+            'kantorCabang' => $this->kantorCabangServices->getAll()->orderBy('name', 'asc')->get(),
+            'jabatan' => $this->jabatanServices->getAll()->orderBy('name', 'asc')->get(),
         ]);
     }
 
@@ -303,7 +342,7 @@ class EmployeeController extends Controller
             $sheet->setCellValue('D' . $row, $employee->kantorCabang?->name ?? '-');
             $sheet->setCellValue('E' . $row, $employee->jabatan?->name ?? '-');
             $sheet->setCellValue('F' . $row, $employee->status_pegawai ?? '-');
-            $sheet->setCellValue('G' . $row, $employee->tanggal_mulai_kerja);
+            $sheet->setCellValue('G' . $row, Carbon::parse($employee->tanggal_mulai_kerja)->format('d-m-Y'));
             $sheet->setCellValue('H' . $row, $employee->nomor_rekening ?? '-');
             $sheet->setCellValue('I' . $row, $employee->ptkp ?? '-');
             $sheet->setCellValue('J' . $row, $employee->gaji_pokok)->getStyle('J' . $row)->getNumberFormat()->setFormatCode($numberFormat);
@@ -432,7 +471,7 @@ class EmployeeController extends Controller
                 <td>' . ($employee->kantorCabang?->name ?? '-') . '</td>
                 <td>' . ($employee->jabatan?->name ?? '-') . '</td>
                 <td>' . ($employee->status_pegawai ?? '-') . '</td>
-                <td>' . $employee->tanggal_mulai_kerja . '</td>
+                <td>' . Carbon::parse($employee->tanggal_mulai_kerja)->format('d-m-Y') . '</td>
                 <td>' . ($employee->nomor_rekening ?? '-') . '</td>
                 <td>' . ($employee->ptkp ?? '-') . '</td>
                 <td class="text-right">' . $formatRupiah($employee->gaji_pokok) . '</td>

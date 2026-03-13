@@ -139,7 +139,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
 
     const handleDelete = (employeeId: number, employeeName: string) => {
         Swal.fire({
-            title: 'Pensiunkan Karyawan?',
+            title: 'Resign Karyawan?',
             text: `Apakah Anda yakin ingin memensiunkan karyawan "${employeeName}"? Karyawan tidak akan dapat login kembali kecuali diaktifkan kembali.`,
             icon: 'warning',
             showCancelButton: true,
@@ -153,7 +153,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                     onSuccess: () => {
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: `Karyawan "${employeeName}" berhasil dipensiunkan.`,
+                            text: `Karyawan "${employeeName}" berhasil diresignkan.`,
                             icon: 'success',
                             timer: 2000,
                             showConfirmButton: false,
@@ -228,7 +228,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                             className='inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 dark:from-orange-600 dark:to-orange-500 dark:hover:from-orange-700 dark:hover:to-orange-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-orange-500/30 dark:shadow-orange-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-105 active:scale-95'
                         >
                             <UserMinus className='size-5' />
-                            <span>Karyawan Pensiun</span>
+                            <span>Karyawan Resign</span>
                         </Link>
                     </div>
                 </div>

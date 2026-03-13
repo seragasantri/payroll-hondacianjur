@@ -65,6 +65,15 @@ const formatCurrency = (amount: number) => {
     }).format(amount || 0);
 };
 
+const formatRupiahTable = (amount: number) => {
+    const num = amount || 0;
+    const formatted = new Intl.NumberFormat('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(num);
+    return `<span style="float: left;">Rp</span><span style="float: right;">${formatted}</span>`;
+};
+
 const formatRupiah = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -120,6 +129,11 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
     const handleExport = () => {
         const params = new URLSearchParams({ bulan, status: status_pegawai });
         window.open(`/payroll/${bulan}/export?${params.toString()}`, '_blank');
+    };
+
+    const handleExportDetail = () => {
+        const params = new URLSearchParams({ bulan, status: status_pegawai });
+        window.open(`/payroll/${bulan}/export-detail?${params.toString()}`, '_blank');
     };
 
     const handlePrintSlip = (employee: Employee) => {
@@ -240,39 +254,39 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     <tr>
                         <td class="text-left">GAJI POKOK</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.gaji_pokok)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.gaji_pokok)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">TUNJANGAN JABATAN</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.tunjangan_jabatan)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.tunjangan_jabatan)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">INSENTIF BULANAN</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.insentif || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.insentif || 0)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">UANG HADIR</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.uang_hadir || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.uang_hadir || 0)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">LEMBUR</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.lembur || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.lembur || 0)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">REWARD</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.reward || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.reward || 0)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">LAIN-LAIN</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.lain_lain || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.lain_lain || 0)}</td>
                     </tr>
-                   
+
                 </table>
             </div>
             <div class="col-right">
@@ -283,27 +297,25 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     <tr>
                         <td class="text-left">TIDAK MASUK (${employee.payroll?.hari_kerja - employee.payroll?.hari_masuk || 0} hari)</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.potongan_tidak_masuk || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.potongan_tidak_masuk || 0)}</td>
                     </tr>
                     <tr>
                         <td class="text-left">TERLAMBAT (${employee.payroll?.jam_terlambat || 0} jam)</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.potongan_terlambat || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.potongan_terlambat || 0)}</td>
                     </tr>
-                    ${employee.payroll?.kasbon ? `
+                   
                     <tr>
                         <td class="text-left">KASBON</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll?.kasbon || 0)}</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.kasbon || 0)}</td>
                     </tr>
-                    ` : ''}
-                    ${employee.payroll?.potongan_lain ? `
+              
                     <tr>
-                        <td class="text-left">POTONGAN LAIN</td>
+                        <td class="text-left">PAJAK</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(employee.payroll.potongan_lain)}</td>
+                        <td class="text-right">0</td>
                     </tr>
-                    ` : ''}
                 </table>
             </div>
         </div>
@@ -316,11 +328,11 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     <tr>
                         <th class="text-left" colspan="3">TUNJANGAN PERUSAHAAN</th>
                     </tr>
-                    ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0).map((t: Tunjangan) => `
+                    ${tunjanganList.map((t: Tunjangan) => `
                     <tr>
                         <td class="text-left">${t.jenis}</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency(t.perusahaan)}</td>
+                        <td class="text-right">${formatRupiahTable(t.perusahaan)}</td>
                     </tr>
                     `).join('')}
                 </table>
@@ -331,11 +343,11 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td colspan="3">&nbsp;</td>
                     </tr>
 
-                    ${tunjanganList.filter((t: Tunjangan) => t.perusahaan > 0 || t.karyawan > 0).map((t: Tunjangan) => `
+                    ${tunjanganList.map((t: Tunjangan) => `
                     <tr>
                         <td class="text-left">${t.jenis}</td>
                         <td>:</td>
-                        <td class="text-right">${formatCurrency((t.perusahaan || 0) + (t.karyawan || 0))}</td>
+                        <td class="text-right">${formatRupiahTable((t.perusahaan || 0) + (t.karyawan || 0))}</td>
                     </tr>
                     `).join('')}
 
@@ -348,17 +360,17 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                 <tr>
                     <td class="text-left bold">TOTAL PENDAPATAN</td>
                     <td>:</td>
-                    <td class="text-right">${formatCurrency(employee.payroll?.total_gaji || 0)}</td>
+                    <td class="text-right">${formatRupiahTable(employee.payroll?.total_gaji || 0)}</td>
                 </tr>
                 <tr>
                     <td class="text-left bold">TOTAL POTONGAN</td>
                     <td>:</td>
-                    <td class="text-right">${formatCurrency(employee.payroll?.total_potongan || 0)}</td>
+                    <td class="text-right">${formatRupiahTable(employee.payroll?.total_potongan || 0)}</td>
                 </tr>
                 <tr class="border-top">
                     <td class="text-left bold">GAJI DITERIMA</td>
                     <td>:</td>
-                    <td class="text-right bold">${formatCurrency(employee.payroll?.gaji_bersih || 0)}</td>
+                    <td class="text-right bold">${formatRupiahTable(employee.payroll?.gaji_bersih || 0)}</td>
                 </tr>
             </table>
         </div>
@@ -428,13 +440,15 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         </div>
                     </div>
                     {isPublished && (
-                        <button
-                            onClick={handleExport}
-                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
-                        >
-                            <Download className="size-4" />
-                            Export Excel
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={handleExportDetail}
+                                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                            >
+                                <Download className="size-4" />
+                                Detail
+                            </button>
+                        </div>
                     )}
                 </div>
 

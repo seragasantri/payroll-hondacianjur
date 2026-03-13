@@ -20,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: employees.index().url
     },
     {
-        title: 'Karyawan Pensiun',
+        title: 'Karyawan Resign',
         href: retired.index().url
     }
 ];
@@ -50,6 +50,22 @@ interface Employee {
     };
 }
 
+interface KantorCabang {
+    id: number;
+    name: string;
+}
+
+interface Jabatan {
+    id: number;
+    name: string;
+}
+
+interface RetiredPageProps {
+    employees: EmployeeList;
+    kantorCabang: KantorCabang[];
+    jabatan: Jabatan[];
+}
+
 interface EmployeeList {
     data: Employee[];
     links: {
@@ -68,7 +84,7 @@ interface EmployeeList {
     };
 }
 
-export default function RetiredEmployeeIndex({ employees }: { employees: EmployeeList }) {
+export default function RetiredEmployeeIndex({ employees, kantorCabang, jabatan }: RetiredPageProps) {
     const { debouncedSearch, getSearchValue, isSearching, resetSearch } = useDebounceSearch();
     const can = useCan();
     const { auth } = usePage().props;
@@ -128,8 +144,12 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
 
         const searchNama = getSearchValue('searchNama');
         const searchNIP = getSearchValue('searchNIP');
+        const searchKantorCabang = getSearchValue('searchKantorCabang');
+        const searchJabatan = getSearchValue('searchJabatan');
         if (searchNama) params.set('searchNama', searchNama);
         if (searchNIP) params.set('searchNIP', searchNIP);
+        if (searchKantorCabang) params.set('searchKantorCabang', searchKantorCabang);
+        if (searchJabatan) params.set('searchJabatan', searchJabatan);
 
         return `?${params.toString()}`;
     };
@@ -232,16 +252,16 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Karyawan Pensiun" />
+            <Head title="Karyawan Resign" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
 
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className='text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent dark:from-orange-400 dark:to-orange-300'>
-                            Karyawan Pensiun
+                            Karyawan Resign
                         </h1>
-                        <p className="text-muted-foreground text-sm mt-1">Kelola data karyawan yang telah pensiun</p>
+                        <p className="text-muted-foreground text-sm mt-1">Kelola data karyawan yang telah Resign</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Link
@@ -303,9 +323,23 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
                                             <span className='ml-1'>{getSortIcon('nip')}</span>
                                         </button>
                                     </th>
-                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Cabang</th>
-                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Jabatan</th>
-                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Tanggal Pensiun</th>
+                                    <th
+                                        onClick={() => handleSort('kantorCabang')}
+                                        className='px-4 py-4 text-left text-sm font-bold text-white cursor-pointer hover:text-orange-100'>
+                                        <button className='flex items-center gap-2'>
+                                            Cabang
+                                            <span className='ml-1'>{getSortIcon('kantorCabang')}</span>
+                                        </button>
+                                    </th>
+                                    <th
+                                        onClick={() => handleSort('jabatan')}
+                                        className='px-4 py-4 text-left text-sm font-bold text-white cursor-pointer hover:text-orange-100'>
+                                        <button className='flex items-center gap-2'>
+                                            Jabatan
+                                            <span className='ml-1'>{getSortIcon('jabatan')}</span>
+                                        </button>
+                                    </th>
+                                    <th className='px-4 py-4 text-left text-sm font-bold text-white'>Tanggal Resign</th>
                                     <th className='rounded-tr-2xl px-4 py-4 text-center text-sm font-bold text-white w-40'>Aksi</th>
                                 </tr>
                             </thead>
@@ -346,11 +380,33 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
                                             </div>
                                         </div>
                                     </th>
-                                    <th className='px-4 py-4'></th>
-                                    <th className='px-4 py-4'></th>
+                                    <th className='px-4 py-4'>
+                                        <select
+                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                            value={getSearchValue('searchKantorCabang') || ''}
+                                            onChange={(e) => debouncedSearch('searchKantorCabang', e.target.value, retired.index().url)}
+                                        >
+                                            <option value="">Semua</option>
+                                            {kantorCabang.map((cab) => (
+                                                <option key={cab.id} value={cab.name}>{cab.name}</option>
+                                            ))}
+                                        </select>
+                                    </th>
+                                    <th className='px-4 py-4'>
+                                        <select
+                                            className='w-full border-2 border-orange-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 dark:focus:border-orange-400 bg-white dark:bg-gray-900 transition-colors'
+                                            value={getSearchValue('searchJabatan') || ''}
+                                            onChange={(e) => debouncedSearch('searchJabatan', e.target.value, retired.index().url)}
+                                        >
+                                            <option value="">Semua</option>
+                                            {jabatan.map((jab) => (
+                                                <option key={jab.id} value={jab.name}>{jab.name}</option>
+                                            ))}
+                                        </select>
+                                    </th>
                                     <th className='px-4 py-4'></th>
                                     <th className='px-4 py-4'>
-                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP')) && (
+                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
                                             <button
                                                 onClick={handleResetSearch}
                                                 className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
@@ -384,8 +440,8 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
                                                 <div className="size-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
                                                     <UserCheck className="size-8 text-orange-500 dark:text-orange-400" />
                                                 </div>
-                                                <p className="text-muted-foreground font-medium">Tidak ada karyawan pensiun</p>
-                                                <p className="text-sm text-muted-foreground">Data karyawan yang dipensiunkan akan muncul di sini</p>
+                                                <p className="text-muted-foreground font-medium">Tidak ada karyawan Resign</p>
+                                                <p className="text-sm text-muted-foreground">Data karyawan yang diResignkan akan muncul di sini</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -538,7 +594,7 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                     <div className="w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-900 shadow-2xl">
                         <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Detail Karyawan Pensiun</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Detail Karyawan Resign</h3>
                             <button
                                 onClick={() => setSelectedEmployee(null)}
                                 className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -569,7 +625,7 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
                                     <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(selectedEmployee.tanggal_mulai_kerja)}</p>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal Pensiun</label>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal Resign</label>
                                     <p className="mt-1 text-sm text-orange-600 dark:text-orange-400 font-semibold">{selectedEmployee.deleted_at ? formatDate(selectedEmployee.deleted_at) : '-'}</p>
                                 </div>
                                 <div>
@@ -588,7 +644,7 @@ export default function RetiredEmployeeIndex({ employees }: { employees: Employe
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
                                     <p className="mt-1">
                                         <span className="inline-flex items-center rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs font-semibold text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
-                                            Pensiun
+                                            Resign
                                         </span>
                                     </p>
                                 </div>

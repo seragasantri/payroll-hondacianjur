@@ -49,6 +49,7 @@ interface TunjanganList {
     jenis_tunjangan: string;
     karyawan: number;
     total: number;
+    perusahaan: number;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -171,6 +172,24 @@ export default function PayrollCreate({
         });
         return initial;
     });
+
+    // Calculate tunjangan based on percentage
+    const calculateTunjanganFromPercentage = (empId: number, newGajiPokok: number) => {
+        const tunjanganObj: Record<string, { perusahaan: number; karyawan: number }> = {};
+
+        tunjanganList.forEach((tunjangan) => {
+            const key = String(Number(tunjangan.id));
+            const perusahaanPct = Number(tunjangan.perusahaan) || 0;
+            const karyawanPct = Number(tunjangan.karyawan) || 0;
+
+            tunjanganObj[key] = {
+                perusahaan: perusahaanPct > 0 ? Math.round(perusahaanPct / 100 * newGajiPokok) : 0,
+                karyawan: karyawanPct > 0 ? Math.round(karyawanPct / 100 * newGajiPokok) : 0
+            };
+        });
+
+        return tunjanganObj;
+    };
 
     // Calculate functions
     const getPotonganTidakMasuk = (empId: number) => {
@@ -357,12 +376,12 @@ export default function PayrollCreate({
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lembur</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Reward</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lain-lain</th>
-                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>TUNJANGAN</th>
+                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>TUNJANGAN (PERUSAHAAN)</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Mangkir</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
-                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>POTONGAN</th>
+                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>POTONGAN (KARYAWAN)</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
                                 </tr>
                                 <tr>
@@ -402,11 +421,14 @@ export default function PayrollCreate({
                                                     value={formData[employee.id]?.gaji_pokok ?? ''}
                                                     onChange={(e) => {
                                                         const formatted = formatRupiahInput(e.target.value);
+                                                        const newGajiPokok = parseRupiah(formatted);
+                                                        const newTunjangan = calculateTunjanganFromPercentage(employee.id, newGajiPokok);
                                                         setFormData({
                                                             ...formData,
                                                             [employee.id]: {
                                                                 ...formData[employee.id],
-                                                                gaji_pokok: formatted
+                                                                gaji_pokok: formatted,
+                                                                tunjangan: newTunjangan
                                                             }
                                                         });
                                                     }}
@@ -522,36 +544,13 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            {tunjanganCols.map((t: TunjanganList) => {
-                                                const tunjanganKey = String(Number(t.id));
-                                                return (
-                                                <td key={t.id} className="px-2 py-3">
-                                                    <input
-                                                        type="text"
-                                                        value={formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan !== undefined ? formatRupiahInput(String(formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan)) : ''}
-                                                        onChange={(e) => {
-                                                            const formatted = formatRupiahInput(e.target.value);
-                                                            const value = parseRupiah(formatted);
-                                                            setFormData({
-                                                                ...formData,
-                                                                [employee.id]: {
-                                                                    ...formData[employee.id],
-                                                                    tunjangan: {
-                                                                        ...formData[employee.id]?.tunjangan,
-                                                                        [tunjanganKey]: {
-                                                                            ...formData[employee.id]?.tunjangan?.[tunjanganKey],
-                                                                            perusahaan: value
-                                                                        }
-                                                                    }
-                                                                }
-                                                            });
-                                                        }}
-                                                        className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
-                                                        placeholder="0"
-                                                    />
+                                            {tunjanganCols.map((t: TunjanganList) => (
+                                                <td key={t.id} className="px-2 py-3 bg-green-50/30 dark:bg-green-900/10">
+                                                    <div className="w-20 px-1 py-1 text-right text-sm rounded border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 font-medium">
+                                                        {t.perusahaan}%
+                                                    </div>
                                                 </td>
-                                                );
-                                            })}
+                                            ))}
                                             <td className="px-3 py-3">
                                                 <input
                                                     type="text"
@@ -638,36 +637,13 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            {tunjanganCols.map((t: TunjanganList) => {
-                                                const tunjanganKey = String(Number(t.id));
-                                                return (
-                                                <td key={t.id} className="px-2 py-3">
-                                                    <input
-                                                        type="text"
-                                                        value={formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan !== undefined ? formatRupiahInput(String(formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan)) : ''}
-                                                        onChange={(e) => {
-                                                            const formatted = formatRupiahInput(e.target.value);
-                                                            const value = parseRupiah(formatted);
-                                                            setFormData({
-                                                                ...formData,
-                                                                [employee.id]: {
-                                                                    ...formData[employee.id],
-                                                                    tunjangan: {
-                                                                        ...formData[employee.id]?.tunjangan,
-                                                                        [tunjanganKey]: {
-                                                                            ...formData[employee.id]?.tunjangan?.[tunjanganKey],
-                                                                            karyawan: value
-                                                                        }
-                                                                    }
-                                                                }
-                                                            });
-                                                        }}
-                                                        className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
-                                                        placeholder="0"
-                                                    />
+                                            {tunjanganCols.map((t: TunjanganList) => (
+                                                <td key={t.id} className="px-2 py-3 bg-red-50/30 dark:bg-red-900/10">
+                                                    <div className="w-20 px-1 py-1 text-right text-sm rounded border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 font-medium">
+                                                        {t.karyawan}%
+                                                    </div>
                                                 </td>
-                                                );
-                                            })}
+                                            ))}
                                             <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">
                                                 {formatCurrency(empGajiBersih)}
                                             </td>
@@ -701,34 +677,20 @@ export default function PayrollCreate({
                                     <td className="px-1 py-4 text-right font-bold text-green-600 text-sm">
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lain_lain || 0)), 0))}
                                     </td>
-                                    {tunjanganCols.map((t: TunjanganList) => {
-                                        const tunjanganKey = String(Number(t.id));
-                                        const colTotal = employees.reduce((sum, e) => {
-                                            return sum + (Number(formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan) || 0);
-                                        }, 0);
-                                        return (
-                                            <td key={t.id} className="px-2 py-4 text-right font-bold text-green-600 text-sm">
-                                                {formatCurrency(colTotal)}
-                                            </td>
-                                        );
-                                    })}
+                                    {tunjanganCols.map((t: TunjanganList) => (
+                                        <td key={t.id} className="px-2 py-4 text-right font-bold text-green-600 text-sm">
+                                            {t.perusahaan}%
+                                        </td>
+                                    ))}
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
-                                    {tunjanganCols.map((t: TunjanganList) => {
-                                        const tunjanganKey = String(Number(t.id));
-                                        const colTotal = employees.reduce((sum, e) => {
-                                            const perusahaan = Number(formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan) || 0;
-                                            const karyawan = Number(formData[e.id]?.tunjangan?.[tunjanganKey]?.karyawan) || 0;
-                                            return sum + perusahaan + karyawan;
-                                        }, 0);
-                                        return (
-                                            <td key={t.id} className="px-2 py-4 text-right font-bold text-red-600 text-sm">
-                                                {formatCurrency(colTotal)}
-                                            </td>
-                                        );
-                                    })}
+                                    {tunjanganCols.map((t: TunjanganList) => (
+                                        <td key={t.id} className="px-2 py-4 text-right font-bold text-red-600 text-sm">
+                                            {t.karyawan}%
+                                        </td>
+                                    ))}
                                     <td className="px-3 py-4 text-right font-bold text-blue-600">
                                         {formatCurrency(totalGajiBersih)}
                                     </td>

@@ -239,6 +239,14 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
         window.open(`/payroll/${bulan}/export?${params.toString()}`, '_blank');
     };
 
+    const handleExportDetail = (bulan: string, statusPegawai?: string | null) => {
+        const params = new URLSearchParams({ bulan });
+        if (statusPegawai) {
+            params.append('status', statusPegawai);
+        }
+        window.open(`/payroll/${bulan}/export-detail?${params.toString()}`, '_blank');
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manajemen Payroll" />
@@ -353,13 +361,16 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                         </button>
                                                     )}
                                                     {item.status === 'published' && (
-                                                        <button
-                                                            onClick={() => handleExport(item.bulan, item.status_pegawai)}
-                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
-                                                        >
-                                                            <Download className="size-3" />
-                                                            <span>Export</span>
-                                                        </button>
+                                                        <div className="flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handleExport(item.bulan, item.status_pegawai)}
+                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
+                                                                title="Export BCA"
+                                                            >
+                                                                <Download className="size-3" />
+                                                                <span>BCA</span>
+                                                            </button>
+                                                        </div>
                                                     )}
                                                     {(isSuperAdmin || can('payroll.delete')) && item.status === 'draft' && !isKaryawan && (
                                                         <button

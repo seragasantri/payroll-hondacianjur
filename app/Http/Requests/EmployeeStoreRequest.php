@@ -24,7 +24,7 @@ class EmployeeStoreRequest extends FormRequest
         return [
             'nip' => 'required|string|unique:employees,nip|unique:users,username',
             'nama' => 'required|string|max:255',
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:6|confirmed',
             'kantor_cabang_id' => 'required|exists:kantor_cabangs,id',
             'jabatan_id' => 'required|exists:jabatans,id',
             'nomor_rekening' => 'nullable|string|max:255',
@@ -50,7 +50,7 @@ class EmployeeStoreRequest extends FormRequest
             'nip.unique' => 'NIP sudah terdaftar',
             'nama.required' => 'Nama wajib diisi',
             'password.required' => 'Password wajib diisi',
-            'password.min' => 'Password minimal 8 karakter',
+            'password.min' => 'Password minimal 6 karakter',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
             'kantor_cabang_id.required' => 'Kantor Cab wajib diisi',
             'kantor_cabang_id.exists' => 'Kantor Cab tidak valid',

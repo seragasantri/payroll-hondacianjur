@@ -8,6 +8,7 @@ use App\Http\Resources\PayrollResource;
 use App\Models\Employee;
 use App\Models\Payrolls;
 use App\Models\PayrollDetail;
+use App\Models\Tunjangan;
 use App\Services\PayrollServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -639,6 +640,230 @@ class PayrollController extends Controller
         }
 
         fclose($output);
+        exit;
+    }
+
+    /**
+     * Export detailed payroll data to Excel (.xlsx)
+     */
+    public function exportDetail($bulan, Request $request)
+    {
+        $user = Auth::user();
+        $isUsersRole = $user->hasRole('users');
+
+        // Manual authorization check
+        $roleNames = $user->getRoleNames()->toArray();
+        $hasAccess = $user->hasPermissionTo('payroll.view any')
+            || in_array('Super Admin', $roleNames)
+            || in_array('users', $roleNames);
+
+        if (!$hasAccess) {
+            abort(403, 'Unauthorized');
+        }
+
+        $status = $request->get('status');
+
+        // Get payrolls header
+        $payrollHeader = Payrolls::where('bulan', $bulan)
+            ->when($status, function ($query) use ($status) {
+                $query->where('status_pegawai', $status);
+            })
+            ->first();
+
+        if (!$payrollHeader || $payrollHeader->status !== 'published') {
+            return redirect()->route('payroll.index')
+                ->with('error', 'Payroll belum dipublish!');
+        }
+
+        // Get payroll details
+        $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
+            ->with(['employee', 'employee.kantorCabang', 'employee.jabatan', 'employee.user']);
+
+        // If user has 'users' role, only export their own data
+        if ($isUsersRole) {
+            $employee = Employee::where('user_id', $user->id)->first();
+            if (!$employee) {
+                return redirect()->route('payroll.index')
+                    ->with('error', 'Data karyawan tidak ditemukan!');
+            }
+            $payrollDetailsQuery->where('employee_id', $employee->id);
+        }
+
+        $payrollDetails = $payrollDetailsQuery->get();
+
+        // Get tunjangan list
+        $tunjanganList = Tunjangan::all()->keyBy('id');
+
+        // Parse tunjangan_lain from each payroll detail
+        foreach ($payrollDetails as $detail) {
+            $tunjanganLain = $detail->tunjangan_lain;
+            if (is_string($tunjanganLain)) {
+                $detail->tunjangan_lain_parsed = json_decode($tunjanganLain, true) ?? [];
+            } else {
+                $detail->tunjangan_lain_parsed = [];
+            }
+        }
+
+        // Use PhpSpreadsheet to create real Excel file
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header styles
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '2777ff']],
+            'font' => ['color' => ['rgb' => 'FFFFFF']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ];
+
+        // Build dynamic headers based on tunjangan list
+        $headers = [
+            'No', 'NIP', 'Nama', 'Cabang', 'Jabatan', 'Status',
+            'Hari Kerja', 'Hari Masuk', 'Gaji Pokok', 'Tunjangan Jabatan',
+            'Insentif', 'Uang Hadir', 'Lembur', 'Reward', 'Lain-Lain',
+        ];
+
+        // Add tunjangan perusahaan columns
+        foreach ($tunjanganList as $tunjangan) {
+            $headers[] = $tunjangan->jenis_tunjangan . ' (Perusahaan)';
+        }
+
+        // Add total tunjangan column
+        $headers[] = 'Total Tunjangan';
+
+        // Add potongan columns
+        foreach ($tunjanganList as $tunjangan) {
+            $headers[] = $tunjangan->jenis_tunjangan . ' (Karyawan)';
+        }
+
+        // Add remaining columns
+        $headers = array_merge($headers, [
+            'Total Potongan', 'Potongan Tidak Masuk', 'Potongan Terlambat', 'Kasbon', 'Potongan Lain', 'Gaji Bersih'
+        ]);
+
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $column++;
+        }
+
+        // Convert column count to Excel column letter (handles more than 26 columns)
+        $lastColNum = count($headers);
+        $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColNum);
+        $headerRange = 'A1:' . $lastColLetter . '1';
+        $sheet->getStyle($headerRange)->applyFromArray($headerStyle);
+
+        // Number format for Indonesian locale
+        $numberFormat = '#,##0';
+
+        // Data
+        $no = 1;
+        $row = 2;
+        $tunjanganCount = count($tunjanganList);
+        foreach ($payrollDetails as $detail) {
+            $employee = $detail->employee;
+
+            // Get tunjangan values from payroll detail
+            $tunjanganValues = [];
+            if (!empty($detail->tunjangan_lain_parsed)) {
+                $tunjanganValues = $detail->tunjangan_lain_parsed;
+            }
+
+            $totalTunjangan = 0;
+            $totalPotonganKaryawan = 0;
+
+            // Calculate per tunjangan
+            $tunjanganPerusahaan = [];
+            $tunjanganKaryawan = [];
+
+            foreach ($tunjanganList as $tunjangan) {
+                $tunjanganId = (string) $tunjangan->id;
+
+                // Get value from payroll or calculate from percentage
+                $perusahaanValue = 0;
+                $karyawanValue = 0;
+
+                if (isset($tunjanganValues[$tunjanganId])) {
+                    $perusahaanValue = isset($tunjanganValues[$tunjanganId]['perusahaan']) ? floatval($tunjanganValues[$tunjanganId]['perusahaan']) : 0;
+                    $karyawanValue = isset($tunjanganValues[$tunjanganId]['karyawan']) ? floatval($tunjanganValues[$tunjanganId]['karyawan']) : 0;
+                } else {
+                    // Calculate from percentage
+                    $perusahaanValue = ($tunjangan->perusahaan / 100) * $employee->gaji_pokok;
+                    $karyawanValue = ($tunjangan->karyawan / 100) * $employee->gaji_pokok;
+                }
+
+                $tunjanganPerusahaan[] = $perusahaanValue;
+                $tunjanganKaryawan[] = $karyawanValue;
+                $totalTunjangan += $perusahaanValue;
+                $totalPotonganKaryawan += $karyawanValue;
+            }
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $employee->nip);
+            $sheet->setCellValue('C' . $row, $employee->nama);
+            $sheet->setCellValue('D' . $row, $employee->kantorCabang?->name ?? '-');
+            $sheet->setCellValue('E' . $row, $employee->jabatan?->name ?? '-');
+            $sheet->setCellValue('F' . $row, $payrollHeader->status_pegawai);
+            $sheet->setCellValue('G' . $row, $detail->hari_kerja);
+            $sheet->setCellValue('H' . $row, $detail->hari_masuk);
+            $sheet->setCellValue('I' . $row, $employee->gaji_pokok)->getStyle('I' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('J' . $row, $employee->tunjangan_jabatan)->getStyle('J' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('K' . $row, $detail->insentif)->getStyle('K' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('L' . $row, $detail->uang_hadir)->getStyle('L' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('M' . $row, $detail->lembur)->getStyle('M' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('N' . $row, $detail->reward)->getStyle('N' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('O' . $row, $detail->lain_lain)->getStyle('O' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+
+            // Add tunjangan perusahaan columns
+            $col = 'P';
+            foreach ($tunjanganPerusahaan as $value) {
+                $sheet->setCellValue($col . $row, $value)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+                $col++;
+            }
+
+            // Total Tunjangan
+            $sheet->setCellValue($col . $row, $totalTunjangan)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+
+            // Add potongan karyawan columns
+            foreach ($tunjanganKaryawan as $value) {
+                $sheet->setCellValue($col . $row, $value)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+                $col++;
+            }
+
+            // Total Potongan
+            $sheet->setCellValue($col . $row, $totalPotonganKaryawan)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+
+            // Other deductions
+            $sheet->setCellValue($col . $row, $detail->potongan_tidak_masuk)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+            $sheet->setCellValue($col . $row, $detail->potongan_terlambat)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+            $sheet->setCellValue($col . $row, $detail->kasbon)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+            $sheet->setCellValue($col . $row, $detail->potongan_lain)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+            $sheet->setCellValue($col . $row, $detail->gaji_bersih)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+
+            $row++;
+        }
+
+        // Auto-size columns
+        $totalColumns = count($headers);
+        for ($i = 1; $i <= $totalColumns; $i++) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        $filename = 'payroll_detail_' . $bulan . '_' . str_replace(' ', '_', $status) . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
         exit;
     }
 
