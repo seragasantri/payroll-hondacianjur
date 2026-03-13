@@ -45,8 +45,8 @@ class PayrollController extends Controller
 
         // If user has 'users' role, only show their own payroll data
         if ($isUsersRole) {
-            // Get employee data associated with this user
-            $employee = Employee::where('user_id', $user->id)->first();
+            // Get employee data associated with this user (include soft-deleted for historical data)
+            $employee = Employee::withTrashed()->where('user_id', $user->id)->first();
 
             if (!$employee) {
                 return Inertia::render('payroll/index', [
@@ -112,15 +112,33 @@ class PayrollController extends Controller
         $payrollDetails = collect([]);
         if ($payrollHeader) {
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
-                ->with(['employee', 'employee.kantorCabang', 'employee.jabatan'])
+                ->with(['employee' => function ($query) {
+                    $query->withTrashed();
+                }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get()
                 ->keyBy('employee_id');
         }
 
+        // Get active employees
         $employees = \App\Models\Employee::with(['kantorCabang', 'jabatan'])
             ->where('status_pegawai', $status)
+            ->whereNull('deleted_at')
             ->orderBy('nama', 'asc')
             ->get();
+
+        // If there's existing payroll, also include soft-deleted employees that have payroll data
+        if ($payrollHeader) {
+            $existingEmployeeIds = $payrollDetails->pluck('employee_id')->toArray();
+            $softDeletedEmployees = \App\Models\Employee::with(['kantorCabang', 'jabatan'])
+                ->withTrashed()
+                ->whereIn('id', $existingEmployeeIds)
+                ->whereNotNull('deleted_at')
+                ->orderBy('nama', 'asc')
+                ->get();
+
+            // Merge active employees with soft-deleted employees that have existing payroll
+            $employees = $employees->merge($softDeletedEmployees);
+        }
 
         $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
 
@@ -382,16 +400,18 @@ class PayrollController extends Controller
 
         // For users role, only show their own data
         if ($isUsersRole) {
-            $employee = Employee::where('user_id', $user->id)->first();
+            $employee = Employee::withTrashed()->where('user_id', $user->id)->first();
             if (!$employee) {
                 return redirect()->route('payroll.index')
                     ->with('error', 'Data karyawan tidak ditemukan!');
             }
 
-            // Get only this employee's payroll detail
+            // Get only this employee's payroll detail (include soft-deleted employee)
             $payrollDetail = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->where('employee_id', $employee->id)
-                ->with(['employee', 'employee.kantorCabang', 'employee.jabatan'])
+                ->with(['employee' => function ($query) {
+                    $query->withTrashed();
+                }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->first();
 
             $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
@@ -424,7 +444,7 @@ class PayrollController extends Controller
                 'gaji_bersih' => (float) $payrollDetail->gaji_bersih,
                 'status' => $payrollHeader->status,
             ] : null;
-            $employeeData['tunjangan'] = $tunjanganList->map(function($tunjangan) use ($existingTunjangan, $employee) {
+            $employeeData['tunjangan'] = $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
                 $tunjanganId = (string) $tunjangan->id;
                 if (isset($existingTunjangan[$tunjanganId])) {
                     $nilaiPerusahaan = $existingTunjangan[$tunjanganId]['perusahaan'] ?? 0;
@@ -453,17 +473,21 @@ class PayrollController extends Controller
             ]);
         }
 
-        // Get employees based on status filter
-        $employees = \App\Models\Employee::with(['kantorCabang', 'jabatan'])
-            ->where('status_pegawai', $payrollHeader->status_pegawai)
-            ->orderBy('nama', 'asc')
-            ->get();
-
-        // Get payroll details
+        // Get payroll details - include soft-deleted employees for historical data
         $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
-            ->with(['employee', 'employee.kantorCabang', 'employee.jabatan'])
+            ->with(['employee' => function ($query) {
+                $query->withTrashed();
+            }, 'employee.kantorCabang', 'employee.jabatan'])
             ->get()
             ->keyBy('employee_id');
+
+        // Get employees from payroll details (includes soft-deleted)
+        $employeeIds = $payrollDetails->pluck('employee_id')->toArray();
+        $employees = \App\Models\Employee::with(['kantorCabang', 'jabatan'])
+            ->withTrashed()
+            ->whereIn('id', $employeeIds)
+            ->orderBy('nama', 'asc')
+            ->get();
 
         $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
 
@@ -575,13 +599,15 @@ class PayrollController extends Controller
                 ->with('error', 'Payroll belum dipublish!');
         }
 
-        // Get payroll details
+        // Get payroll details (include soft-deleted employees)
         $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
-            ->with(['employee', 'employee.kantorCabang', 'employee.jabatan']);
+            ->with(['employee' => function ($query) {
+                $query->withTrashed();
+            }, 'employee.kantorCabang', 'employee.jabatan']);
 
         // If user has 'users' role, only export their own data
         if ($isUsersRole) {
-            $employee = Employee::where('user_id', $user->id)->first();
+            $employee = Employee::withTrashed()->where('user_id', $user->id)->first();
             if (!$employee) {
                 return redirect()->route('payroll.index')
                     ->with('error', 'Data karyawan tidak ditemukan!');
@@ -591,18 +617,41 @@ class PayrollController extends Controller
 
         $payrollDetails = $payrollDetailsQuery->get();
 
-        // Generate Excel-like CSV data
-        $filename = 'payroll_' . $bulan . '_' . str_replace(' ', '_', $status) . '.csv';
+        // Parse bulan to get date parts and Indonesian month name
+        $bulanDate = \Carbon\Carbon::parse($bulan . '-01');
+        $day = $bulanDate->format('d');
+        $month = $bulanDate->format('m');
+        $year = $bulanDate->format('y');
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Pragma: no-cache');
-        header('Expires: 0');
+        $bulanIndo = [
+            '01' => 'JANUARI',
+            '02' => 'FEBRUARI',
+            '03' => 'MARET',
+            '04' => 'APRIL',
+            '05' => 'MEI',
+            '06' => 'JUNI',
+            '07' => 'JULI',
+            '08' => 'AGUSTUS',
+            '09' => 'SEPTEMBER',
+            '10' => 'OKTOBER',
+            '11' => 'NOVEMBER',
+            '12' => 'DESEMBER'
+        ];
+        $bulanName = $bulanIndo[$month] ?? strtoupper($bulan);
+        $tahunFull = $bulanDate->format('Y');
 
-        $output = fopen('php://output', 'w');
+        // Initialize counters for each status
+        $counters = [
+            'Pegawai Tetap' => 0,
+            'Pegawai Kontrak' => 0
+        ];
 
-        // Header CSV
-        fputcsv($output, [
+        // Create new Spreadsheet object
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set headers
+        $headers = [
             'No',
             'Transaction ID',
             'Transfer Type',
@@ -616,30 +665,68 @@ class PayrollController extends Controller
             'Receiver Swift Code',
             'Receiver Cust Type',
             'Receiver Cust Residence'
-        ], ';');
+        ];
 
+        // Write headers
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        // Style headers
+        $sheet->getStyle('A1:M1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:M1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Write data
+        $row = 2;
         $no = 1;
         foreach ($payrollDetails as $detail) {
             $employee = $detail->employee;
 
-            fputcsv($output, [
-                $no++,
-                'PAY-' . $bulan . '-' . str_pad($detail->id, 4, '0', STR_PAD_LEFT),
-                'BATCH',
-                $employee->id,
-                $employee->no_rekening ?? '',
-                $employee->nama ?? '',
-                number_format($detail->gaji_bersih, 0, ',', '.'),
-                $employee->nip ?? '',
-                'Gaji Bulan ' . $bulan . ' - ' . ($employee->jabatan?->name ?? ''),
-                $employee->email ?? '',
-                '',
-                'INDIVIDUAL',
-                'RESIDENT'
-            ], ';');
+            // Determine status code (1 = Tetap, 2 = Kontrak)
+            $statusCode = ($employee->status_pegawai === 'Pegawai Kontrak') ? '2' : '1';
+
+            // Increment counter for this status
+            $counters[$employee->status_pegawai] = ($counters[$employee->status_pegawai] ?? 0) + 1;
+            $urutan = str_pad($counters[$employee->status_pegawai], 3, '0', STR_PAD_LEFT);
+
+            // Transaction ID: DDMMYY + Status Code + 3-digit sequential number
+            $transactionId = $day . $month . $year . $statusCode . $urutan;
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $transactionId);
+            $sheet->setCellValue('C' . $row, 'BCA');
+            $sheet->setCellValue('D' . $row, '');
+            $sheet->setCellValue('E' . $row, $employee->nomor_rekening ?? '');
+            $sheet->setCellValue('F' . $row, $employee->nama ?? '');
+            $sheet->setCellValue('G' . $row, $detail->gaji_bersih);
+            $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->setCellValue('H' . $row, '');
+            $sheet->setCellValue('I' . $row, 'GAJI ' . $bulanName . ' ' . $tahunFull);
+            $sheet->setCellValue('J' . $row, $employee->email ?? '');
+            $sheet->setCellValue('K' . $row, '14');
+            $sheet->setCellValue('L' . $row, '1');
+            $sheet->setCellValue('M' . $row, '1');
+
+            $row++;
         }
 
-        fclose($output);
+        // Auto-size columns
+        foreach (range('A', 'M') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Generate filename
+        $filename = 'payroll_' . $bulan . '_' . str_replace(' ', '_', $status) . '.xlsx';
+
+        // Output to browser
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
         exit;
     }
 
@@ -675,13 +762,15 @@ class PayrollController extends Controller
                 ->with('error', 'Payroll belum dipublish!');
         }
 
-        // Get payroll details
+        // Get payroll details (include soft-deleted employees)
         $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
-            ->with(['employee', 'employee.kantorCabang', 'employee.jabatan', 'employee.user']);
+            ->with(['employee' => function ($query) {
+                $query->withTrashed();
+            }, 'employee.kantorCabang', 'employee.jabatan', 'employee.user']);
 
         // If user has 'users' role, only export their own data
         if ($isUsersRole) {
-            $employee = Employee::where('user_id', $user->id)->first();
+            $employee = Employee::withTrashed()->where('user_id', $user->id)->first();
             if (!$employee) {
                 return redirect()->route('payroll.index')
                     ->with('error', 'Data karyawan tidak ditemukan!');
@@ -718,9 +807,21 @@ class PayrollController extends Controller
 
         // Build dynamic headers based on tunjangan list
         $headers = [
-            'No', 'NIP', 'Nama', 'Cabang', 'Jabatan', 'Status',
-            'Hari Kerja', 'Hari Masuk', 'Gaji Pokok', 'Tunjangan Jabatan',
-            'Insentif', 'Uang Hadir', 'Lembur', 'Reward', 'Lain-Lain',
+            'No',
+            'NIP',
+            'Nama',
+            'Cabang',
+            'Jabatan',
+            'Status',
+            'Hari Kerja',
+            'Hari Masuk',
+            'Gaji Pokok',
+            'Tunjangan Jabatan',
+            'Insentif',
+            'Uang Hadir',
+            'Lembur',
+            'Reward',
+            'Lain-Lain',
         ];
 
         // Add tunjangan perusahaan columns
@@ -738,7 +839,12 @@ class PayrollController extends Controller
 
         // Add remaining columns
         $headers = array_merge($headers, [
-            'Total Potongan', 'Potongan Tidak Masuk', 'Potongan Terlambat', 'Kasbon', 'Potongan Lain', 'Gaji Bersih'
+            'Total Potongan',
+            'Potongan Tidak Masuk',
+            'Potongan Terlambat',
+            'Kasbon',
+            'Potongan Lain',
+            'Gaji Bersih'
         ]);
 
         $column = 'A';
