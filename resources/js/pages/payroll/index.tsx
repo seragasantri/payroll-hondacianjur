@@ -68,7 +68,31 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
     };
 
     const handleCreate = async () => {
-        const currentBulan = new Date().toISOString().slice(0, 7);
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+
+        // Generate year options (current year and 2 years back)
+        const years = [currentYear, currentYear - 1, currentYear - 2];
+
+        // Indonesian month names
+        const monthNames = [
+            { value: '01', label: 'Januari' },
+            { value: '02', label: 'Februari' },
+            { value: '03', label: 'Maret' },
+            { value: '04', label: 'April' },
+            { value: '05', label: 'Mei' },
+            { value: '06', label: 'Juni' },
+            { value: '07', label: 'Juli' },
+            { value: '08', label: 'Agustus' },
+            { value: '09', label: 'September' },
+            { value: '10', label: 'Oktober' },
+            { value: '11', label: 'November' },
+            { value: '12', label: 'Desember' }
+        ];
+
+        const yearOptions = years.map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`).join('');
+        const monthOptions = monthNames.map(m => `<option value="${m.value}" ${m.value === currentMonth ? 'selected' : ''}>${m.label}</option>`).join('');
 
         const { value: formValues } = await Swal.fire({
             title: 'Buat Payroll',
@@ -80,29 +104,38 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
             confirmButtonText: 'Buat',
             cancelButtonText: 'Batal',
             html: `
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Bulan</label>
-                    <input type="text" id="swal-bulan" class="swal2-input" placeholder="YYYY-MM" value="${currentBulan}">
+                <div class="mb-4 flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Bulan</label>
+                        <select id="swal-bulan" class="swal2-select">
+                            ${monthOptions}
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Tahun</label>
+                        <select id="swal-tahun" class="swal2-select">
+                            ${yearOptions}
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Status Pegawai</label>
                     <select id="swal-status" class="swal2-select">
                         <option value="Pegawai Tetap">Pegawai Tetap</option>
                         <option value="Pegawai Kontrak">Pegawai Kontrak</option>
+                        <option value="THR">THR</option>
                     </select>
                 </div>
             `,
             focusConfirm: false,
             preConfirm: () => {
-                const bulan = (document.getElementById('swal-bulan') as HTMLInputElement).value;
+                const bulan = (document.getElementById('swal-bulan') as HTMLSelectElement).value;
+                const tahun = (document.getElementById('swal-tahun') as HTMLSelectElement).value;
                 const status = (document.getElementById('swal-status') as HTMLSelectElement).value;
 
-                if (!bulan || !/^\d{4}-\d{2}$/.test(bulan)) {
-                    Swal.showValidationMessage('Format harus YYYY-MM');
-                    return false;
-                }
+                const fullBulan = `${tahun}-${bulan}`;
 
-                return { bulan, status };
+                return { bulan: fullBulan, status };
             }
         });
 

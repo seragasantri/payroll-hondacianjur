@@ -106,7 +106,9 @@ class PayrollController extends Controller
 
         // Check if payrolls header exists
         $payrollHeader = Payrolls::where('bulan', $bulan)
-            ->where('status_pegawai', $status)
+            ->when($status !== 'THR', function ($query) use ($status) {
+                $query->where('status_pegawai', $status);
+            })
             ->first();
 
         $payrollDetails = collect([]);
@@ -121,13 +123,15 @@ class PayrollController extends Controller
 
         // Get active employees
         $employees = \App\Models\Employee::with(['kantorCabang', 'jabatan'])
-            ->where('status_pegawai', $status)
             ->whereNull('deleted_at')
+            ->when($status !== 'THR', function ($query) use ($status) {
+                $query->where('status_pegawai', $status);
+            })
             ->orderBy('nama', 'asc')
             ->get();
 
-        // If there's existing payroll, also include soft-deleted employees that have payroll data
-        if ($payrollHeader) {
+        // If there's existing payroll (and not THR), also include soft-deleted employees that have payroll data
+        if ($payrollHeader && $status !== 'THR') {
             $existingEmployeeIds = $payrollDetails->pluck('employee_id')->toArray();
             $softDeletedEmployees = \App\Models\Employee::with(['kantorCabang', 'jabatan'])
                 ->withTrashed()
@@ -388,7 +392,7 @@ class PayrollController extends Controller
 
         // Get payrolls header
         $payrollHeader = Payrolls::where('bulan', $bulan)
-            ->when($status, function ($query) use ($status) {
+            ->when($status && $status !== 'THR', function ($query) use ($status) {
                 $query->where('status_pegawai', $status);
             })
             ->first();
@@ -752,7 +756,7 @@ class PayrollController extends Controller
 
         // Get payrolls header
         $payrollHeader = Payrolls::where('bulan', $bulan)
-            ->when($status, function ($query) use ($status) {
+            ->when($status && $status !== 'THR', function ($query) use ($status) {
                 $query->where('status_pegawai', $status);
             })
             ->first();
@@ -985,7 +989,7 @@ class PayrollController extends Controller
 
         // Check if payroll is draft
         $payrollHeader = Payrolls::where('bulan', $bulan)
-            ->when($status, function ($query) use ($status) {
+            ->when($status && $status !== 'THR', function ($query) use ($status) {
                 $query->where('status_pegawai', $status);
             })
             ->first();
@@ -1017,7 +1021,7 @@ class PayrollController extends Controller
         // Check if payroll is draft
         $status = $request->get('status');
         $payrollHeader = Payrolls::where('bulan', $bulan)
-            ->when($status, function ($query) use ($status) {
+            ->when($status && $status !== 'THR', function ($query) use ($status) {
                 $query->where('status_pegawai', $status);
             })
             ->first();
@@ -1043,7 +1047,7 @@ class PayrollController extends Controller
 
         // Check if payroll is draft
         $payrollHeader = Payrolls::where('bulan', $bulan)
-            ->when($status, function ($query) use ($status) {
+            ->when($status && $status !== 'THR', function ($query) use ($status) {
                 $query->where('status_pegawai', $status);
             })
             ->first();
@@ -1075,16 +1079,20 @@ class PayrollController extends Controller
         // Check if there's payroll for this month with the specific status
         $query = Payrolls::where('bulan', $bulan);
 
-        if ($status) {
+        if ($status === 'THR') {
+            // For THR, check if THR payroll already exists
+            $query->where('status_pegawai', 'THR');
+        } elseif ($status) {
             $query->where('status_pegawai', $status);
         }
 
         $existing = $query->first();
 
         if ($existing) {
+            $statusLabel = $status === 'THR' ? 'THR' : $status;
             return response()->json([
                 'exists' => true,
-                'message' => "Payroll bulan {$bulan} untuk status {$status} sudah ada!",
+                'message' => "Payroll bulan {$bulan} untuk status {$statusLabel} sudah ada!",
                 'bulan' => $bulan,
                 'status_pegawai' => $existing->status_pegawai,
                 'payroll_status' => $existing->status
@@ -1107,7 +1115,7 @@ class PayrollController extends Controller
         // Get payrolls for this bulan, filtered by status if provided
         $payrollQuery = Payrolls::where('bulan', $bulan);
 
-        if ($status) {
+        if ($status && $status !== 'THR') {
             $payrollQuery->where('status_pegawai', $status);
         }
 
