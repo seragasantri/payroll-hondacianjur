@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Briefcase, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog, Wallet } from 'lucide-react';
+import { Briefcase, Calculator, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog, Wallet } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -82,6 +82,12 @@ export function AppSidebar() {
             href: payroll.index().url,
             icon: Wallet,
             show: isSuperAdmin || can('payroll.view any') || can('payroll.view')
+        },
+        {
+            title: 'Pajak (PPH 21)',
+            href: '/tax',
+            icon: Calculator,
+            show: isSuperAdmin
         },
     ];
 

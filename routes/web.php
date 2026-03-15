@@ -8,6 +8,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TunjanganController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('kantor-cabang', KantorCabangController::class);
     Route::resource('jabatan', JabatanController::class);
     Route::resource('tunjangan', TunjanganController::class);
+
+    // Tax settings routes
+    Route::get('tax', [TaxController::class, 'index'])->name('tax.index');
+    Route::post('tax/calculate', [TaxController::class, 'calculate'])->name('tax.calculate');
 
     // Payroll routes - using bulan instead of id
     Route::get('payroll', [PayrollController::class, 'index'])->name('payroll.index');

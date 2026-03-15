@@ -31,6 +31,9 @@ interface PayrollData {
     total_potongan: number;
     gaji_bersih: number;
     status: string;
+    pph21_amount?: number;
+    tax_method?: string;
+    tax_rate_applied?: number;
 }
 
 interface Employee {
@@ -316,11 +319,11 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td>:</td>
                         <td class="text-right">${formatRupiahTable(employee.payroll?.kasbon || 0)}</td>
                     </tr>
-              
+
                     <tr>
                         <td class="text-left">PAJAK</td>
-                            <td>:</td>
-                        <td class="text-right">${formatRupiahTable(0)}</td>
+                        <td>:</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.pph21_amount || 0)}</td>
                     </tr>
                 </table>
             </div>

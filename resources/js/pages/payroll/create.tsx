@@ -18,6 +18,7 @@ interface EmployeePayroll {
     nama: string;
     kantorCabang: string;
     jabatan: string;
+    ptkp: string;
     gaji_pokok: number;
     tunjangan_jabatan: number;
     potongan_tidak_masuk: number;
@@ -41,6 +42,9 @@ interface EmployeePayroll {
         total_potongan: number;
         gaji_bersih: number;
         status: string;
+        pph21_amount?: number;
+        tax_method?: string;
+        tax_rate_applied?: number;
     } | null;
 }
 
@@ -102,6 +106,169 @@ export default function PayrollCreate({
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(amount || 0);
+    };
+
+    // PTKP data
+    const ptkpData: Record<string, { amount: number; category: string }> = {
+        'TK/0': { amount: 54000000, category: 'A' },
+        'TK/1': { amount: 58500000, category: 'A' },
+        'K/0': { amount: 58500000, category: 'A' },
+        'TK/2': { amount: 63000000, category: 'B' },
+        'TK/3': { amount: 67500000, category: 'B' },
+        'K/1': { amount: 63000000, category: 'B' },
+        'K/2': { amount: 67500000, category: 'B' },
+        'K/3': { amount: 72000000, category: 'C' },
+    };
+
+    // TER rates (simplified - main brackets only)
+    const terRates: Record<string, { min: number; max: number | null; percentage: number }[]> = {
+        'A': [
+            { min: 0, max: 5400000, percentage: 0 },
+            { min: 5400001, max: 5650000, percentage: 0.25 },
+            { min: 5650001, max: 5950000, percentage: 0.5 },
+            { min: 5950001, max: 6300000, percentage: 0.75 },
+            { min: 6300001, max: 6750000, percentage: 1.0 },
+            { min: 6750001, max: 7500000, percentage: 1.25 },
+            { min: 7500001, max: 8550000, percentage: 1.5 },
+            { min: 8550001, max: 9650000, percentage: 1.75 },
+            { min: 9650001, max: 10050000, percentage: 2.0 },
+            { min: 10050001, max: 10350000, percentage: 2.25 },
+            { min: 10350001, max: 10700000, percentage: 2.5 },
+            { min: 10700001, max: 11050000, percentage: 3.0 },
+            { min: 11050001, max: 11600000, percentage: 3.5 },
+            { min: 11600001, max: 12500000, percentage: 4.0 },
+            { min: 12500001, max: 13750000, percentage: 5.0 },
+            { min: 13750001, max: 15100000, percentage: 6.0 },
+            { min: 15100001, max: 16950000, percentage: 7.0 },
+            { min: 16950001, max: 19750000, percentage: 8.0 },
+            { min: 19750001, max: 24150000, percentage: 9.0 },
+            { min: 24150001, max: 26450000, percentage: 10.0 },
+            { min: 26450001, max: 28000000, percentage: 11.0 },
+            { min: 28000001, max: 30050000, percentage: 12.0 },
+            { min: 30050001, max: 32400000, percentage: 13.0 },
+            { min: 32400001, max: 35000000, percentage: 14.0 },
+            { min: 35000001, max: 40000000, percentage: 15.0 },
+            { min: 40000001, max: 50000000, percentage: 16.0 },
+            { min: 50000001, max: 60000000, percentage: 17.0 },
+            { min: 60000001, max: 75000000, percentage: 18.0 },
+            { min: 75000001, max: 100000000, percentage: 19.0 },
+            { min: 100000001, max: 200000000, percentage: 20.0 },
+            { min: 200000001, max: null, percentage: 21.0 },
+        ],
+        'B': [
+            { min: 0, max: 6200000, percentage: 0 },
+            { min: 6200001, max: 6500000, percentage: 0.25 },
+            { min: 6500001, max: 6850000, percentage: 0.5 },
+            { min: 6850001, max: 7300000, percentage: 0.75 },
+            { min: 7300001, max: 9200000, percentage: 1.0 },
+            { min: 9200001, max: 10750000, percentage: 1.5 },
+            { min: 10750001, max: 11250000, percentage: 2.0 },
+            { min: 11250001, max: 11600000, percentage: 2.5 },
+            { min: 11600001, max: 12600000, percentage: 3.0 },
+            { min: 12600001, max: 13600000, percentage: 4.0 },
+            { min: 13600001, max: 14950000, percentage: 5.0 },
+            { min: 14950001, max: 16400000, percentage: 6.0 },
+            { min: 16400001, max: 18450000, percentage: 7.0 },
+            { min: 18450001, max: 21850000, percentage: 8.0 },
+            { min: 21850001, max: 26000000, percentage: 9.0 },
+            { min: 26000001, max: 27700000, percentage: 10.0 },
+            { min: 27700001, max: 29350000, percentage: 11.0 },
+            { min: 29350001, max: 31450000, percentage: 12.0 },
+            { min: 31450001, max: 35000000, percentage: 13.0 },
+            { min: 35000001, max: 40000000, percentage: 14.0 },
+            { min: 40000001, max: 50000000, percentage: 15.0 },
+            { min: 50000001, max: 60000000, percentage: 16.0 },
+            { min: 60000001, max: 75000000, percentage: 17.0 },
+            { min: 75000001, max: 100000000, percentage: 18.0 },
+            { min: 100000001, max: 200000000, percentage: 19.0 },
+            { min: 200000001, max: null, percentage: 20.0 },
+        ],
+        'C': [
+            { min: 0, max: 6600000, percentage: 0 },
+            { min: 6600001, max: 6950000, percentage: 0.25 },
+            { min: 6950001, max: 7350000, percentage: 0.5 },
+            { min: 7350001, max: 7800000, percentage: 0.75 },
+            { min: 7800001, max: 8850000, percentage: 1.0 },
+            { min: 8850001, max: 9800000, percentage: 1.25 },
+            { min: 9800001, max: 10950000, percentage: 1.5 },
+            { min: 10950001, max: 11200000, percentage: 1.75 },
+            { min: 11200001, max: 12050000, percentage: 2.0 },
+            { min: 12050001, max: 12950000, percentage: 3.0 },
+            { min: 12950001, max: 14150000, percentage: 4.0 },
+            { min: 14150001, max: 15550000, percentage: 5.0 },
+            { min: 15550001, max: 17050000, percentage: 6.0 },
+            { min: 17050001, max: 19500000, percentage: 7.0 },
+            { min: 19500001, max: 22700000, percentage: 8.0 },
+            { min: 22700001, max: 26600000, percentage: 9.0 },
+            { min: 26600001, max: 28100000, percentage: 10.0 },
+            { min: 28100001, max: 30100000, percentage: 11.0 },
+            { min: 30100001, max: 32600000, percentage: 12.0 },
+            { min: 32600001, max: 35000000, percentage: 13.0 },
+            { min: 35000001, max: 40000000, percentage: 14.0 },
+            { min: 40000001, max: 50000000, percentage: 15.0 },
+            { min: 50000001, max: 60000000, percentage: 16.0 },
+            { min: 60000001, max: 75000000, percentage: 17.0 },
+            { min: 75000001, max: 100000000, percentage: 18.0 },
+            { min: 100000001, max: 200000000, percentage: 19.0 },
+            { min: 200000001, max: null, percentage: 20.0 },
+        ],
+    };
+
+    // Calculate tax using TER method
+    const calculateTax = (grossSalary: number, ptkpCode: string): { tax: number; rate: number } => {
+        const ptkp = ptkpData[ptkpCode] || ptkpData['TK/0'];
+        const category = ptkp.category;
+        const rates = terRates[category] || terRates['A'];
+
+        // Find applicable TER rate - salary must be >= min
+        let taxRate = 0;
+        for (const rate of rates) {
+            if (grossSalary >= rate.min) {
+                // Check if within this bracket's max, or if this is the last bracket (max is high enough)
+                if (rate.max === null || grossSalary <= rate.max) {
+                    taxRate = rate.percentage;
+                    break;
+                }
+            }
+        }
+
+        const tax = Math.round(grossSalary * taxRate / 100);
+        return { tax, rate: taxRate };
+    };
+
+    // Calculate gross salary for tax
+    const getGrossSalary = (empId: number) => {
+        const emp = employees.find(e => e.id === empId);
+        if (!emp) return 0;
+
+        const gajiPokok = parseRupiah(String(formData[empId]?.gaji_pokok || 0));
+        const tunjanganJabatan = parseRupiah(String(formData[empId]?.tunjangan_jabatan || 0));
+        const insentif = parseRupiah(String(formData[empId]?.insentif || 0));
+        const uangHadir = parseRupiah(String(formData[empId]?.uang_hadir || 0));
+        const lembur = parseRupiah(String(formData[empId]?.lembur || 0));
+        const reward = parseRupiah(String(formData[empId]?.reward || 0));
+        const lainLain = parseRupiah(String(formData[empId]?.lain_lain || 0));
+
+        // Add tunjangan perusahaan
+        let tunjanganPerusahaan = 0;
+        const tunjangan = formData[empId]?.tunjangan;
+        if (tunjangan) {
+            Object.values(tunjangan).forEach((t: { perusahaan: number; karyawan: number }) => {
+                tunjanganPerusahaan += Number(t.perusahaan) || 0;
+            });
+        }
+
+        return gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tunjanganPerusahaan;
+    };
+
+    // Get calculated tax for employee
+    const getCalculatedTax = (empId: number) => {
+        const emp = employees.find(e => e.id === empId);
+        if (!emp) return 0;
+
+        const grossSalary = getGrossSalary(empId);
+        const result = calculateTax(grossSalary, emp.ptkp);
+        return result.tax;
     };
 
     const [formData, setFormData] = useState<Record<number, {
@@ -254,11 +421,15 @@ export default function PayrollCreate({
             });
         }
 
+        // Add calculated tax
+        const calculatedTax = getCalculatedTax(empId);
+
         return getPotonganTidakMasuk(empId) +
             getPotonganTerlambat(empId) +
             parseRupiah(String(formData[empId]?.kasbon || 0)) +
             parseRupiah(String(formData[empId]?.potongan_lain || 0)) +
-            totalTunjangan;
+            totalTunjangan +
+            calculatedTax;
     };
 
     const getGajiBersih = (empId: number) => {
@@ -388,7 +559,10 @@ export default function PayrollCreate({
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500' rowSpan={2}>Pajak</th>
                                     <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>POTONGAN (KARYAWAN)</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pendapatan</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pengurangan</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
                                 </tr>
                                 <tr>
@@ -685,15 +859,26 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
+                                            <td className="px-3 py-3 text-right text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-900/20">
+                                                {formatCurrency(getCalculatedTax(employee.id))}
+                                            </td>
                                             {tunjanganCols.map((t: TunjanganList) => {
                                                 const tunjanganKey = String(Number(t.id));
-                                                const currentValue = formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan || 0;
+                                                const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
+                                                const karyawan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan || 0;
+                                                const totalPotongan = perusahaan + karyawan;
                                                 return (
                                                     <td key={t.id} className="px-2 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-sm font-medium text-red-700 dark:text-red-400">
-                                                        {formatCurrency(currentValue)}
+                                                        {formatCurrency(totalPotongan)}
                                                     </td>
                                                 );
                                             })}
+                                            <td className="px-3 py-3 text-right text-sm font-bold text-green-600">
+                                                {formatCurrency(getTotalTunjangan(employee.id) + parseRupiah(String(formData[employee.id]?.gaji_pokok || 0)))}
+                                            </td>
+                                            <td className="px-3 py-3 text-right text-sm font-bold text-red-600">
+                                                {formatCurrency(getTotalPotongan(employee.id))}
+                                            </td>
                                             <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">
                                                 {formatCurrency(empGajiBersih)}
                                             </td>
@@ -741,18 +926,28 @@ export default function PayrollCreate({
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
-                                    <td className="px-3 py-4"></td>
+                                    <td className="px-3 py-4 text-right font-bold text-orange-600">
+                                        {formatCurrency(employees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}
+                                    </td>
                                     {tunjanganCols.map((t: TunjanganList) => {
                                         const tunjanganKey = String(Number(t.id));
-                                        const totalKaryawan = employees.reduce((sum, e) => {
-                                            return sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.karyawan || 0);
+                                        const totalPotongan = employees.reduce((sum, e) => {
+                                            const perusahaan = formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
+                                            const karyawan = formData[e.id]?.tunjangan?.[tunjanganKey]?.karyawan || 0;
+                                            return sum + perusahaan + karyawan;
                                         }, 0);
                                         return (
                                             <td key={t.id} className="px-2 py-4 text-right font-bold text-red-600 text-sm">
-                                                {formatCurrency(totalKaryawan)}
+                                                {formatCurrency(totalPotongan)}
                                             </td>
                                         );
                                     })}
+                                    <td className="px-3 py-4 text-right font-bold text-green-600">
+                                        {formatCurrency(totalTunjangan + totalGajiPokok)}
+                                    </td>
+                                    <td className="px-3 py-4 text-right font-bold text-red-600">
+                                        {formatCurrency(totalPotongan)}
+                                    </td>
                                     <td className="px-3 py-4 text-right font-bold text-blue-600">
                                         {formatCurrency(totalGajiBersih)}
                                     </td>

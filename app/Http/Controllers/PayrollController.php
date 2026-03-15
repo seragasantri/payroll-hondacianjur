@@ -10,6 +10,7 @@ use App\Models\Payrolls;
 use App\Models\PayrollDetail;
 use App\Models\Tunjangan;
 use App\Services\PayrollServices;
+use App\Services\TaxService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,7 @@ class PayrollController extends Controller
     public function __construct()
     {
         $this->payrollServices = new PayrollServices();
+        $this->taxService = new TaxService();
     }
 
     /**
@@ -169,6 +171,7 @@ class PayrollController extends Controller
                 'tanggal_mulai_kerja' => $employee->tanggal_mulai_kerja,
                 'kantorCabang' => $employee->kantorCabang?->name,
                 'jabatan' => $employee->jabatan?->name,
+                'ptkp' => $employee->ptkp ?? 'TK/0',
                 'gaji_pokok' => $gajiPokok,
                 'tunjangan_jabatan' => $tunjanganJabatan,
                 'potongan_tidak_masuk' => (float) $employee->potongan_tidak_masuk,
@@ -215,6 +218,9 @@ class PayrollController extends Controller
                     'total_gaji' => (float) $existing->total_gaji,
                     'total_potongan' => (float) $existing->total_potongan,
                     'gaji_bersih' => (float) $existing->gaji_bersih,
+                    'pph21_amount' => (float) $existing->pph21_amount,
+                    'tax_method' => $existing->tax_method,
+                    'tax_rate_applied' => (float) $existing->tax_rate_applied,
                 ] : null
             ];
         });
@@ -316,6 +322,17 @@ class PayrollController extends Controller
                 $totalPotonganKaryawan += (float) ($t['karyawan'] ?? 0);
             }
 
+            // Calculate gross salary for tax
+            $grossSalary = $gajiPokok + $tunjanganJabatan + $insentif + $uangHadir + $lembur + $reward + $lainLain + $totalTunjanganPerusahaan;
+
+            // Calculate PPh21 tax based on employee's PTKP
+            $ptkpCode = $employee->ptkp ?? 'TK/0';
+            $taxResult = $this->taxService->hitungPPh21($grossSalary, $ptkpCode);
+
+            $pph21Amount = $taxResult['pph21_bulanan'];
+            $taxMethod = $taxResult['method'];
+            $taxRateApplied = $taxResult['tarif'];
+
             // Check if payroll detail exists
             $existing = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->where('employee_id', $employeeId)
@@ -338,6 +355,9 @@ class PayrollController extends Controller
                     'potongan_tidak_masuk' => $potonganTidakMasuk,
                     'potongan_terlambat' => $potonganTerlambat,
                     'potongan_lain' => $potonganLain,
+                    'pph21_amount' => $pph21Amount,
+                    'tax_method' => $taxMethod,
+                    'tax_rate_applied' => $taxRateApplied,
                     'updated_by' => auth()->id(),
                 ]);
             } else {
@@ -359,6 +379,9 @@ class PayrollController extends Controller
                     'potongan_tidak_masuk' => $potonganTidakMasuk,
                     'potongan_terlambat' => $potonganTerlambat,
                     'potongan_lain' => $potonganLain,
+                    'pph21_amount' => $pph21Amount,
+                    'tax_method' => $taxMethod,
+                    'tax_rate_applied' => $taxRateApplied,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
@@ -450,6 +473,9 @@ class PayrollController extends Controller
                 'total_potongan' => (float) $payrollDetail->total_potongan,
                 'gaji_bersih' => (float) $payrollDetail->gaji_bersih,
                 'status' => $payrollHeader->status,
+                'pph21_amount' => (float) $payrollDetail->pph21_amount,
+                'tax_method' => $payrollDetail->tax_method,
+                'tax_rate_applied' => (float) $payrollDetail->tax_rate_applied,
             ] : null;
             $employeeData['tunjangan'] = $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
                 $tunjanganId = (string) $tunjangan->id;
@@ -562,6 +588,9 @@ class PayrollController extends Controller
                     'total_potongan' => (float) $existing->total_potongan,
                     'gaji_bersih' => (float) $existing->gaji_bersih,
                     'status' => $payrollHeader->status,
+                    'pph21_amount' => (float) $existing->pph21_amount,
+                    'tax_method' => $existing->tax_method,
+                    'tax_rate_applied' => (float) $existing->tax_rate_applied,
                 ] : null
             ];
         });
@@ -852,6 +881,7 @@ class PayrollController extends Controller
             'Potongan Terlambat',
             'Kasbon',
             'Potongan Lain',
+            'Pajak',
             'Gaji Bersih'
         ]);
 
@@ -957,6 +987,8 @@ class PayrollController extends Controller
             $sheet->setCellValue($col . $row, $detail->kasbon)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
             $col++;
             $sheet->setCellValue($col . $row, $detail->potongan_lain)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $col++;
+            $sheet->setCellValue($col . $row, $detail->pph21_amount)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
             $col++;
             $sheet->setCellValue($col . $row, $detail->gaji_bersih)->getStyle($col . $row)->getNumberFormat()->setFormatCode($numberFormat);
 

@@ -33,6 +33,9 @@ class PayrollDetail extends Model
         'total_gaji',
         'total_potongan',
         'gaji_bersih',
+        'pph21_amount',
+        'tax_method',
+        'tax_rate_applied',
         'created_by',
         'updated_by',
     ];
@@ -52,6 +55,8 @@ class PayrollDetail extends Model
         'total_gaji' => 'decimal:2',
         'total_potongan' => 'decimal:2',
         'gaji_bersih' => 'decimal:2',
+        'pph21_amount' => 'decimal:2',
+        'tax_rate_applied' => 'decimal:2',
     ];
 
     public function payroll(): BelongsTo
@@ -109,13 +114,14 @@ class PayrollDetail extends Model
             + ($this->lain_lain ?? 0)
             + $totalTunjanganPerusahaan;
 
-        // total_potongan = kasbon + potongan_tidak_masuk + potongan_terlambat + potongan_lain + total_tunjangan_perusahaan + total_potongan_karyawan
+        // total_potongan = kasbon + potongan_tidak_masuk + potongan_terlambat + potongan_lain + total_tunjangan_perusahaan + total_potongan_karyawan + pph21
         $this->total_potongan = ($this->kasbon ?? 0)
             + $this->potongan_tidak_masuk
             + $this->potongan_terlambat
             + ($this->potongan_lain ?? 0)
             + $totalTunjanganPerusahaan
-            + $totalPotonganKaryawan;
+            + $totalPotonganKaryawan
+            + ($this->pph21_amount ?? 0);
 
         // gaji_bersih = total_gaji - total_potongan
         $this->gaji_bersih = $this->total_gaji - $this->total_potongan;
