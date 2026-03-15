@@ -23,6 +23,8 @@ class EmployeeStoreRequest extends FormRequest
     {
         return [
             'nip' => 'required|string|unique:employees,nip|unique:users,username',
+            'nik' => 'nullable|string|max:20',
+            'jenis_kelamin' => 'nullable|string|in:laki-laki,perempuan',
             'nama' => 'required|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
             'kantor_cabang_id' => 'required|exists:kantor_cabangs,id',

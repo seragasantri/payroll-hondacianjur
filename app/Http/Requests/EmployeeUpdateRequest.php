@@ -34,6 +34,8 @@ class EmployeeUpdateRequest extends FormRequest
                 Rule::unique('employees', 'nip')->ignore($this->route('employee')),
                 Rule::unique('users', 'username')->ignore($employee?->user_id),
             ],
+            'nik' => 'nullable|string|max:20',
+            'jenis_kelamin' => 'nullable|string|in:laki-laki,perempuan',
             'nama' => 'sometimes|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
             'kantor_cabang_id' => 'sometimes|exists:kantor_cabangs,id',

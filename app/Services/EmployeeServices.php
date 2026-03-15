@@ -77,6 +77,8 @@ class EmployeeServices
             $employeeData = [
                 'user_id' => $user->id,
                 'nip' => $data['nip'],
+                'nik' => $data['nik'] ?? null,
+                'jenis_kelamin' => $data['jenis_kelamin'] ?? null,
                 'nama' => $data['nama'],
                 'kantor_cabang_id' => $data['kantor_cabang_id'],
                 'jabatan_id' => $data['jabatan_id'],
@@ -111,6 +113,8 @@ class EmployeeServices
             // Prepare employee data
             $employeeData = [
                 'nip' => $data['nip'] ?? $employee->nip,
+                'nik' => $data['nik'] ?? $employee->nik,
+                'jenis_kelamin' => $data['jenis_kelamin'] ?? $employee->jenis_kelamin,
                 'nama' => $data['nama'] ?? $employee->nama,
                 'kantor_cabang_id' => $data['kantor_cabang_id'] ?? $employee->kantor_cabang_id,
                 'jabatan_id' => $data['jabatan_id'] ?? $employee->jabatan_id,

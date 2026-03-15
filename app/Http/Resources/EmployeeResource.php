@@ -18,6 +18,8 @@ class EmployeeResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'nip' => $this->nip,
+            'nik' => $this->nik,
+            'jenis_kelamin' => $this->jenis_kelamin,
             'nama' => $this->nama,
             'kantor_cabang_id' => $this->kantor_cabang_id,
             'jabatan_id' => $this->jabatan_id,

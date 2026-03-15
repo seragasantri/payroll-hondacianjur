@@ -66,6 +66,10 @@ export default function Dashboard(props: DashboardProps) {
     };
 
     const formatBulan = (bulan: string) => {
+        // Handle THR case (e.g., "THR 2026")
+        if (bulan.startsWith('THR')) {
+            return bulan;
+        }
         const [year, month] = bulan.split('-');
         const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         return `${monthNames[parseInt(month) - 1]} ${year}`;

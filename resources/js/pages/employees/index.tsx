@@ -24,6 +24,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface Employee {
     id: number;
     nip: string;
+    nik: string;
+    jenis_kelamin?: string;
     nama: string;
     kantorCabang?: { id: number; name: string };
     jabatan?: { id: number; name: string };
@@ -324,6 +326,12 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             <span className='ml-1'>{getSortIcon('nip')}</span>
                                         </button>
                                     </th>
+                                    <th className='px-4 py-4 w-40 text-left text-sm font-bold text-white'>
+                                        NIK
+                                    </th>
+                                    <th className='px-4 py-4 w-32 text-left text-sm font-bold text-white'>
+                                        JK
+                                    </th>
                                     <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('kantorCabang')}
@@ -383,6 +391,33 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         </div>
                                     </th>
                                     <th className='px-4 py-4'>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
+                                                placeholder='Cari NIK...'
+                                                value={getSearchValue('searchNIK')}
+                                                onChange={(e) => debouncedSearch('searchNIK', e.target.value, index().url)}
+                                            />
+                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-blue-400">
+                                                <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th className='px-4 py-4'>
+                                        <select
+                                            value={getSearchValue('searchJenisKelamin')}
+                                            onChange={(e) => debouncedSearch('searchJenisKelamin', e.target.value, index().url)}
+                                            className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
+                                        >
+                                            <option value="">Semua</option>
+                                            <option value="laki-laki">Laki-laki</option>
+                                            <option value="perempuan">Perempuan</option>
+                                        </select>
+                                    </th>
+                                    <th className='px-4 py-4'>
                                         <select
                                             value={getSearchValue('searchKantorCabang')}
                                             onChange={(e) => debouncedSearch('searchKantorCabang', e.target.value, index().url)}
@@ -411,7 +446,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         </select>
                                     </th>
                                     <th className='px-4 py-4'>
-                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
+                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchNIK') || getSearchValue('searchJenisKelamin') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
                                             <button
                                                 onClick={handleResetSearch}
                                                 className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
@@ -467,6 +502,22 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                                 <code className="rounded bg-blue-100 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                                                     {employee.nip}
                                                 </code>
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm">
+                                                {employee.nik || '-'}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {employee.jenis_kelamin === 'laki-laki' ? (
+                                                    <span className="inline-flex items-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-2 py-0.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                                        L
+                                                    </span>
+                                                ) : employee.jenis_kelamin === 'perempuan' ? (
+                                                    <span className="inline-flex items-center rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs font-semibold text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800">
+                                                        P
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400">-</span>
+                                                )}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
@@ -621,8 +672,18 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nip}</p>
                                     </div>
                                     <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">NIK</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nik || '-'}</p>
+                                    </div>
+                                    <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Nama</p>
                                         <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nama}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Jenis Kelamin</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                            {selectedEmployee.jenis_kelamin === 'laki-laki' ? 'Laki-laki' : selectedEmployee.jenis_kelamin === 'perempuan' ? 'Perempuan' : '-'}
+                                        </p>
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">KantorCabang</p>

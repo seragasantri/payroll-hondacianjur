@@ -93,6 +93,10 @@ const formatDate = (dateString: string) => {
 
 const formatBulan = (bulan: string) => {
     if (!bulan) return '-';
+    // Handle THR case (e.g., "THR 2026")
+    if (bulan.startsWith('THR')) {
+        return bulan;
+    }
     const parts = bulan.split('-');
     if (parts.length !== 2) return bulan;
     const [year, month] = parts;
@@ -116,6 +120,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function PayrollDetail({ bulan, status_pegawai, status, employees }: Props) {
+    console.log("🚀 ~ PayrollDetail ~ employees:", employees)
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
     const [expandedEmployee, setExpandedEmployee] = useState<number | null>(null);
@@ -137,6 +142,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
     };
 
     const handlePrintSlip = (employee: Employee) => {
+        console.log("🚀 ~ handlePrintSlip ~ employee:", employee.payroll)
         const printWindow = window.open('', '_blank', 'width=800,height=600');
         if (!printWindow) return;
 
@@ -306,15 +312,15 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     </tr>
                    
                     <tr>
-                        <td class="text-left">KASBON</td>
+                        <td class="text-left">PINJAMAN KARYAWAN</td>
                         <td>:</td>
                         <td class="text-right">${formatRupiahTable(employee.payroll?.kasbon || 0)}</td>
                     </tr>
               
                     <tr>
                         <td class="text-left">PAJAK</td>
-                        <td>:</td>
-                        <td class="text-right">0</td>
+                            <td>:</td>
+                        <td class="text-right">${formatRupiahTable(0)}</td>
                     </tr>
                 </table>
             </div>

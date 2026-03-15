@@ -25,6 +25,8 @@ interface Employee {
     id: number;
     user_id: number;
     nip: string;
+    nik: string;
+    jenis_kelamin?: string;
     nama: string;
     kantor_cabang_id: number;
     jabatan_id: number;
@@ -49,6 +51,8 @@ interface PageProps {
 export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PageProps) {
     const { data, setData, errors, put, processing } = useForm<{
         nip: string;
+        nik: string;
+        jenis_kelamin: string;
         nama: string;
         password: string;
         password_confirmation: string;
@@ -64,6 +68,8 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
         potongan_terlambat: string;
     }>({
         nip: employee.nip || '',
+        nik: employee.nik || '',
+        jenis_kelamin: employee.jenis_kelamin || '',
         nama: employee.nama || '',
         password: '',
         password_confirmation: '',
@@ -164,6 +170,47 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                         />
                                         {errors.nama && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.nama}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* NIK dan Jenis Kelamin */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* NIK */}
+                                    <div>
+                                        <label htmlFor="nik" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            NIK
+                                        </label>
+                                        <input
+                                            id="nik"
+                                            type="text"
+                                            value={data.nik}
+                                            onChange={e => setData('nik', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            placeholder="Contoh: 1234567890123456"
+                                        />
+                                        {errors.nik && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.nik}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Jenis Kelamin */}
+                                    <div>
+                                        <label htmlFor="jenis_kelamin" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Jenis Kelamin
+                                        </label>
+                                        <select
+                                            id="jenis_kelamin"
+                                            value={data.jenis_kelamin}
+                                            onChange={e => setData('jenis_kelamin', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                        >
+                                            <option value="">Pilih Jenis Kelamin</option>
+                                            <option value="laki-laki">Laki-laki</option>
+                                            <option value="perempuan">Perempuan</option>
+                                        </select>
+                                        {errors.jenis_kelamin && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.jenis_kelamin}</p>
                                         )}
                                     </div>
                                 </div>

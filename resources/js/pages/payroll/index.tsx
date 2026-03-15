@@ -49,6 +49,10 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
 
     const formatBulan = (bulan: string) => {
+        // Handle THR case (e.g., "THR 2026")
+        if (bulan.startsWith('THR')) {
+            return bulan;
+        }
         const [year, month] = bulan.split('-');
         const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         return `${monthNames[parseInt(month) - 1]} ${year}`;
@@ -104,7 +108,14 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
             confirmButtonText: 'Buat',
             cancelButtonText: 'Batal',
             html: `
-                <div class="mb-4 flex gap-2">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Jenis Payroll</label>
+                    <select id="swal-jenis-payroll" class="swal2-select">
+                        <option value="bulanan">Payroll Bulanan</option>
+                        <option value="thr">THR (Tunjangan Hari Raya)</option>
+                    </select>
+                </div>
+                <div id="payroll-bulanan-options" class="mb-4 flex gap-2">
                     <div class="flex-1">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Bulan</label>
                         <select id="swal-bulan" class="swal2-select">
@@ -118,23 +129,55 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                         </select>
                     </div>
                 </div>
-                <div>
+                <div id="payroll-thr-options" class="mb-4" style="display: none;">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Tahun</label>
+                    <select id="swal-tahun-thr" class="swal2-select">
+                        ${yearOptions}
+                    </select>
+                </div>
+                <div id="payroll-status-options">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Status Pegawai</label>
                     <select id="swal-status" class="swal2-select">
                         <option value="Pegawai Tetap">Pegawai Tetap</option>
                         <option value="Pegawai Kontrak">Pegawai Kontrak</option>
-                        <option value="THR">THR</option>
                     </select>
                 </div>
             `,
             focusConfirm: false,
+            didOpen: () => {
+                const jenisSelect = document.getElementById('swal-jenis-payroll') as HTMLSelectElement;
+                const bulananOptions = document.getElementById('payroll-bulanan-options') as HTMLElement;
+                const thrOptions = document.getElementById('payroll-thr-options') as HTMLElement;
+                const statusOptions = document.getElementById('payroll-status-options') as HTMLElement;
+
+                const toggleOptions = () => {
+                    if (jenisSelect.value === 'thr') {
+                        bulananOptions.style.display = 'none';
+                        thrOptions.style.display = 'block';
+                        statusOptions.style.display = 'none';
+                    } else {
+                        bulananOptions.style.display = 'flex';
+                        thrOptions.style.display = 'none';
+                        statusOptions.style.display = 'block';
+                    }
+                };
+
+                // Add event listener
+                jenisSelect.addEventListener('change', toggleOptions);
+            },
             preConfirm: () => {
+                const jenisPayroll = (document.getElementById('swal-jenis-payroll') as HTMLSelectElement).value;
                 const bulan = (document.getElementById('swal-bulan') as HTMLSelectElement).value;
                 const tahun = (document.getElementById('swal-tahun') as HTMLSelectElement).value;
-                const status = (document.getElementById('swal-status') as HTMLSelectElement).value;
+                const tahunThr = (document.getElementById('swal-tahun-thr') as HTMLSelectElement)?.value;
+                const status = (document.getElementById('swal-status') as HTMLSelectElement)?.value || '';
+
+                if (jenisPayroll === 'thr') {
+                    const thrValue = `THR ${tahunThr}`;
+                    return { bulan: thrValue, status: thrValue };
+                }
 
                 const fullBulan = `${tahun}-${bulan}`;
-
                 return { bulan: fullBulan, status };
             }
         });
