@@ -30,6 +30,7 @@ class EmployeeStoreRequest extends FormRequest
             'kantor_cabang_id' => 'required|exists:kantor_cabangs,id',
             'jabatan_id' => 'required|exists:jabatans,id',
             'nomor_rekening' => 'nullable|string|max:255',
+            'kjt' => 'required|string|max:255',
             'status_pegawai' => 'nullable|string|in:Pegawai Tetap,Pegawai Kontrak',
             'tanggal_mulai_kerja' => 'required|date',
             'ptkp' => 'nullable|string|in:TK/0,TK/1,TK/2,TK/3,K/0,K/1,K/2,K/3',
@@ -63,6 +64,7 @@ class EmployeeStoreRequest extends FormRequest
             'gaji_pokok.numeric' => 'Gaji pokok harus berupa angka',
             'tunjangan_jabatan.required' => 'Tunjangan jabatan wajib diisi',
             'tunjangan_jabatan.numeric' => 'Tunjangan jabatan harus berupa angka',
+            'kjt.required' => 'KJT (Kartu Peserta Jamsostek) wajib diisi',
         ];
     }
 }

@@ -43,11 +43,10 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
         nik: string;
         jenis_kelamin: string;
         nama: string;
-        password: string;
-        password_confirmation: string;
         kantor_cabang_id: number | '';
         jabatan_id: number | '';
         nomor_rekening: string;
+        kjt: string;
         status_pegawai: string;
         tanggal_mulai_kerja: string;
         ptkp: string;
@@ -60,11 +59,10 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
         nik: '',
         jenis_kelamin: '',
         nama: '',
-        password: '',
-        password_confirmation: '',
         kantor_cabang_id: '',
         jabatan_id: '',
         nomor_rekening: '',
+        kjt: '',
         status_pegawai: '',
         tanggal_mulai_kerja: '',
         ptkp: '',
@@ -75,13 +73,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
     });
 
     const handleNipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const nip = e.target.value;
-        setData('nip', nip);
-        // Auto-fill password with NIP if password is empty
-        if (!data.password && nip) {
-            setData('password', nip);
-            setData('password_confirmation', nip);
-        }
+        setData('nip', e.target.value);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -199,39 +191,6 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                     </div>
                                 </div>
 
-                                {/* Password - Auto-filled from NIP */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Password
-                                        </label>
-                                        <input
-                                            id="password"
-                                            type="hidden"
-                                            value={data.password}
-                                        />
-                                        <div className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                            Password akan otomatis menggunakan NIP
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Konfirmasi Password
-                                        </label>
-                                        <input
-                                            id="password_confirmation"
-                                            type="hidden"
-                                            value={data.password_confirmation}
-                                        />
-                                        <div className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                            Konfirmasi password akan otomatis menggunakan NIP
-                                        </div>
-                                    </div>
-                                </div>
-
-
-
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* KantorCabang */}
                                     <div>
@@ -280,7 +239,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                     </div>
                                 </div>
 
-                                {/* Nomor Rekening dan Status Pegawai */}
+                                {/* Nomor Rekening dan KJT */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Nomor Rekening */}
                                     <div>
@@ -300,10 +259,30 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
                                         )}
                                     </div>
 
-                                    {/* Status Pegawai */}
+                                    {/* KJT (Kartu Peserta Jamsostek) */}
+                                    <div>
+                                        <label htmlFor="kjt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            KJT (Kartu Peserta Jamsostek) <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            id="kjt"
+                                            type="text"
+                                            value={data.kjt}
+                                            onChange={e => setData('kjt', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            placeholder="Contoh: 123456789012345678"
+                                        />
+                                        {errors.kjt && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.kjt}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Status Pegawai */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label htmlFor="status_pegawai" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Status Pegawai
+                                            Status Pegawai <span className="text-red-500">*</span>
                                         </label>
                                         <select
                                             id="status_pegawai"

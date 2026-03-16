@@ -31,6 +31,7 @@ interface Employee {
     kantor_cabang_id: number;
     jabatan_id: number;
     nomor_rekening?: string;
+    kjt?: string;
     status_pegawai?: string;
     kantorCabang?: { id: number; name: string };
     jabatan?: { id: number; name: string };
@@ -59,6 +60,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
         kantor_cabang_id: number | '';
         jabatan_id: number | '';
         nomor_rekening: string;
+        kjt: string;
         status_pegawai: string;
         tanggal_mulai_kerja: string;
         ptkp: string;
@@ -76,6 +78,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
         kantor_cabang_id: employee.kantor_cabang_id || '',
         jabatan_id: employee.jabatan_id || '',
         nomor_rekening: employee.nomor_rekening || '',
+        kjt: employee.kjt || '',
         status_pegawai: employee.status_pegawai || '',
         tanggal_mulai_kerja: employee.tanggal_mulai_kerja || '',
         ptkp: employee.ptkp || '',
@@ -211,6 +214,26 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                         </select>
                                         {errors.jenis_kelamin && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.jenis_kelamin}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* KJT (Kartu Peserta Jamsostek) */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="kjt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            KJT (Kartu Peserta Jamsostek) <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            id="kjt"
+                                            type="text"
+                                            value={data.kjt}
+                                            onChange={e => setData('kjt', e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            placeholder="Contoh: 123456789012345678"
+                                        />
+                                        {errors.kjt && (
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.kjt}</p>
                                         )}
                                     </div>
                                 </div>

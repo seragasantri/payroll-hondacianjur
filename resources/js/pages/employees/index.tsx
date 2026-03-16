@@ -30,6 +30,7 @@ interface Employee {
     kantorCabang?: { id: number; name: string };
     jabatan?: { id: number; name: string };
     nomor_rekening?: string;
+    kjt?: string;
     status_pegawai?: string;
     tanggal_mulai_kerja: string;
     ptkp?: string;

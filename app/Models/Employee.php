@@ -24,6 +24,7 @@ class Employee extends Model
         'potongan_tidak_masuk',
         'potongan_terlambat',
         'nomor_rekening',
+        'kjt',
         'status_pegawai',
         'ptkp',
     ];
