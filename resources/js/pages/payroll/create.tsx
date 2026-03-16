@@ -4,6 +4,7 @@ import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
+import { log } from 'console';
 
 interface TunjanganItem {
     id: number;
@@ -261,10 +262,15 @@ export default function PayrollCreate({
             });
         }
 
-        // Subtract potongan terlambat for tax
+        // Subtract potongan tidak masuk and terlambat for tax
         const potonganTerlambat = getPotonganTerlambat(empId);
+        const potonganTidakMasuk = getPotonganTidakMasuk(empId);
+        const totalPotonganAbsen = potonganTerlambat + potonganTidakMasuk;
 
-        return gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tunjanganPerusahaanPajak - potonganTerlambat;
+        // TJ Perusahaan minus absen (tidak masuk + terlambat)
+        const tjPerusahaanMinAbsen = Math.max(0, tunjanganPerusahaanPajak - totalPotonganAbsen);
+
+        return gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tjPerusahaanMinAbsen;
     };
 
     // Get calculated tax for employee
@@ -497,6 +503,60 @@ export default function PayrollCreate({
     const totalGajiBersih = employees.reduce((sum, e) => sum + getGajiBersih(e.id), 0);
 
     const tunjanganCols = tunjanganList || [];
+
+    // Total pendapatan excluding JHT (id=8) and Pensiun (id=5), minus absen (tidak masuk + terlambat)
+    const totalPendapatanKenaPajak = employees.reduce((sum, e) => {
+        const emp = employees.find(emp => emp.id === e.id);
+        const gajiPokok = parseRupiah(String(formData[e.id]?.gaji_pokok || 0));
+        const tunjanganJabatan = parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0));
+        const insentif = parseRupiah(String(formData[e.id]?.insentif || 0));
+        const uangHadir = parseRupiah(String(formData[e.id]?.uang_hadir || 0));
+        const lembur = parseRupiah(String(formData[e.id]?.lembur || 0));
+        const reward = parseRupiah(String(formData[e.id]?.reward || 0));
+        const lainLain = parseRupiah(String(formData[e.id]?.lain_lain || 0));
+
+        // Potongan tidak masuk
+        const hariTidakMasuk = formData[e.id]?.hari_tidak_masuk || 0;
+        const potonganTidakMasuk = hariTidakMasuk * (Number(emp?.potongan_tidak_masuk) || 0);
+
+        // Potongan terlambat
+        const jamTerlambat = formData[e.id]?.jam_terlambat || 0;
+        const potonganTerlambat = jamTerlambat * (Number(emp?.potongan_terlambat) || 0);
+
+        const totalPotonganAbsen = potonganTidakMasuk + potonganTerlambat;
+
+        let tunjanganPajak = 0;
+        const tunjangan = formData[e.id]?.tunjangan;
+        if (tunjangan) {
+            Object.entries(tunjangan).forEach(([id, t]: [string, { perusahaan: number; karyawan: number }]) => {
+                if (id !== '8' && id !== '5') {
+                    tunjanganPajak += Number(t.perusahaan) || 0;
+                }
+            });
+        }
+
+        // TJ Perusahaan - absen (tidak masuk + terlambat)
+        const tjPerusahaanMinAbsen = Math.max(0, tunjanganPajak - totalPotonganAbsen);
+
+        return sum + gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tjPerusahaanMinAbsen;
+    }, 0);
+
+    // Total tidak masuk / potongan tidak masuk
+    const totalTidakMasuk = employees.reduce((sum, e) => {
+        const emp = employees.find(emp => emp.id === e.id);
+        if (!emp) return sum;
+        const hariTidakMasuk = formData[e.id]?.hari_tidak_masuk || 0;
+        return sum + (hariTidakMasuk * (Number(emp.potongan_tidak_masuk) || 0));
+    }, 0);
+
+    // Total pajak
+    const totalPajak = employees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0);
+
+    // Persentase pajak rata-rata
+    const persenpajak = totalPendapatanKenaPajak > 0
+        ? ((totalPajak / totalPendapatanKenaPajak) * 100).toFixed(2)
+        : '0.00';
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
