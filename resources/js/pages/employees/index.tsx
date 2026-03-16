@@ -699,6 +699,10 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.nomor_rekening || '-'}</p>
                                     </div>
                                     <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">KJT (Kartu Peserta Jamsostek)</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.kjt || '-'}</p>
+                                    </div>
+                                    <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Status Pegawai</p>
                                         <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedEmployee.status_pegawai || '-'}</p>
                                     </div>
