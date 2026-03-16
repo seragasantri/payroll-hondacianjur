@@ -52,27 +52,27 @@ class TunjanganController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        // Check authorization
-        Gate::authorize('create', \App\Models\Tunjangan::class);
+    // public function create()
+    // {
+    //     // Check authorization
+    //     Gate::authorize('create', \App\Models\Tunjangan::class);
 
-        return Inertia::render('tunjangan/create');
-    }
+    //     return Inertia::render('tunjangan/create');
+    // }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(TunjanganStoreRequest $request)
-    {
-        // Check authorization
-        Gate::authorize('create', \App\Models\Tunjangan::class);
+    // /**
+    //  * Store a newly created resource in storage.
+    //  */
+    // public function store(TunjanganStoreRequest $request)
+    // {
+    //     // Check authorization
+    //     Gate::authorize('create', \App\Models\Tunjangan::class);
 
-        $this->tunjanganServices->create($request->validated());
+    //     $this->tunjanganServices->create($request->validated());
 
-        return redirect()->route('tunjangan.index')
-            ->with('success', 'Tunjangan berhasil ditambahkan!');
-    }
+    //     return redirect()->route('tunjangan.index')
+    //         ->with('success', 'Tunjangan berhasil ditambahkan!');
+    // }
 
     /**
      * Display the specified resource.
@@ -116,15 +116,15 @@ class TunjanganController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        $tunjangan = $this->tunjanganServices->findId($id);
+    // public function destroy($id)
+    // {
+    //     $tunjangan = $this->tunjanganServices->findId($id);
 
-        // Check authorization
-        Gate::authorize('delete', $tunjangan);
+    //     // Check authorization
+    //     Gate::authorize('delete', $tunjangan);
 
-        $this->tunjanganServices->delete($id);
+    //     $this->tunjanganServices->delete($id);
 
-        return to_route('tunjangan.index');
-    }
+    //     return to_route('tunjangan.index');
+    // }
 }

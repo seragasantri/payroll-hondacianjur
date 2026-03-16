@@ -175,16 +175,6 @@ export default function TunjanganIndex({ tunjangan }: { tunjangan: TunjanganList
                         <p className="text-muted-foreground text-sm mt-1">Kelola data Tunjangan dengan mudah</p>
                     </div>
                     <div className="flex items-center gap-3">
-
-                        {(isSuperAdmin || can('tunjangan.create')) && (
-                            <Link
-                                href={create().url}
-                                className='inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95'
-                            >
-                                <PlusCircle className='size-5' />
-                                <span>Tambah Tunjangan</span>
-                            </Link>
-                        )}
                     </div>
                 </div>
 
@@ -330,15 +320,6 @@ export default function TunjanganIndex({ tunjangan }: { tunjangan: TunjanganList
                                                             >
                                                                 <Pencil className="size-3" />
                                                             </Link>
-                                                        )}
-                                                        {(isSuperAdmin || can('tunjangan.delete')) && (
-                                                            <button
-                                                                onClick={() => handleDelete(item.id, item.jenis_tunjangan)}
-                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
-                                                                title="Delete"
-                                                            >
-                                                                <Trash2 className="size-3" />
-                                                            </button>
                                                         )}
                                                     </div>
                                                 </td>

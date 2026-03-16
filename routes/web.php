@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('kantor-cabang', KantorCabangController::class);
     Route::resource('jabatan', JabatanController::class);
-    Route::resource('tunjangan', TunjanganController::class);
+    Route::resource('tunjangan', TunjanganController::class)->except(['create', 'delete']);
 
     // Tax settings routes
     Route::get('tax', [TaxController::class, 'index'])->name('tax.index');
