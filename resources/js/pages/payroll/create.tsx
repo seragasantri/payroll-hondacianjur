@@ -236,7 +236,7 @@ export default function PayrollCreate({
         return { tax, rate: taxRate };
     };
 
-    // Calculate gross salary for tax
+    // Calculate gross salary for tax (exclude JHT id=8 & Pensiun id=5, subtract potongan terlambat)
     const getGrossSalary = (empId: number) => {
         const emp = employees.find(e => e.id === empId);
         if (!emp) return 0;
@@ -249,16 +249,22 @@ export default function PayrollCreate({
         const reward = parseRupiah(String(formData[empId]?.reward || 0));
         const lainLain = parseRupiah(String(formData[empId]?.lain_lain || 0));
 
-        // Add tunjangan perusahaan
-        let tunjanganPerusahaan = 0;
+        // Add tunjangan perusahaan (exclude JHT id=8 & Pensiun id=5 from tax)
+        let tunjanganPerusahaanPajak = 0;
         const tunjangan = formData[empId]?.tunjangan;
         if (tunjangan) {
-            Object.values(tunjangan).forEach((t: { perusahaan: number; karyawan: number }) => {
-                tunjanganPerusahaan += Number(t.perusahaan) || 0;
+            Object.entries(tunjangan).forEach(([id, t]: [string, { perusahaan: number; karyawan: number }]) => {
+                // Exclude JHT (id = 8) and Pensiun (id = 5) from tax calculation
+                if (id !== '8' && id !== '5') {
+                    tunjanganPerusahaanPajak += Number(t.perusahaan) || 0;
+                }
             });
         }
 
-        return gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tunjanganPerusahaan;
+        // Subtract potongan terlambat for tax
+        const potonganTerlambat = getPotonganTerlambat(empId);
+
+        return gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tunjanganPerusahaanPajak - potonganTerlambat;
     };
 
     // Get calculated tax for employee
@@ -560,7 +566,7 @@ export default function PayrollCreate({
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500' rowSpan={2}>Pajak</th>
-                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>POTONGAN (KARYAWAN)</th>
+                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length * 2}>TUNJANGAN KARYAWAN & POTONGAN</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pendapatan</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pengurangan</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
@@ -572,8 +578,13 @@ export default function PayrollCreate({
                                         </th>
                                     ))}
                                     {tunjanganCols.map((t: TunjanganList) => (
-                                        <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-red-400 dark:bg-red-600 min-w-[80px]'>
-                                            {t.jenis_tunjangan}
+                                        <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-purple-400 dark:bg-purple-600 min-w-[70px]'>
+                                            TJ {t.jenis_tunjangan}
+                                        </th>
+                                    ))}
+                                    {tunjanganCols.map((t: TunjanganList) => (
+                                        <th key={t.id + '_pot'} className='px-1 py-2 text-right text-xs font-bold text-white bg-red-400 dark:bg-red-600 min-w-[70px]'>
+                                            Potongan
                                         </th>
                                     ))}
                                 </tr>
@@ -865,10 +876,24 @@ export default function PayrollCreate({
                                             {tunjanganCols.map((t: TunjanganList) => {
                                                 const tunjanganKey = String(Number(t.id));
                                                 const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
-                                                const karyawan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.karyawan || 0;
-                                                const totalPotongan = perusahaan + karyawan;
+                                                const karyawanPercent = t.karyawan || 0;
+                                                const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
+                                                const tjKaryawan = Math.round(gajiPokok * karyawanPercent / 100);
                                                 return (
-                                                    <td key={t.id} className="px-2 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-sm font-medium text-red-700 dark:text-red-400">
+                                                    <td key={t.id + '_tj'} className="px-1 py-3 bg-purple-50/30 dark:bg-purple-900/10 text-right text-xs font-medium text-purple-700 dark:text-purple-400">
+                                                        {formatCurrency(tjKaryawan)}
+                                                    </td>
+                                                );
+                                            })}
+                                            {tunjanganCols.map((t: TunjanganList) => {
+                                                const tunjanganKey = String(Number(t.id));
+                                                const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
+                                                const karyawanPercent = t.karyawan || 0;
+                                                const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
+                                                const tjKaryawan = Math.round(gajiPokok * karyawanPercent / 100);
+                                                const totalPotongan = perusahaan + tjKaryawan;
+                                                return (
+                                                    <td key={t.id + '_pot'} className="px-1 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-xs font-medium text-red-700 dark:text-red-400">
                                                         {formatCurrency(totalPotongan)}
                                                     </td>
                                                 );
@@ -926,18 +951,33 @@ export default function PayrollCreate({
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4"></td>
+                                    <td className="px-3 py-4"></td>
                                     <td className="px-3 py-4 text-right font-bold text-orange-600">
                                         {formatCurrency(employees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}
                                     </td>
                                     {tunjanganCols.map((t: TunjanganList) => {
+                                        const karyawanPercent = t.karyawan || 0;
+                                        const totalTjKaryawan = employees.reduce((sum, e) => {
+                                            const gajiPokok = parseRupiah(String(formData[e.id]?.gaji_pokok || 0));
+                                            return sum + Math.round(gajiPokok * karyawanPercent / 100);
+                                        }, 0);
+                                        return (
+                                            <td key={t.id + '_tj'} className="px-1 py-4 text-right font-bold text-purple-600 text-xs">
+                                                {formatCurrency(totalTjKaryawan)}
+                                            </td>
+                                        );
+                                    })}
+                                    {tunjanganCols.map((t: TunjanganList) => {
                                         const tunjanganKey = String(Number(t.id));
                                         const totalPotongan = employees.reduce((sum, e) => {
                                             const perusahaan = formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
-                                            const karyawan = formData[e.id]?.tunjangan?.[tunjanganKey]?.karyawan || 0;
-                                            return sum + perusahaan + karyawan;
+                                            const karyawanPercent = t.karyawan || 0;
+                                            const gajiPokok = parseRupiah(String(formData[e.id]?.gaji_pokok || 0));
+                                            const tjKaryawan = Math.round(gajiPokok * karyawanPercent / 100);
+                                            return sum + perusahaan + tjKaryawan;
                                         }, 0);
                                         return (
-                                            <td key={t.id} className="px-2 py-4 text-right font-bold text-red-600 text-sm">
+                                            <td key={t.id + '_pot'} className="px-1 py-4 text-right font-bold text-red-600 text-xs">
                                                 {formatCurrency(totalPotongan)}
                                             </td>
                                         );

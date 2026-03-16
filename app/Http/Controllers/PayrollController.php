@@ -149,7 +149,13 @@ class PayrollController extends Controller
             $employees = $employees->merge($softDeletedEmployees);
         }
 
-        $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
+        $tunjanganList = \App\Models\Tunjangan::orderByRaw("CASE
+            WHEN jenis_tunjangan = 'BPJS Kesehatan' THEN 1
+            WHEN jenis_tunjangan = 'JKK' THEN 2
+            WHEN jenis_tunjangan = 'JKM' THEN 3
+            WHEN jenis_tunjangan = 'JHT' THEN 4
+            WHEN jenis_tunjangan = 'Pensiun' THEN 5
+            ELSE 6 END")->get();
 
         $employeesWithPayroll = $employees->map(function ($employee) use ($payrollDetails, $bulan, $tunjanganList) {
             $existing = $payrollDetails->get($employee->id);
@@ -312,18 +318,26 @@ class PayrollController extends Controller
 
             // Convert array to object with string keys for proper storage
             $tunjanganLain = [];
+            $totalTunjanganPerusahaan = 0;
+            $totalTunjanganPerusahaanPajak = 0; // For tax calculation (exclude JHT & Pensiun)
             foreach ($tunjanganLainInput as $t) {
                 $tunjanganId = (string) ($t['id'] ?? 0);
                 $tunjanganLain[$tunjanganId] = [
                     'perusahaan' => (float) ($t['perusahaan'] ?? 0),
                     'karyawan' => (float) ($t['karyawan'] ?? 0),
                 ];
-                $totalTunjanganPerusahaan += (float) ($t['perusahaan'] ?? 0);
+                $perusahaanValue = (float) ($t['perusahaan'] ?? 0);
+                $totalTunjanganPerusahaan += $perusahaanValue;
+
+                // Exclude JHT (id = 8) and Pensiun (id = 5) from tax calculation
+                if ($tunjanganId !== '8' && $tunjanganId !== '5') {
+                    $totalTunjanganPerusahaanPajak += $perusahaanValue;
+                }
                 $totalPotonganKaryawan += (float) ($t['karyawan'] ?? 0);
             }
 
-            // Calculate gross salary for tax
-            $grossSalary = $gajiPokok + $tunjanganJabatan + $insentif + $uangHadir + $lembur + $reward + $lainLain + $totalTunjanganPerusahaan;
+            // Calculate gross salary for tax (PKP = total pendapatan - potongan terlambat, exclude JHT & Pensiun)
+            $grossSalary = $gajiPokok + $tunjanganJabatan + $insentif + $uangHadir + $lembur + $reward + $lainLain + $totalTunjanganPerusahaanPajak - $potonganTerlambat;
 
             // Calculate PPh21 tax based on employee's PTKP
             $ptkpCode = $employee->ptkp ?? 'TK/0';
@@ -444,7 +458,13 @@ class PayrollController extends Controller
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->first();
 
-            $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
+            $tunjanganList = \App\Models\Tunjangan::orderByRaw("CASE
+            WHEN jenis_tunjangan = 'BPJS Kesehatan' THEN 1
+            WHEN jenis_tunjangan = 'JKK' THEN 2
+            WHEN jenis_tunjangan = 'JKM' THEN 3
+            WHEN jenis_tunjangan = 'JHT' THEN 4
+            WHEN jenis_tunjangan = 'Pensiun' THEN 5
+            ELSE 6 END")->get();
 
             $existingTunjangan = [];
             if ($payrollDetail && $payrollDetail->tunjangan_lain) {
@@ -522,7 +542,13 @@ class PayrollController extends Controller
             ->orderBy('nama', 'asc')
             ->get();
 
-        $tunjanganList = \App\Models\Tunjangan::orderBy('id', 'asc')->get();
+        $tunjanganList = \App\Models\Tunjangan::orderByRaw("CASE
+            WHEN jenis_tunjangan = 'BPJS Kesehatan' THEN 1
+            WHEN jenis_tunjangan = 'JKK' THEN 2
+            WHEN jenis_tunjangan = 'JKM' THEN 3
+            WHEN jenis_tunjangan = 'JHT' THEN 4
+            WHEN jenis_tunjangan = 'Pensiun' THEN 5
+            ELSE 6 END")->get();
 
         $employeesWithPayroll = $employees->map(function ($employee) use ($payrollDetails, $bulan, $tunjanganList, $payrollHeader) {
             $existing = $payrollDetails->get($employee->id);
@@ -817,8 +843,14 @@ class PayrollController extends Controller
 
         $payrollDetails = $payrollDetailsQuery->get();
 
-        // Get tunjangan list
-        $tunjanganList = Tunjangan::all()->keyBy('id');
+        // Get tunjangan list (ordered)
+        $tunjanganList = Tunjangan::orderByRaw("CASE
+            WHEN jenis_tunjangan = 'BPJS Kesehatan' THEN 1
+            WHEN jenis_tunjangan = 'JKK' THEN 2
+            WHEN jenis_tunjangan = 'JKM' THEN 3
+            WHEN jenis_tunjangan = 'JHT' THEN 4
+            WHEN jenis_tunjangan = 'Pensiun' THEN 5
+            ELSE 6 END")->get()->keyBy('id');
 
         // Parse tunjangan_lain from each payroll detail
         foreach ($payrollDetails as $detail) {
