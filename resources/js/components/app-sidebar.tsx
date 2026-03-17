@@ -24,6 +24,7 @@ import payroll from '@/routes/payroll';
 import laporan from '@/routes/laporan';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
+import { NavKeuangan } from './nav-keuangan';
 import { NavManajemenUsers } from './nav-manajemen-users';
 import { NavMasterData } from './nav-master-data';
 
@@ -46,14 +47,7 @@ export function AppSidebar() {
     ];
 
     // If user is users (karyawan), show limited menu
-    const masterDataNavItems: NavItem[] = isKaryawan ? [
-        {
-            title: 'Payroll',
-            href: payroll.index().url,
-            icon: Wallet,
-            show: true
-        },
-    ] : [
+    const masterDataNavItems: NavItem[] = isKaryawan ? [] : [
         {
             title: 'Karyawan',
             href: employees.index().url,
@@ -79,6 +73,23 @@ export function AppSidebar() {
             show: isSuperAdmin || can('tunjangan.view any') || can('tunjangan.view')
         },
         {
+            title: 'Pajak (PPH 21)',
+            href: '/tax',
+            icon: Calculator,
+            show: isSuperAdmin
+        },
+    ];
+
+    // Menu Keuangan - untuk Payroll, Laporan, Pajak
+    const keuanganNavItems: NavItem[] = isKaryawan ? [
+        {
+            title: 'Payroll',
+            href: payroll.index().url,
+            icon: Wallet,
+            show: true
+        },
+    ] : [
+        {
             title: 'Payroll',
             href: payroll.index().url,
             icon: Wallet,
@@ -89,13 +100,7 @@ export function AppSidebar() {
             href: laporan.index().url,
             icon: FileBarChart,
             show: isSuperAdmin
-        },
-        {
-            title: 'Pajak (PPH 21)',
-            href: '/tax',
-            icon: Calculator,
-            show: isSuperAdmin
-        },
+        }
     ];
 
     // Hide settings for users (karyawan)
@@ -138,6 +143,7 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
 
                 {masterDataNavItems.length > 0 && <NavMasterData items={masterDataNavItems} />}
+                {keuanganNavItems.length > 0 && <NavKeuangan items={keuanganNavItems} />}
                 {settingNavItems.length > 0 && <NavManajemenUsers items={settingNavItems} />}
             </SidebarContent>
 
