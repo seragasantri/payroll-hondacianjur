@@ -17,6 +17,7 @@ use PhpOffice\PhpSpreadsheet\Style\Borders;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LaporanController extends Controller
 {
@@ -557,6 +558,309 @@ class LaporanController extends Controller
 
         // Output file
         $filename = 'BPJS_TK_' . $tahun . '_' . strtoupper($cabang->name) . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Export PPH 21 to Excel with multiple sheets (one per month with data).
+     */
+    public function exportPph21($cabangId, $tahun, Request $request)
+    {
+        // Get kantor cabang
+        $cabang = KantorCabang::findOrFail($cabangId);
+
+        // Get all published payrolls for the selected year and cabang (including THR)
+        $payrollHeaders = Payrolls::where(function ($query) use ($tahun) {
+            $query->where('bulan', 'like', $tahun . '-%')
+                ->orWhere('bulan', 'like', 'THR ' . $tahun);
+        })
+            ->where('status', 'published')
+            ->orderBy('bulan', 'asc')
+            ->get();
+
+        if ($payrollHeaders->isEmpty()) {
+            return redirect()->route('laporan.index', ['tahun' => $tahun])
+                ->with('error', 'Tidak ada data payroll untuk tahun tersebut!');
+        }
+
+        // Indonesian month names
+        $bulanIndo = [
+            '01' => 'JANUARI',
+            '02' => 'FEBRUARI',
+            '03' => 'MARET',
+            '04' => 'APRIL',
+            '05' => 'MEI',
+            '06' => 'JUNI',
+            '07' => 'JULI',
+            '08' => 'AGUSTUS',
+            '09' => 'SEPTEMBER',
+            '10' => 'OKTOBER',
+            '11' => 'NOVEMBER',
+            '12' => 'DESEMBER'
+        ];
+
+        // Create Excel
+        $spreadsheet = new Spreadsheet();
+
+        // Remove default sheet
+        $spreadsheet->removeSheetByIndex(0);
+
+        $hasData = false;
+
+        foreach ($payrollHeaders as $payrollHeader) {
+            $bulan = $payrollHeader->bulan;
+
+            // Handle THR format
+            if (str_starts_with($bulan, 'THR ')) {
+                $bulanName = 'THR';
+            } else {
+                $bulanDate = \Carbon\Carbon::parse($bulan . '-01');
+                $month = $bulanDate->format('m');
+                $bulanName = $bulanIndo[$month] ?? strtoupper($month);
+            }
+
+            // Get payroll details with employee data for this cabang
+            $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
+                ->whereHas('employee', function ($query) use ($cabangId) {
+                    $query->where('kantor_cabang_id', $cabangId);
+                })
+                ->with(['employee' => function ($query) {
+                    $query->withTrashed();
+                }, 'employee.kantorCabang', 'employee.jabatan'])
+                ->get();
+
+            if ($payrollDetails->isEmpty()) {
+                continue; // Skip months with no data
+            }
+
+            $hasData = true;
+
+            // Create new sheet
+            $sheet = $spreadsheet->createSheet();
+            $sheet->setTitle($bulanName);
+
+            // Set column widths
+            $sheet->getColumnDimension('A')->setWidth(5);
+            $sheet->getColumnDimension('B')->setWidth(10);
+            $sheet->getColumnDimension('C')->setWidth(15);
+            $sheet->getColumnDimension('D')->setWidth(15);
+            $sheet->getColumnDimension('E')->setWidth(20);
+            $sheet->getColumnDimension('F')->setWidth(25);
+            $sheet->getColumnDimension('G')->setWidth(8);
+            $sheet->getColumnDimension('H')->setWidth(15);
+            $sheet->getColumnDimension('I')->setWidth(15);
+            $sheet->getColumnDimension('J')->setWidth(15);
+            $sheet->getColumnDimension('K')->setWidth(15);
+            $sheet->getColumnDimension('L')->setWidth(15);
+            $sheet->getColumnDimension('M')->setWidth(15);
+            $sheet->getColumnDimension('N')->setWidth(15);
+
+            // Set row heights for header area
+            $sheet->getRowDimension(1)->setRowHeight(80);
+            $sheet->getRowDimension(2)->setRowHeight(30);
+            $sheet->getRowDimension(3)->setRowHeight(25);
+            $sheet->getRowDimension(4)->setRowHeight(25);
+            $sheet->getRowDimension(5)->setRowHeight(25);
+
+            // Logo - Row 1
+            $logoPath = public_path('assets/images/logo_2.png');
+            if (file_exists($logoPath)) {
+                $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                $drawing->setPath($logoPath);
+                $drawing->setWidth(80);
+                $drawing->setHeight(80);
+                $drawing->setCoordinates('A1');
+                $drawing->setOffsetX(5);
+                $drawing->setOffsetY(5);
+                $drawing->setWorksheet($sheet);
+            }
+
+            // Company Name - Row 2 (next to logo)
+            $sheet->mergeCells('B2:N2');
+            $sheet->setCellValue('B2', 'PUSAKA MOTOR UTAMA');
+            $sheet->getStyle('B2')->getFont()->setSize(16)->setBold(true);
+            $sheet->getStyle('B2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('B2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+            // Title - Row 3
+            $sheet->mergeCells('B3:N3');
+            $sheet->setCellValue('B3', 'LAPORAN PPH21 BULANAN');
+            $sheet->getStyle('B3')->getFont()->setSize(14)->setBold(true);
+            $sheet->getStyle('B3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+            // Period - Row 4
+            $sheet->mergeCells('B4:N4');
+            $sheet->setCellValue('B4', 'PERIODE : ' . $bulanName . ' ' . $tahun);
+            $sheet->getStyle('B4')->getFont()->setSize(12)->setBold(true);
+            $sheet->getStyle('B4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+            // Branch - Row 5
+            $sheet->mergeCells('B5:N5');
+            $sheet->setCellValue('B5', 'CABANG : ' . strtoupper($cabang->name));
+            $sheet->getStyle('B5')->getFont()->setSize(12)->setBold(true);
+            $sheet->getStyle('B5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+            // Empty row
+            $sheet->mergeCells('A6:N6');
+
+            // Table Header - Row 7
+            $headerRow = 7;
+            $headers = ['NO', 'DIVISI', 'NIP', 'NO REK', 'NIK', 'NAMA PEGAWAI', 'STATUS', 'GAJI/UPAH', 'TUNJANGAN', 'ASTEK', 'INSENTIF/BONUS/THR', 'TOTAL DPP', 'PPH21', 'PPH TERHUTANG'];
+            $column = 'A';
+            foreach ($headers as $header) {
+                $sheet->setCellValue($column . $headerRow, $header);
+                $column++;
+            }
+
+            // Style header
+            $sheet->getStyle('A' . $headerRow . ':N' . $headerRow)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $headerRow . ':N' . $headerRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0E0FF');
+            $sheet->getStyle('A' . $headerRow . ':N' . $headerRow)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('A' . $headerRow . ':N' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // Data rows
+            $no = 1;
+            $row = $headerRow + 1;
+
+            $totalGaji = 0;
+            $totalTunjangan = 0;
+            $totalAstek = 0;
+            $totalInsentif = 0;
+            $totalDpp = 0;
+            $totalPph21 = 0;
+
+            foreach ($payrollDetails as $detail) {
+                $employee = $detail->employee;
+
+                // Parse tunjangan_lain JSON to get ASTEK (BPJS Kesehatan + JKK + JKM from perusahaan)
+                $tunjanganData = json_decode($detail->tunjangan_lain, true) ?? [];
+                $bpjsKesehatan = 0;
+                $jkk = 0;
+                $jkm = 0;
+
+                // JSON keys: 1=BPJS Kesehatan, 2=JHT, 3=JKK, 4=JKM, 5=Pensiun
+                // But json_decode with true returns indexed array, so we need to check keys
+                $tunjanganAssoc = json_decode($detail->tunjangan_lain, true) ?? [];
+                if (!empty($tunjanganAssoc)) {
+                    // Check if it's keyed array or indexed
+                    if (isset($tunjanganAssoc['1'])) {
+                        // Keyed array - use the keys directly
+                        $bpjsKesehatan = (float) ($tunjanganAssoc['1']['perusahaan'] ?? 0);
+                        $jkk = (float) ($tunjanganAssoc['3']['perusahaan'] ?? 0);
+                        $jkm = (float) ($tunjanganAssoc['4']['perusahaan'] ?? 0);
+                    } else {
+                        // Indexed array - use index 0, 2, 3
+                        $bpjsKesehatan = (float) ($tunjanganAssoc[0]['perusahaan'] ?? 0);
+                        $jkk = (float) ($tunjanganAssoc[2]['perusahaan'] ?? 0);
+                        $jkm = (float) ($tunjanganAssoc[3]['perusahaan'] ?? 0);
+                    }
+                }
+
+                $astek = $bpjsKesehatan + $jkk + $jkm;
+                Log::info([
+                    'employee_nip' => $employee->nip,
+                    'employee_nama' => $employee->nama,
+                    'astek' => $astek,
+                    'bpjs_kes' => $bpjsKesehatan,
+                    'jkk' => $jkk,
+                    'jkm' => $jkm
+                ]);
+
+                // GAJI/UPAH = gaji_pokok - potongan_tidak_masuk - potongan_terlambat
+                $gaji_upah = $detail->gaji_pokok - $detail->potongan_tidak_masuk - $detail->potongan_terlambat;
+
+                // TUNJANGAN = tunjangan_jabatan + uang_hadir + lembur + lain_lain
+                $tunjangan = $detail->tunjangan_jabatan + ($detail->uang_hadir ?? 0) + ($detail->lembur ?? 0) + ($detail->lain_lain ?? 0);
+
+                // INSENTIF/BONUS/THR = insentif + lembur (already included in tunjangan, so just insentif here)
+                $insentif = $detail->insentif ?? 0;
+
+                // TOTAL DPP PPH21 = GAJI/UPAH + TUNJANGAN + ASTEK + INSENTIF/BONUS/THR
+                $totalDppRow = $gaji_upah + $tunjangan + $astek + $insentif;
+
+                // PPH21 = pph21_amount
+                $pph21 = $detail->pph21_amount ?? 0;
+
+                // Write data
+                $sheet->setCellValue('A' . $row, $no);
+                $sheet->setCellValue('B' . $row, $employee->kantorCabang?->name ?? '-');
+                $sheet->setCellValue('C' . $row, $employee->nip);
+                $sheet->setCellValue('D' . $row, $employee->nomor_rekening ?? '-');
+                $sheet->setCellValue('E' . $row, $employee->nik ?? '-');
+                $sheet->setCellValue('F' . $row, $employee->nama);
+                $sheet->setCellValue('G' . $row, $employee->ptkp ?? '-');
+                $sheet->setCellValue('H' . $row, $gaji_upah);
+                $sheet->setCellValue('I' . $row, $tunjangan);
+                $sheet->setCellValue('J' . $row, $astek);
+                $sheet->setCellValue('K' . $row, $insentif);
+                $sheet->setCellValue('L' . $row, $totalDppRow);
+                $sheet->setCellValue('M' . $row, $pph21);
+                $sheet->setCellValue('N' . $row, $pph21);
+
+                // Style data row
+                $sheet->getStyle('A' . $row . ':N' . $row)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('A' . $row . ':G' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('H' . $row . ':N' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+                // Number format
+                $sheet->getStyle('H' . $row)->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle('J' . $row)->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle('L' . $row)->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle('M' . $row)->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle('N' . $row)->getNumberFormat()->setFormatCode('#,##0');
+
+                $totalGaji += $gaji_upah;
+                $totalTunjangan += $tunjangan;
+                $totalAstek += $astek;
+                $totalInsentif += $insentif;
+                $totalDpp += $totalDppRow;
+                $totalPph21 += $pph21;
+
+                $no++;
+                $row++;
+            }
+
+            // Total row
+            $sheet->mergeCells('A' . $row . ':G' . $row);
+            $sheet->setCellValue('A' . $row, 'JUMLAH :');
+            $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+            $sheet->setCellValue('H' . $row, $totalGaji);
+            $sheet->setCellValue('I' . $row, $totalTunjangan);
+            $sheet->setCellValue('J' . $row, $totalAstek);
+            $sheet->setCellValue('K' . $row, $totalInsentif);
+            $sheet->setCellValue('L' . $row, $totalDpp);
+            $sheet->setCellValue('M' . $row, $totalPph21);
+            $sheet->setCellValue('N' . $row, $totalPph21);
+
+            $sheet->getStyle('A' . $row . ':N' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $row . ':N' . $row)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('A' . $row . ':N' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F5F5DC');
+            $sheet->getStyle('H' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('J' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('L' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('M' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('N' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        }
+
+        if (!$hasData) {
+            return redirect()->route('laporan.index', ['tahun' => $tahun])
+                ->with('error', 'Tidak ada data payroll untuk cabang tersebut!');
+        }
+
+        // Output file
+        $filename = 'PPH21_' . $tahun . '_' . strtoupper($cabang->name) . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

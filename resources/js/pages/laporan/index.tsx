@@ -144,6 +144,8 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
             window.location.href = `/laporan/${cabangId}/${tahun}/export-bpjs-kes`;
         } else if (type === 'bpjs-ketenaga') {
             window.location.href = `/laporan/${cabangId}/${tahun}/export-bpjs-tk`;
+        } else if (type === 'pph21-bulanan') {
+            window.location.href = `/laporan/${cabangId}/${tahun}/export-pph21`;
         } else {
             console.log(`Export ${type} for cabang ${cabangId} tahun ${tahun}`);
         }

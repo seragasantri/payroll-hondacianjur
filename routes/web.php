@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('laporan/{cabangId}/{tahun}/export-bpjs-kes', [LaporanController::class, 'exportBpjsKes'])->name('laporan.export-bpjs-kes');
     Route::get('laporan/{cabangId}/{tahun}/export-bpjs-tk', [LaporanController::class, 'exportBpjsTk'])->name('laporan.export-bpjs-tk');
+    Route::get('laporan/{cabangId}/{tahun}/export-pph21', [LaporanController::class, 'exportPph21'])->name('laporan.export-pph21');
 
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
