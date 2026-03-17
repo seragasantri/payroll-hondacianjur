@@ -331,10 +331,10 @@ class EmployeeController extends Controller
             'font' => ['color' => ['rgb' => 'FFFFFF']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ];
-        $sheet->getStyle('A1:O1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A1:R1')->applyFromArray($headerStyle);
 
         // Headers
-        $headers = ['No', 'NIP', 'Nama', 'Cabang', 'Jabatan', 'Status Pegawai', 'Tanggal Mulai Kerja', 'No. Rekening', 'PTKP', 'Gaji Pokok', 'Tunjangan Jabatan', 'Total Gaji', 'Potongan Tidak Masuk', 'Potongan Terlambat', 'Total Potongan'];
+        $headers = ['No', 'NIP', 'Nama', 'Cabang', 'Jabatan', 'Status Pegawai', 'Tanggal Mulai Kerja', 'Jenis Kelamin', 'NIK', 'KJT', 'No. Rekening', 'PTKP', 'Gaji Pokok', 'Tunjangan Jabatan', 'Total Gaji', 'Potongan Tidak Masuk', 'Potongan Terlambat', 'Total Potongan'];
         $column = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($column . '1', $header);
@@ -355,19 +355,22 @@ class EmployeeController extends Controller
             $sheet->setCellValue('E' . $row, $employee->jabatan?->name ?? '-');
             $sheet->setCellValue('F' . $row, $employee->status_pegawai ?? '-');
             $sheet->setCellValue('G' . $row, Carbon::parse($employee->tanggal_mulai_kerja)->format('d-m-Y'));
-            $sheet->setCellValue('H' . $row, $employee->nomor_rekening ?? '-');
-            $sheet->setCellValue('I' . $row, $employee->ptkp ?? '-');
-            $sheet->setCellValue('J' . $row, $employee->gaji_pokok)->getStyle('J' . $row)->getNumberFormat()->setFormatCode($numberFormat);
-            $sheet->setCellValue('K' . $row, $employee->tunjangan_jabatan)->getStyle('K' . $row)->getNumberFormat()->setFormatCode($numberFormat);
-            $sheet->setCellValue('L' . $row, $employee->total_gaji)->getStyle('L' . $row)->getNumberFormat()->setFormatCode($numberFormat);
-            $sheet->setCellValue('M' . $row, $employee->potongan_tidak_masuk)->getStyle('M' . $row)->getNumberFormat()->setFormatCode($numberFormat);
-            $sheet->setCellValue('N' . $row, $employee->potongan_terlambat)->getStyle('N' . $row)->getNumberFormat()->setFormatCode($numberFormat);
-            $sheet->setCellValue('O' . $row, $employee->total_potongan)->getStyle('O' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('H' . $row, $employee->jenis_kelamin === 'laki-laki' ? 'L' : ($employee->jenis_kelamin === 'perempuan' ? 'P' : '-'));
+            $sheet->setCellValue('I' . $row, $employee->nik ?? '-');
+            $sheet->setCellValue('J' . $row, $employee->kjt ?? '-');
+            $sheet->setCellValue('K' . $row, $employee->nomor_rekening ?? '-');
+            $sheet->setCellValue('L' . $row, $employee->ptkp ?? '-');
+            $sheet->setCellValue('M' . $row, $employee->gaji_pokok)->getStyle('M' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('N' . $row, $employee->tunjangan_jabatan)->getStyle('N' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('O' . $row, $employee->total_gaji)->getStyle('O' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('P' . $row, $employee->potongan_tidak_masuk)->getStyle('P' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('Q' . $row, $employee->potongan_terlambat)->getStyle('Q' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('R' . $row, $employee->total_potongan)->getStyle('R' . $row)->getNumberFormat()->setFormatCode($numberFormat);
             $row++;
         }
 
         // Auto-size columns
-        foreach (range('A', 'O') as $col) {
+        foreach (range('A', 'R') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -462,6 +465,9 @@ class EmployeeController extends Controller
                 <th>Jabatan</th>
                 <th style="width: 50px;">Status</th>
                 <th style="width: 60px;">Tgl Mulai</th>
+                <th style="width: 40px;">JK</th>
+                <th style="width: 80px;">NIK</th>
+                <th style="width: 80px;">KJT</th>
                 <th style="width: 80px;">No. Rekening</th>
                 <th style="width: 40px;">PTKP</th>
                 <th class="text-right">Gaji Pokok</th>
@@ -476,6 +482,7 @@ class EmployeeController extends Controller
 
         $no = 1;
         foreach ($employees as $employee) {
+            $jk = $employee->jenis_kelamin === 'laki-laki' ? 'L' : ($employee->jenis_kelamin === 'perempuan' ? 'P' : '-');
             $html .= '<tr>
                 <td style="text-align: center;">' . $no++ . '</td>
                 <td>' . $employee->nip . '</td>
@@ -484,6 +491,9 @@ class EmployeeController extends Controller
                 <td>' . ($employee->jabatan?->name ?? '-') . '</td>
                 <td>' . ($employee->status_pegawai ?? '-') . '</td>
                 <td>' . Carbon::parse($employee->tanggal_mulai_kerja)->format('d-m-Y') . '</td>
+                <td>' . $jk . '</td>
+                <td>' . ($employee->nik ?? '-') . '</td>
+                <td>' . ($employee->kjt ?? '-') . '</td>
                 <td>' . ($employee->nomor_rekening ?? '-') . '</td>
                 <td>' . ($employee->ptkp ?? '-') . '</td>
                 <td class="text-right">' . $formatRupiah($employee->gaji_pokok) . '</td>
