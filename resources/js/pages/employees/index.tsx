@@ -67,7 +67,18 @@ interface EmployeeList {
 }
 
 export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { employees: EmployeeList, kantorCabang: KantorCabang[], jabatan: Jabatan[] }) {
-    const { debouncedSearch, getSearchValue, isSearching, resetSearch } = useDebounceSearch();
+    // Get initial search values from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSearchValues: Record<string, string> = {};
+    const searchKeys = ['searchNama', 'searchNIP', 'searchNIK', 'searchStatusPegawai', 'searchJenisKelamin', 'searchKantorCabang', 'searchJabatan'];
+    searchKeys.forEach(key => {
+        const value = urlParams.get(key);
+        if (value) {
+            initialSearchValues[key] = value;
+        }
+    });
+
+    const { debouncedSearch, getSearchValue, isSearching, resetSearch } = useDebounceSearch(initialSearchValues);
     const can = useCan();
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
@@ -77,7 +88,6 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
     const hasActionAccess = isSuperAdmin || can('employees.edit') || can('employees.delete');
 
     // Get current sort params from URL
-    const urlParams = new URLSearchParams(window.location.search);
     const currentSortField = urlParams.get('sortField') || 'nama';
     const currentSortDirection = urlParams.get('sortDirection') || 'asc';
     const currentPerPage = urlParams.get('perPage') || '10';
@@ -318,7 +328,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             <span className='ml-1'>{getSortIcon('nama')}</span>
                                         </button>
                                     </th>
-                                    <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
+                                    {/* <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('nip')}
                                             className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'
@@ -326,12 +336,12 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             NIP
                                             <span className='ml-1'>{getSortIcon('nip')}</span>
                                         </button>
-                                    </th>
+                                    </th> */}
                                     <th className='px-4 py-4 w-40 text-left text-sm font-bold text-white'>
                                         NIK
                                     </th>
-                                    <th className='px-4 py-4 w-32 text-left text-sm font-bold text-white'>
-                                        JK
+                                    <th className='px-4 py-4 w-40 text-left text-sm font-bold text-white'>
+                                        Status Pegawai
                                     </th>
                                     <th className='px-4 py-4 w-55 text-left text-sm font-bold text-white'>
                                         <button
@@ -375,7 +385,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             </div>
                                         </div>
                                     </th>
-                                    <th className='px-4 py-4'>
+                                    {/* <th className='px-4 py-4'>
                                         <div className="relative">
                                             <input
                                                 type="text"
@@ -390,7 +400,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                                 </svg>
                                             </div>
                                         </div>
-                                    </th>
+                                    </th> */}
                                     <th className='px-4 py-4'>
                                         <div className="relative">
                                             <input
@@ -409,13 +419,13 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                     </th>
                                     <th className='px-4 py-4'>
                                         <select
-                                            value={getSearchValue('searchJenisKelamin')}
-                                            onChange={(e) => debouncedSearch('searchJenisKelamin', e.target.value, index().url)}
+                                            value={getSearchValue('searchStatusPegawai')}
+                                            onChange={(e) => debouncedSearch('searchStatusPegawai', e.target.value, index().url)}
                                             className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
                                         >
                                             <option value="">Semua</option>
-                                            <option value="laki-laki">Laki-laki</option>
-                                            <option value="perempuan">Perempuan</option>
+                                            <option value="Pegawai Tetap">Tetap</option>
+                                            <option value="Pegawai Kontrak">Kontrak</option>
                                         </select>
                                     </th>
                                     <th className='px-4 py-4'>
@@ -447,7 +457,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         </select>
                                     </th>
                                     <th className='px-4 py-4'>
-                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchNIK') || getSearchValue('searchJenisKelamin') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
+                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchNIK') || getSearchValue('searchStatusPegawai') || getSearchValue('searchJenisKelamin') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
                                             <button
                                                 onClick={handleResetSearch}
                                                 className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
@@ -499,22 +509,21 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             <td className="px-4 py-3">
                                                 <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <code className="rounded bg-blue-100 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                                                    {employee.nip}
-                                                </code>
-                                            </td>
                                             <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm">
                                                 {employee.nik || '-'}
                                             </td>
                                             <td className="px-4 py-3">
-                                                {employee.jenis_kelamin === 'laki-laki' ? (
-                                                    <span className="inline-flex items-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-2 py-0.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                                                        L
+                                                {employee.status_pegawai === 'tetap' ? (
+                                                    <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
+                                                        Tetap
                                                     </span>
-                                                ) : employee.jenis_kelamin === 'perempuan' ? (
-                                                    <span className="inline-flex items-center rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs font-semibold text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800">
-                                                        P
+                                                ) : employee.status_pegawai === 'kontrak' ? (
+                                                    <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                                        Kontrak
+                                                    </span>
+                                                ) : employee.status_pegawai === 'magang' ? (
+                                                    <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 text-xs font-semibold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                                        Magang
                                                     </span>
                                                 ) : (
                                                     <span className="text-gray-400">-</span>

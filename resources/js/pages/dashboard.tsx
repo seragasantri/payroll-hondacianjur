@@ -121,6 +121,16 @@ export default function Dashboard(props: DashboardProps) {
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.nama}</p>
                                         </div>
                                         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Jenis Kelamin</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                                                {employee.jenis_kelamin === 'laki-laki' ? 'Laki-laki' : employee.jenis_kelamin === 'perempuan' ? 'Perempuan' : '-'}
+                                            </p>
+                                        </div>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">NIK</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.nik || '-'}</p>
+                                        </div>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
                                             <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">NIP</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.nip}</p>
                                         </div>
@@ -133,16 +143,20 @@ export default function Dashboard(props: DashboardProps) {
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.kantor_cabang || '-'}</p>
                                         </div>
                                         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Tanggal Mulai Kerja</p>
-                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{formatDate(employee.tanggal_mulai_kerja)}</p>
-                                        </div>
-                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
                                             <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Status Pegawai</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.status_pegawai || '-'}</p>
                                         </div>
                                         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Tanggal Mulai Kerja</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{formatDate(employee.tanggal_mulai_kerja)}</p>
+                                        </div>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
                                             <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Status PTKP</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.ptkp || '-'}</p>
+                                        </div>
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Nomor KJT</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{employee.kjt || '-'}</p>
                                         </div>
                                         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
                                             <p className="text-xs text-blue-600 dark:text-blue-400 uppercase font-semibold">Nomor Rekening</p>

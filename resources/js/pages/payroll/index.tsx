@@ -1,5 +1,5 @@
-import { Head, router, usePage } from '@inertiajs/react';
-import { PlusCircle, Trash2, Pencil, FileText, Send, Calendar, Eye, Download } from 'lucide-react';
+import { Head, router, usePage, Link } from '@inertiajs/react';
+import { PlusCircle, Trash2, Pencil, FileText, Send, Calendar, Eye, Download, Wallet, User } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useCan } from '@/hooks/useCan';
 import AppLayout from '@/layouts/app-layout';
@@ -323,6 +323,84 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
         window.open(`/payroll/${bulan}/export-detail?${params.toString()}`, '_blank');
     };
 
+    // Special view for Karyawan (employee) role
+    if (isKaryawan) {
+        const formatCurrency = (amount: number) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount);
+        };
+
+        const formatBulanPayroll = (bulan: string) => {
+            if (bulan.startsWith('THR')) return bulan;
+            const [year, month] = bulan.split('-');
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            return `${monthNames[parseInt(month) - 1]} ${year}`;
+        };
+
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Head title="Payroll Saya" />
+                <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
+                    {/* Header */}
+                    <div>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                            Payroll Saya
+                        </h1>
+                        <p className="text-muted-foreground text-sm mt-1">Riwayat gaji Anda</p>
+                    </div>
+
+                    {/* Payroll History */}
+                    <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4 flex items-center justify-between">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                <Wallet className="size-5" />
+                                Riwayat Gaji
+                            </h2>
+                        </div>
+                        <div className="p-6">
+                            {!payrollSummary?.data || payrollSummary.data.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <Wallet className="size-12 text-gray-400 mx-auto mb-3" />
+                                    <p className="text-gray-500">Belum ada slip gaji</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {payrollSummary.data.map((payroll) => (
+                                        <div key={payroll.bulan} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                                            <div className="flex items-center gap-4">
+                                                <div className="size-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                                    <Calendar className="size-5 text-green-600 dark:text-green-400" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">{formatBulanPayroll(payroll.bulan)}</p>
+                                                    <p className="text-xs text-gray-500">{payroll.status_pegawai || 'Pegawai'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <Link
+                                                    href={`/payroll/${payroll.bulan}/detail`}
+                                                    className="text-sm font-bold text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
+                                                >
+                                                    <Eye className="size-4" />
+                                                    Lihat Slip
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </AppLayout>
+        );
+    }
+
+    // Normal view for Admin/Super Admin
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manajemen Payroll" />

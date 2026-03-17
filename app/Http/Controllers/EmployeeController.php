@@ -39,6 +39,7 @@ class EmployeeController extends Controller
         $searchNIP = $request->input('searchNIP');
         $searchNIK = $request->input('searchNIK');
         $searchJenisKelamin = $request->input('searchJenisKelamin');
+        $searchStatusPegawai = $request->input('searchStatusPegawai');
         $searchKantorCabang = $request->input('searchKantorCabang');
         $searchJabatan = $request->input('searchJabatan');
         $sortField = $request->input('sortField', 'nama');
@@ -64,6 +65,11 @@ class EmployeeController extends Controller
         // Filter by Jenis Kelamin
         if ($searchJenisKelamin) {
             $query->where('jenis_kelamin', $searchJenisKelamin);
+        }
+
+        // Filter by Status Pegawai
+        if ($searchStatusPegawai) {
+            $query->where('status_pegawai', $searchStatusPegawai);
         }
 
         // Filter by kantorCabang

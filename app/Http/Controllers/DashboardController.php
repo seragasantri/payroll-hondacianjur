@@ -49,6 +49,9 @@ class DashboardController extends Controller
                 'employee' => [
                     'nama' => $employee->nama,
                     'nip' => $employee->nip,
+                    'nik' => $employee->nik,
+                    'kjt' => $employee->kjt,
+                    'jenis_kelamin' => $employee->jenis_kelamin,
                     'jabatan' => $employee->jabatan?->name,
                     'kantor_cabang' => $employee->kantorCabang?->name,
                     'tanggal_mulai_kerja' => $employee->tanggal_mulai_kerja,
