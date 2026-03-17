@@ -182,22 +182,16 @@ class PayrollController extends Controller
                 'tunjangan_jabatan' => $tunjanganJabatan,
                 'potongan_tidak_masuk' => (float) $employee->potongan_tidak_masuk,
                 'potongan_terlambat' => (float) $employee->potongan_terlambat,
-                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok) {
                     $tunjanganId = (string) $tunjangan->id;
 
-                    // Check if existing value in payroll
-                    if (isset($existingTunjangan[$tunjanganId])) {
-                        $nilaiPerusahaan = $existingTunjangan[$tunjanganId]['perusahaan'] ?? 0;
-                        $nilaiKaryawan = $existingTunjangan[$tunjanganId]['karyawan'] ?? 0;
-                    } else {
-                        // Calculate from percentage
-                        $nilaiPerusahaan = $tunjangan->perusahaan > 0
-                            ? round($tunjangan->perusahaan / 100 * $employee->gaji_pokok)
-                            : 0;
-                        $nilaiKaryawan = $tunjangan->karyawan > 0
-                            ? round($tunjangan->karyawan / 100 * $employee->gaji_pokok)
-                            : 0;
-                    }
+                    // Always calculate from percentage using payroll's gajiPokok (not from stored values)
+                    $nilaiPerusahaan = $tunjangan->perusahaan > 0
+                        ? round($tunjangan->perusahaan / 100 * $gajiPokok)
+                        : 0;
+                    $nilaiKaryawan = $tunjangan->karyawan > 0
+                        ? round($tunjangan->karyawan / 100 * $gajiPokok)
+                        : 0;
 
                     return [
                         'id' => $tunjangan->id,
@@ -336,8 +330,11 @@ class PayrollController extends Controller
                 $totalPotonganKaryawan += (float) ($t['karyawan'] ?? 0);
             }
 
-            // Calculate gross salary for tax (PKP = total pendapatan - potongan terlambat, exclude JHT & Pensiun)
-            $grossSalary = $gajiPokok + $tunjanganJabatan + $insentif + $uangHadir + $lembur + $reward + $lainLain + $totalTunjanganPerusahaanPajak - $potonganTerlambat;
+            // Calculate gross salary for tax (PKP = total pendapatan - potongan absen, exclude JHT & Pensiun)
+            // TJ Perusahaan dikurangi absen (tidak masuk + terlambat)
+            $totalPotonganAbsen = $potonganTidakMasuk + $potonganTerlambat;
+            $totalTunjanganPerusahaanPajakAbsen = max(0, $totalTunjanganPerusahaanPajak - $totalPotonganAbsen);
+            $grossSalary = $gajiPokok + $tunjanganJabatan + $insentif + $uangHadir + $lembur + $reward + $lainLain + $totalTunjanganPerusahaanPajakAbsen;
 
             // Calculate PPh21 tax based on employee's PTKP
             $ptkpCode = $employee->ptkp ?? 'TK/0';
@@ -471,9 +468,15 @@ class PayrollController extends Controller
                 $existingTunjangan = json_decode($payrollDetail->tunjangan_lain, true) ?? [];
             }
 
+            // Use existing payroll values if available, otherwise use employee defaults
+            $gajiPokok = $payrollDetail ? (float) $payrollDetail->gaji_pokok : (float) $employee->gaji_pokok;
+            $tunjanganJabatan = $payrollDetail ? (float) $payrollDetail->tunjangan_jabatan : (float) $employee->tunjangan_jabatan;
+
             $employeeData = $employee->toArray();
             $employeeData['kantorCabang'] = $employee->kantorCabang?->name;
             $employeeData['jabatan'] = $employee->jabatan?->name;
+            $employeeData['gaji_pokok'] = $gajiPokok;
+            $employeeData['tunjangan_jabatan'] = $tunjanganJabatan;
             $employeeData['payroll'] = $payrollDetail ? [
                 'id' => $payrollDetail->id,
                 'hari_kerja' => (int) $payrollDetail->hari_kerja,
@@ -497,19 +500,15 @@ class PayrollController extends Controller
                 'tax_method' => $payrollDetail->tax_method,
                 'tax_rate_applied' => (float) $payrollDetail->tax_rate_applied,
             ] : null;
-            $employeeData['tunjangan'] = $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
+            $employeeData['tunjangan'] = $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok) {
                 $tunjanganId = (string) $tunjangan->id;
-                if (isset($existingTunjangan[$tunjanganId])) {
-                    $nilaiPerusahaan = $existingTunjangan[$tunjanganId]['perusahaan'] ?? 0;
-                    $nilaiKaryawan = $existingTunjangan[$tunjanganId]['karyawan'] ?? 0;
-                } else {
-                    $nilaiPerusahaan = $tunjangan->perusahaan > 0
-                        ? round($tunjangan->perusahaan / 100 * $employee->gaji_pokok)
-                        : 0;
-                    $nilaiKaryawan = $tunjangan->karyawan > 0
-                        ? round($tunjangan->karyawan / 100 * $employee->gaji_pokok)
-                        : 0;
-                }
+                // Always calculate from percentage using payroll's gajiPokok (not from stored values)
+                $nilaiPerusahaan = $tunjangan->perusahaan > 0
+                    ? round($tunjangan->perusahaan / 100 * $gajiPokok)
+                    : 0;
+                $nilaiKaryawan = $tunjangan->karyawan > 0
+                    ? round($tunjangan->karyawan / 100 * $gajiPokok)
+                    : 0;
                 return [
                     'id' => $tunjangan->id,
                     'jenis' => $tunjangan->jenis_tunjangan,
@@ -573,20 +572,16 @@ class PayrollController extends Controller
                 'tunjangan_jabatan' => $tunjanganJabatan,
                 'potongan_tidak_masuk' => (float) $employee->potongan_tidak_masuk,
                 'potongan_terlambat' => (float) $employee->potongan_terlambat,
-                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok) {
                     $tunjanganId = (string) $tunjangan->id;
 
-                    if (isset($existingTunjangan[$tunjanganId])) {
-                        $nilaiPerusahaan = $existingTunjangan[$tunjanganId]['perusahaan'] ?? 0;
-                        $nilaiKaryawan = $existingTunjangan[$tunjanganId]['karyawan'] ?? 0;
-                    } else {
-                        $nilaiPerusahaan = $tunjangan->perusahaan > 0
-                            ? round($tunjangan->perusahaan / 100 * $employee->gaji_pokok)
-                            : 0;
-                        $nilaiKaryawan = $tunjangan->karyawan > 0
-                            ? round($tunjangan->karyawan / 100 * $employee->gaji_pokok)
-                            : 0;
-                    }
+                    // Always calculate from percentage using payroll's gajiPokok (not from stored values)
+                    $nilaiPerusahaan = $tunjangan->perusahaan > 0
+                        ? round($tunjangan->perusahaan / 100 * $gajiPokok)
+                        : 0;
+                    $nilaiKaryawan = $tunjangan->karyawan > 0
+                        ? round($tunjangan->karyawan / 100 * $gajiPokok)
+                        : 0;
 
                     return [
                         'id' => $tunjangan->id,
@@ -963,9 +958,10 @@ class PayrollController extends Controller
                     $perusahaanValue = isset($tunjanganValues[$tunjanganId]['perusahaan']) ? floatval($tunjanganValues[$tunjanganId]['perusahaan']) : 0;
                     $karyawanValue = isset($tunjanganValues[$tunjanganId]['karyawan']) ? floatval($tunjanganValues[$tunjanganId]['karyawan']) : 0;
                 } else {
-                    // Calculate from percentage
-                    $perusahaanValue = ($tunjangan->perusahaan / 100) * $employee->gaji_pokok;
-                    $karyawanValue = ($tunjangan->karyawan / 100) * $employee->gaji_pokok;
+                    // Calculate from percentage using payroll's gajiPokok
+                    $gajiPokokExcel = (float) $detail->gaji_pokok;
+                    $perusahaanValue = ($tunjangan->perusahaan / 100) * $gajiPokokExcel;
+                    $karyawanValue = ($tunjangan->karyawan / 100) * $gajiPokokExcel;
                 }
 
                 $tunjanganPerusahaan[] = $perusahaanValue;
@@ -982,8 +978,8 @@ class PayrollController extends Controller
             $sheet->setCellValue('F' . $row, $payrollHeader->status_pegawai);
             $sheet->setCellValue('G' . $row, $detail->hari_kerja);
             $sheet->setCellValue('H' . $row, $detail->hari_masuk);
-            $sheet->setCellValue('I' . $row, $employee->gaji_pokok)->getStyle('I' . $row)->getNumberFormat()->setFormatCode($numberFormat);
-            $sheet->setCellValue('J' . $row, $employee->tunjangan_jabatan)->getStyle('J' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('I' . $row, $detail->gaji_pokok)->getStyle('I' . $row)->getNumberFormat()->setFormatCode($numberFormat);
+            $sheet->setCellValue('J' . $row, $detail->tunjangan_jabatan)->getStyle('J' . $row)->getNumberFormat()->setFormatCode($numberFormat);
             $sheet->setCellValue('K' . $row, $detail->insentif)->getStyle('K' . $row)->getNumberFormat()->setFormatCode($numberFormat);
             $sheet->setCellValue('L' . $row, $detail->uang_hadir)->getStyle('L' . $row)->getNumberFormat()->setFormatCode($numberFormat);
             $sheet->setCellValue('M' . $row, $detail->lembur)->getStyle('M' . $row)->getNumberFormat()->setFormatCode($numberFormat);

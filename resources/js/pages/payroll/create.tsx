@@ -43,6 +43,8 @@ interface EmployeePayroll {
         total_potongan: number;
         gaji_bersih: number;
         status: string;
+        gaji_pokok?: number;
+        tunjangan_jabatan?: number;
         pph21_amount?: number;
         tax_method?: string;
         tax_rate_applied?: number;
@@ -302,12 +304,26 @@ export default function PayrollCreate({
         const initial: Record<number, any> = {};
         employees.forEach(emp => {
             const tunjanganObj: Record<string, { perusahaan: number; karyawan: number }> = {};
+            // Get gaji_pokok from payroll or employee default
+            const gajiPokok = emp.payroll?.gaji_pokok || emp.gaji_pokok || 0;
+            // Use tunjanganList to get the percentages
+            const tunjanganListMap: Record<number, { perusahaan: number; karyawan: number }> = {};
+            tunjanganList?.forEach((t: TunjanganList) => {
+                tunjanganListMap[t.id] = {
+                    perusahaan: Number(t.perusahaan) || 0,
+                    karyawan: Number(t.karyawan) || 0
+                };
+            });
             emp.tunjangan?.forEach((t: TunjanganItem) => {
                 // Ensure id is converted to string for consistent key access
                 const key = String(Number(t.id));
+                // Get percentages from tunjanganList (not from stored tunjangan values)
+                const pct = tunjanganListMap[t.id] || { perusahaan: 0, karyawan: 0 };
+                const perusahaanVal = Math.round(gajiPokok * pct.perusahaan / 100);
+                const karyawanVal = Math.round(gajiPokok * pct.karyawan / 100);
                 tunjanganObj[key] = {
-                    perusahaan: Number(t.perusahaan) || 0,
-                    karyawan: Number(t.karyawan) || 0
+                    perusahaan: perusahaanVal,
+                    karyawan: karyawanVal
                 };
             });
 
@@ -369,9 +385,8 @@ export default function PayrollCreate({
             const key = String(Number(tunjangan.id));
             const karyawanPct = Number(tunjangan.karyawan) || 0;
 
-            // Potongan karyawan dihitung dari tunjangan perusahaan (tunjangan perusahaan * % karyawan)
-            const tunjanganPerusahaan = formData[empId]?.tunjangan?.[key]?.perusahaan || 0;
-            potonganObj[key] = Math.round(tunjanganPerusahaan * karyawanPct / 100);
+            // Potongan karyawan dihitung dari Gaji Pokok (% karyawan * Gaji Pokok)
+            potonganObj[key] = Math.round(currentGaji * karyawanPct / 100);
         });
 
         return potonganObj;
@@ -682,7 +697,7 @@ export default function PayrollCreate({
                                                             const perusahaanPct = Number(tunjangan.perusahaan) || 0;
                                                             const karyawanPct = Number(tunjangan.karyawan) || 0;
                                                             const tunjanganPerusahaan = Math.round(newGaji * perusahaanPct / 100);
-                                                            const tunjanganKaryawan = Math.round(tunjanganPerusahaan * karyawanPct / 100);
+                                                            const tunjanganKaryawan = Math.round(newGaji * karyawanPct / 100);
                                                             newTunjangan[key] = {
                                                                 perusahaan: tunjanganPerusahaan,
                                                                 karyawan: tunjanganKaryawan
@@ -821,8 +836,9 @@ export default function PayrollCreate({
                                                             onChange={(e) => {
                                                                 const formatted = formatRupiahInput(e.target.value);
                                                                 const newValue = parseRupiah(formatted);
+                                                                const currentGaji = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
                                                                 const karyawanPct = Number(t.karyawan) || 0;
-                                                                const newPotonganKaryawan = Math.round(newValue * karyawanPct / 100);
+                                                                const newPotonganKaryawan = Math.round(currentGaji * karyawanPct / 100);
                                                                 setFormData({
                                                                     ...formData,
                                                                     [employee.id]: {
