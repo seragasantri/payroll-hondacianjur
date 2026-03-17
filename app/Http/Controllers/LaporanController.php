@@ -223,9 +223,9 @@ class LaporanController extends Controller
                 // Get tunjangan values from tunjangan_lain JSON
                 $tunjanganData = json_decode($detail->tunjangan_lain, true) ?? [];
 
-                // BPJS Kesehatan id = 9
-                $bpjsPerusahaan = isset($tunjanganData['9']['perusahaan']) ? (float) $tunjanganData['9']['perusahaan'] : 0;
-                $bpjsKaryawan = isset($tunjanganData['9']['karyawan']) ? (float) $tunjanganData['9']['karyawan'] : 0;
+                // BPJS Kesehatan id = 1 (server uses 1-5 instead of 5-9)
+                $bpjsPerusahaan = isset($tunjanganData['1']['perusahaan']) ? (float) $tunjanganData['1']['perusahaan'] : 0;
+                $bpjsKaryawan = isset($tunjanganData['1']['karyawan']) ? (float) $tunjanganData['1']['karyawan'] : 0;
                 $totalPremiRow = $bpjsPerusahaan + $bpjsKaryawan;
 
                 $sheet->setCellValue('A' . $row, $no);
@@ -334,12 +334,11 @@ class LaporanController extends Controller
             '12' => 'DESEMBER'
         ];
 
-        // BPJS TK tunjangan IDs
-        // 5=Pensiun, 6=JKM, 7=JKK, 8=JHT
+        // BPJS TK tunjangan IDs (server uses 1-5: 1=BPJS Kes, 2=JHT, 3=JKK, 4=JKM, 5=Pensiun)
         $bpjsTkIds = [
-            'jkk' => '7',
-            'jkm' => '6',
-            'jht' => '8',
+            'jkk' => '3',
+            'jkm' => '4',
+            'jht' => '2',
             'pensiun' => '5',
         ];
 

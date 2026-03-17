@@ -323,7 +323,7 @@ class PayrollController extends Controller
                 $perusahaanValue = (float) ($t['perusahaan'] ?? 0);
                 $totalTunjanganPerusahaan += $perusahaanValue;
 
-                // Exclude JHT (id = 8) and Pensiun (id = 5) from tax calculation
+                // Exclude JHT (id = 2) and Pensiun (id = 5) from tax calculation (server uses 1-5)
                 if ($tunjanganId !== '2' && $tunjanganId !== '5') {
                     $totalTunjanganPerusahaanPajak += $perusahaanValue;
                 }
