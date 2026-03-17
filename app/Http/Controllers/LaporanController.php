@@ -67,7 +67,7 @@ class LaporanController extends Controller
             ->get();
 
         if ($payrollHeaders->isEmpty()) {
-            return redirect()->route('laporan.index')
+            return redirect()->route('laporan.index', ['tahun' => $tahun])
                 ->with('error', 'Tidak ada data payroll untuk tahun tersebut!');
         }
 
@@ -272,7 +272,7 @@ class LaporanController extends Controller
         }
 
         if (!$hasData) {
-            return redirect()->route('laporan.index')
+            return redirect()->route('laporan.index', ['tahun' => $tahun])
                 ->with('error', 'Tidak ada data payroll untuk cabang tersebut!');
         }
 
