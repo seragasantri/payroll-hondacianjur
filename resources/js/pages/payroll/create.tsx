@@ -258,7 +258,7 @@ export default function PayrollCreate({
         if (tunjangan) {
             Object.entries(tunjangan).forEach(([id, t]: [string, { perusahaan: number; karyawan: number }]) => {
                 // Exclude JHT (id = 8) and Pensiun (id = 5) from tax calculation
-                if (id !== '8' && id !== '5') {
+                if (id !== '2' && id !== '5') {
                     tunjanganPerusahaanPajak += Number(t.perusahaan) || 0;
                 }
             });
@@ -544,7 +544,7 @@ export default function PayrollCreate({
         const tunjangan = formData[e.id]?.tunjangan;
         if (tunjangan) {
             Object.entries(tunjangan).forEach(([id, t]: [string, { perusahaan: number; karyawan: number }]) => {
-                if (id !== '8' && id !== '5') {
+                if (id !== '2' && id !== '5') {
                     tunjanganPajak += Number(t.perusahaan) || 0;
                 }
             });
@@ -601,7 +601,7 @@ export default function PayrollCreate({
             const tunjangan = formData[e.id]?.tunjangan;
             if (tunjangan) {
                 Object.entries(tunjangan).forEach(([id, t]: [string, { perusahaan: number; karyawan: number }]) => {
-                    if (id !== '8' && id !== '5') {
+                    if (id !== '2' && id !== '5') {
                         tunjanganPajak += Number(t.perusahaan) || 0;
                     }
                 });
