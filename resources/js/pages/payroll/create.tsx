@@ -573,6 +573,77 @@ export default function PayrollCreate({
         : '0.00';
 
 
+    console.log({
+        'penghasilan exc: jht dan pensiun': totalPendapatanKenaPajak,
+        'tidak masuk': totalTidakMasuk,
+        'jumlah % pajak': persenpajak,
+        'detail per employee': employees.map(e => {
+            const emp = employees.find(emp => emp.id === e.id);
+            const gajiPokok = parseRupiah(String(formData[e.id]?.gaji_pokok || 0));
+            const tunjanganJabatan = parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0));
+            const insentif = parseRupiah(String(formData[e.id]?.insentif || 0));
+            const uangHadir = parseRupiah(String(formData[e.id]?.uang_hadir || 0));
+            const lembur = parseRupiah(String(formData[e.id]?.lembur || 0));
+            const reward = parseRupiah(String(formData[e.id]?.reward || 0));
+            const lainLain = parseRupiah(String(formData[e.id]?.lain_lain || 0));
+
+            // Potongan tidak masuk
+            const hariTidakMasuk = formData[e.id]?.hari_tidak_masuk || 0;
+            const potonganTidakMasuk = hariTidakMasuk * (Number(emp?.potongan_tidak_masuk) || 0);
+
+            // Potongan terlambat
+            const jamTerlambat = formData[e.id]?.jam_terlambat || 0;
+            const potonganTerlambat = jamTerlambat * (Number(emp?.potongan_terlambat) || 0);
+
+            const totalPotonganAbsen = potonganTidakMasuk + potonganTerlambat;
+
+            let tunjanganPajak = 0;
+            const tunjangan = formData[e.id]?.tunjangan;
+            if (tunjangan) {
+                Object.entries(tunjangan).forEach(([id, t]: [string, { perusahaan: number; karyawan: number }]) => {
+                    if (id !== '8' && id !== '5') {
+                        tunjanganPajak += Number(t.perusahaan) || 0;
+                    }
+                });
+            }
+
+            // TJ Perusahaan - absen (tidak masuk + terlambat)
+            const tjPerusahaanMinAbsen = tunjanganPajak - totalPotonganAbsen;
+
+            return {
+                nama: emp?.nama,
+                gp: gajiPokok,
+                tj: tunjanganJabatan,
+                ins: insentif,
+                uh: uangHadir,
+                lembur: lembur,
+                reward: reward,
+                lain: lainLain,
+                tjPerusahaan: tunjanganPajak,
+                tjPerusahaanMinAbsen: tjPerusahaanMinAbsen,
+                totalAbsen: totalPotonganAbsen,
+                totalMinTpPerus: gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain,
+                totalPlusPerus: gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tunjanganPajak,
+                totalMinAbsen: gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tunjanganPajak - totalPotonganAbsen,
+                pajakRate: (() => {
+                    const pkp = gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tjPerusahaanMinAbsen;
+                    const taxResult = calculateTax(pkp, emp?.ptkp || 'TK/0');
+                    return taxResult;
+                })(),
+                persenKenaPaja: (() => {
+                    const pkp = gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tjPerusahaanMinAbsen;
+                    const taxResult = calculateTax(pkp, emp?.ptkp || 'TK/0');
+                    return taxResult.rate.toFixed(2);
+                })(),
+                totalPajakditerima: (() => {
+                    const pkp = gajiPokok + tunjanganJabatan + insentif + uangHadir + lembur + reward + lainLain + tjPerusahaanMinAbsen;
+                    const taxResult = calculateTax(pkp, emp?.ptkp || 'TK/0');
+                    return taxResult.tax;
+                })(),
+            };
+        })
+    });
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Payroll ${formatBulan(bulan)}`} />
