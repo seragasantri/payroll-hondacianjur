@@ -70,7 +70,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
     // Get initial search values from URL
     const urlParams = new URLSearchParams(window.location.search);
     const initialSearchValues: Record<string, string> = {};
-    const searchKeys = ['searchNama', 'searchNIP', 'searchNIK', 'searchStatusPegawai', 'searchJenisKelamin', 'searchKantorCabang', 'searchJabatan'];
+    const searchKeys = ['searchNama', 'searchNIP', 'searchStatusPegawai', 'searchJenisKelamin', 'searchKantorCabang', 'searchJabatan'];
     searchKeys.forEach(key => {
         const value = urlParams.get(key);
         if (value) {
@@ -338,7 +338,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         </button>
                                     </th> */}
                                     <th className='px-4 py-4 w-40 text-left text-sm font-bold text-white'>
-                                        NIK
+                                        NIP
                                     </th>
                                     <th className='px-4 py-4 w-40 text-left text-sm font-bold text-white'>
                                         Status Pegawai
@@ -406,9 +406,9 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             <input
                                                 type="text"
                                                 className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
-                                                placeholder='Cari NIK...'
-                                                value={getSearchValue('searchNIK')}
-                                                onChange={(e) => debouncedSearch('searchNIK', e.target.value, index().url)}
+                                                placeholder='Cari NIP...'
+                                                value={getSearchValue('searchNIP')}
+                                                onChange={(e) => debouncedSearch('searchNIP', e.target.value, index().url)}
                                             />
                                             <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-blue-400">
                                                 <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -424,8 +424,8 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                             className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
                                         >
                                             <option value="">Semua</option>
-                                            <option value="Pegawai Tetap">Tetap</option>
-                                            <option value="Pegawai Kontrak">Kontrak</option>
+                                            <option value="Pegawai Tetap">Pegawai Tetap</option>
+                                            <option value="Pegawai Kontrak">Pegawai Kontrak</option>
                                         </select>
                                     </th>
                                     <th className='px-4 py-4'>
@@ -457,7 +457,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                         </select>
                                     </th>
                                     <th className='px-4 py-4'>
-                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchNIK') || getSearchValue('searchStatusPegawai') || getSearchValue('searchJenisKelamin') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
+                                        {(getSearchValue('searchNama') || getSearchValue('searchNIP') || getSearchValue('searchStatusPegawai') || getSearchValue('searchJenisKelamin') || getSearchValue('searchKantorCabang') || getSearchValue('searchJabatan')) && (
                                             <button
                                                 onClick={handleResetSearch}
                                                 className="inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 text-sm"
@@ -510,7 +510,7 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                                 <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
                                             </td>
                                             <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm">
-                                                {employee.nik || '-'}
+                                                {employee.nip || '-'}
                                             </td>
                                             <td className="px-4 py-3">
                                                 {employee.status_pegawai === 'Pegawai Tetap' ? (

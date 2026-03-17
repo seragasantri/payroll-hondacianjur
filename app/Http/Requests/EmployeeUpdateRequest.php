@@ -42,7 +42,7 @@ class EmployeeUpdateRequest extends FormRequest
             'jabatan_id' => 'required|exists:jabatans,id',
             'nomor_rekening' => 'required|string|max:255',
             'kjt' => 'required|string|max:255',
-            'status_pegawai' => 'required|string|in:tetap,kontrak,magang',
+            'status_pegawai' => 'required|string|in:Pegawai Tetap,Pegawai Kontrak',
             'tanggal_mulai_kerja' => 'required|date',
             'ptkp' => 'required|string|in:TK/0,TK/1,TK/2,TK/3,K/0,K/1,K/2,K/3',
             'gaji_pokok' => 'required|numeric|min:0',
