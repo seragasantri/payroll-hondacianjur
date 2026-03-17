@@ -303,6 +303,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                         title="Penggajian"
                                                     >
                                                         <Briefcase className="size-3" />
+                                                        <span>Penggajian</span>
                                                     </button>
 
                                                     {/* Button 2: PPH21 Bulanan - Purple */}
@@ -312,6 +313,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                         title="PPH21 Bulanan"
                                                     >
                                                         <Calculator className="size-3" />
+                                                        <span>PPH21 Bulanan</span>
                                                     </button>
 
                                                     {/* Button 3: PPH21 Tahunan - Indigo */}
@@ -321,6 +323,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                         title="PPH21 Tahunan"
                                                     >
                                                         <FileText className="size-3" />
+                                                        <span>PPH21 Tahunan</span>
                                                     </button>
 
                                                     {/* Button 4: BPJS TK - Orange */}
@@ -330,6 +333,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                         title="BPJS Ketenaga kerjaan"
                                                     >
                                                         <FileSpreadsheet className="size-3" />
+                                                        <span>BPJS TK</span>
                                                     </button>
 
                                                     {/* Button 5: BPJS Kesehatan - Green */}
@@ -339,6 +343,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                         title="BPJS Kesehatan"
                                                     >
                                                         <HeartPulse className="size-3" />
+                                                        <span>BPJS Kes</span>
                                                     </button>
                                                 </div>
                                             </td>
