@@ -513,17 +513,13 @@ export default function EmployeeIndex({ employees, kantorCabang, jabatan }: { em
                                                 {employee.nik || '-'}
                                             </td>
                                             <td className="px-4 py-3">
-                                                {employee.status_pegawai === 'tetap' ? (
+                                                {employee.status_pegawai === 'Pegawai Tetap' ? (
                                                     <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
-                                                        Tetap
+                                                        Pegawai Tetap
                                                     </span>
-                                                ) : employee.status_pegawai === 'kontrak' ? (
+                                                ) : employee.status_pegawai === 'Pegawai Kontrak' ? (
                                                     <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                                                        Kontrak
-                                                    </span>
-                                                ) : employee.status_pegawai === 'magang' ? (
-                                                    <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 text-xs font-semibold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                                                        Magang
+                                                        Pegawai  Kontrak
                                                     </span>
                                                 ) : (
                                                     <span className="text-gray-400">-</span>
