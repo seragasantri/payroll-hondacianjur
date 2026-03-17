@@ -142,6 +142,8 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
     const handleExport = (cabangId: number, type: string) => {
         if (type === 'bpjs-kes') {
             window.location.href = `/laporan/${cabangId}/${tahun}/export-bpjs-kes`;
+        } else if (type === 'bpjs-ketenaga') {
+            window.location.href = `/laporan/${cabangId}/${tahun}/export-bpjs-tk`;
         } else {
             console.log(`Export ${type} for cabang ${cabangId} tahun ${tahun}`);
         }
