@@ -357,9 +357,8 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                         >
                                             <option value="">Pilih Status</option>
-                                            <option value="tetap">Pegawai Tetap</option>
-                                            <option value="kontrak">Pegawai Kontrak</option>
-                                            <option value="magang">Magang</option>
+                                            <option value="Pegawai Tetap">Pegawai Tetap</option>
+                                            <option value="Pegawai Kontrak">Pegawai Kontrak</option>
                                         </select>
                                         {errors.status_pegawai && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.status_pegawai}</p>
