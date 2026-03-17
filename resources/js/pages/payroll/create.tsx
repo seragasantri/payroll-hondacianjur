@@ -608,7 +608,7 @@ export default function PayrollCreate({
             }
 
             // TJ Perusahaan - absen (tidak masuk + terlambat)
-            const tjPerusahaanMinAbsen = tunjanganPajak - totalPotonganAbsen;
+            const tjPerusahaanMinAbsen = Math.max(0, tunjanganPajak - totalPotonganAbsen);
 
             return {
                 nama: emp?.nama,
