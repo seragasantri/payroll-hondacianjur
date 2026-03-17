@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TunjanganController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -47,6 +48,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('payroll/{bulan}', [PayrollController::class, 'destroy'])->name('payroll.destroy');
     Route::post('payroll/publish', [PayrollController::class, 'publish'])->name('payroll.publish');
     Route::get('payroll/check', [PayrollController::class, 'check'])->name('payroll.check');
+
+    // Laporan routes
+    Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('laporan/{cabangId}/{tahun}/export-bpjs-kes', [LaporanController::class, 'exportBpjsKes'])->name('laporan.export-bpjs-kes');
 
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);

@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Briefcase, Calculator, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog, Wallet } from 'lucide-react';
+import { Briefcase, Calculator, HeartPulse, KeyRoundIcon, LayoutGrid, ShieldCheckIcon, Users, Folder, UserCog, Wallet, FileBarChart } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -21,6 +21,7 @@ import users from '@/routes/users';
 import * as KantorCabang from '@/routes/kantor-cabang';
 import jabatan from '@/routes/jabatan';
 import payroll from '@/routes/payroll';
+import laporan from '@/routes/laporan';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { NavManajemenUsers } from './nav-manajemen-users';
@@ -82,6 +83,12 @@ export function AppSidebar() {
             href: payroll.index().url,
             icon: Wallet,
             show: isSuperAdmin || can('payroll.view any') || can('payroll.view')
+        },
+        {
+            title: 'Laporan',
+            href: laporan.index().url,
+            icon: FileBarChart,
+            show: isSuperAdmin
         },
         {
             title: 'Pajak (PPH 21)',
