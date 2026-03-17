@@ -481,9 +481,9 @@ class LaporanController extends Controller
 
                 // Get BPJS TK values (perusahaan + karyawan for each)
                 // ID: 5=Pensiun, 6=JKM, 7=JKK, 8=JHT
-                $jkk = ((float) ($tunjanganData['3']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['7']['karyawan'] ?? 0));
-                $jkm = ((float) ($tunjanganData['4']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['6']['karyawan'] ?? 0));
-                $jht = ((float) ($tunjanganData['2']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['8']['karyawan'] ?? 0));
+                $jkk = ((float) ($tunjanganData['3']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['3']['karyawan'] ?? 0));
+                $jkm = ((float) ($tunjanganData['4']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['4']['karyawan'] ?? 0));
+                $jht = ((float) ($tunjanganData['2']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['2']['karyawan'] ?? 0));
                 $pensiun = ((float) ($tunjanganData['5']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['5']['karyawan'] ?? 0));
 
                 $totalPremiRow = $jkk + $jkm + $jht + $pensiun;
