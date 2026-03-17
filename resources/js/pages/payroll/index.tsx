@@ -436,7 +436,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                             <span>Publish</span>
                                                         </button>
                                                     )}
-                                                    {item.status === 'published' && (
+                                                    {isSuperAdmin || item.status === 'published' && (
                                                         <div className="flex items-center gap-1">
                                                             <button
                                                                 onClick={() => handleExport(item.bulan, item.status_pegawai)}
