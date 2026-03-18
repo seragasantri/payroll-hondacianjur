@@ -148,6 +148,8 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
             window.location.href = `/laporan/${cabangId}/${tahun}/export-pph21`;
         } else if (type === 'pph21-tahunan') {
             window.location.href = `/laporan/${cabangId}/${tahun}/export-pph21-tahunan`;
+        } else if (type === 'penggajian') {
+            window.location.href = `/laporan/${cabangId}/${tahun}/export-penggajian`;
         } else {
             console.log(`Export ${type} for cabang ${cabangId} tahun ${tahun}`);
         }
