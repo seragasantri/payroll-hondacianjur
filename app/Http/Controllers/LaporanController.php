@@ -869,4 +869,422 @@ class LaporanController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    /**
+     * Export PPH 21 Tahunan to Excel.
+     */
+    public function exportPph21Tahunan($cabangId, $tahun, Request $request)
+    {
+        // Get kantor cabang
+        $cabang = KantorCabang::findOrFail($cabangId);
+
+        // Get all published payrolls for the selected year (January to December + THR)
+        $payrollHeaders = Payrolls::where(function ($query) use ($tahun) {
+            $query->where('bulan', 'like', $tahun . '-%')
+                ->orWhere('bulan', 'like', 'THR ' . $tahun);
+        })
+            ->where('status', 'published')
+            ->orderBy('bulan', 'asc')
+            ->get();
+
+        if ($payrollHeaders->isEmpty()) {
+            return redirect()->route('laporan.index', ['tahun' => $tahun])
+                ->with('error', 'Tidak ada data payroll untuk tahun tersebut!');
+        }
+
+        // PTKP values
+        $ptkpValues = [
+            'TK/0' => 54000000,
+            'TK/1' => 58500000,
+            'TK/2' => 63000000,
+            'TK/3' => 67500000,
+            'K/0' => 58500000,
+            'K/1' => 63000000,
+            'K/2' => 67500000,
+            'K/3' => 72000000,
+        ];
+
+        // Get all payroll details for this cabang grouped by employee
+        $employeeData = [];
+
+        foreach ($payrollHeaders as $payrollHeader) {
+            $bulan = $payrollHeader->bulan;
+
+            // Get payroll details
+            $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
+                ->whereHas('employee', function ($query) use ($cabangId) {
+                    $query->where('kantor_cabang_id', $cabangId);
+                })
+                ->with(['employee' => function ($query) {
+                    $query->withTrashed();
+                }, 'employee.kantorCabang', 'employee.jabatan'])
+                ->get();
+
+            foreach ($payrollDetails as $detail) {
+                $employee = $detail->employee;
+                $employeeId = $employee->id;
+
+                if (!isset($employeeData[$employeeId])) {
+                    $employeeData[$employeeId] = [
+                        'employee' => $employee,
+                        'gaji_setahun' => 0,
+                        'tunjangan_setahun' => 0,
+                        'astek_setahun' => 0,
+                        'insentif_setahun' => 0,
+                        'pph21_dibayar' => 0,
+                        'jht_karyawan' => 0,
+                        'pensiun_karyawan' => 0,
+                        'bulan_list' => [],
+                    ];
+                }
+
+                // Parse tunjangan_lain
+                $tunjanganData = json_decode($detail->tunjangan_lain, true) ?? [];
+                $bpjsKesehatan = 0;
+                $jkk = 0;
+                $jkm = 0;
+                $jht = 0;
+                $pensiun = 0;
+
+                if (!empty($tunjanganData)) {
+                    if (isset($tunjanganData['1'])) {
+                        $bpjsKesehatan = (float) ($tunjanganData['1']['perusahaan'] ?? 0);
+                    } elseif (isset($tunjanganData[0])) {
+                        $bpjsKesehatan = (float) ($tunjanganData[0]['perusahaan'] ?? 0);
+                    }
+
+                    if (isset($tunjanganData['3'])) {
+                        $jkk = (float) ($tunjanganData['3']['perusahaan'] ?? 0);
+                    } elseif (isset($tunjanganData[2])) {
+                        $jkk = (float) ($tunjanganData[2]['perusahaan'] ?? 0);
+                    }
+
+                    if (isset($tunjanganData['4'])) {
+                        $jkm = (float) ($tunjanganData['4']['perusahaan'] ?? 0);
+                    } elseif (isset($tunjanganData[3])) {
+                        $jkm = (float) ($tunjanganData[3]['perusahaan'] ?? 0);
+                    }
+
+                    // JHT and Pensiun - bagian karyawan
+                    if (isset($tunjanganData['2'])) {
+                        $jht = (float) ($tunjanganData['2']['karyawan'] ?? 0);
+                    } elseif (isset($tunjanganData[1])) {
+                        $jht = (float) ($tunjanganData[1]['karyawan'] ?? 0);
+                    }
+
+                    if (isset($tunjanganData['5'])) {
+                        $pensiun = (float) ($tunjanganData['5']['karyawan'] ?? 0);
+                    } elseif (isset($tunjanganData[4])) {
+                        $pensiun = (float) ($tunjanganData[4]['karyawan'] ?? 0);
+                    }
+                }
+
+                $astek = $bpjsKesehatan + $jkk + $jkm;
+
+                // GAJI/UPAH = gaji_pokok - potongan_tidak_masuk - potongan_terlambat
+                $gaji_upah = $detail->gaji_pokok - $detail->potongan_tidak_masuk - $detail->potongan_terlambat;
+
+                // TUNJANGAN = tunjangan_jabatan + uang_hadir + lembur + lain_lain
+                $tunjangan = $detail->tunjangan_jabatan + ($detail->uang_hadir ?? 0) + ($detail->lembur ?? 0) + ($detail->lain_lain ?? 0);
+
+                // INSENTIF = insentif
+                $insentif = $detail->insentif ?? 0;
+
+                // Add to employee totals
+                $employeeData[$employeeId]['gaji_setahun'] += $gaji_upah;
+                $employeeData[$employeeId]['tunjangan_setahun'] += $tunjangan;
+                $employeeData[$employeeId]['astek_setahun'] += $astek;
+                $employeeData[$employeeId]['insentif_setahun'] += $insentif;
+                $employeeData[$employeeId]['pph21_dibayar'] += ($detail->pph21_amount ?? 0);
+                $employeeData[$employeeId]['jht_karyawan'] += $jht;
+                $employeeData[$employeeId]['pensiun_karyawan'] += $pensiun;
+
+                // Track bulan
+                if (str_starts_with($bulan, 'THR')) {
+                    $employeeData[$employeeId]['bulan_list'][] = 'THR';
+                } else {
+                    $bulanNum = (int) substr($bulan, 5, 2);
+                    $employeeData[$employeeId]['bulan_list'][] = $bulanNum;
+                }
+            }
+        }
+
+        if (empty($employeeData)) {
+            return redirect()->route('laporan.index', ['tahun' => $tahun])
+                ->with('error', 'Tidak ada data payroll untuk cabang tersebut!');
+        }
+
+        // Create Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('PPH21 Tahunan');
+
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(10);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(12);
+        $sheet->getColumnDimension('E')->setWidth(18);
+        $sheet->getColumnDimension('F')->setWidth(25);
+        $sheet->getColumnDimension('G')->setWidth(8);
+        $sheet->getColumnDimension('H')->setWidth(8);
+        $sheet->getColumnDimension('I')->setWidth(8);
+        $sheet->getColumnDimension('J')->setWidth(15);
+        $sheet->getColumnDimension('K')->setWidth(15);
+        $sheet->getColumnDimension('L')->setWidth(15);
+        $sheet->getColumnDimension('M')->setWidth(15);
+        $sheet->getColumnDimension('N')->setWidth(15);
+        $sheet->getColumnDimension('O')->setWidth(15);
+        $sheet->getColumnDimension('P')->setWidth(15);
+        $sheet->getColumnDimension('Q')->setWidth(20);
+        $sheet->getColumnDimension('R')->setWidth(20);
+        $sheet->getColumnDimension('S')->setWidth(18);
+
+        // Set row heights for header area
+        $sheet->getRowDimension(1)->setRowHeight(80);
+        $sheet->getRowDimension(2)->setRowHeight(30);
+        $sheet->getRowDimension(3)->setRowHeight(25);
+        $sheet->getRowDimension(4)->setRowHeight(25);
+
+        // Logo - Row 1
+        $logoPath = public_path('assets/images/logo_2.png');
+        if (file_exists($logoPath)) {
+            $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            $drawing->setPath($logoPath);
+            $drawing->setWidth(80);
+            $drawing->setHeight(80);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(5);
+            $drawing->setOffsetY(5);
+            $drawing->setWorksheet($sheet);
+        }
+
+        // Company Name - Row 2 (next to logo)
+        $sheet->mergeCells('B2:S2');
+        $sheet->setCellValue('B2', 'PUSAKA MOTOR UTAMA');
+        $sheet->getStyle('B2')->getFont()->setSize(16)->setBold(true);
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('B2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+        // Title - Row 3
+        $sheet->mergeCells('B3:S3');
+        $sheet->setCellValue('B3', 'LAPORAN PPH21 TAHUNAN');
+        $sheet->getStyle('B3')->getFont()->setSize(14)->setBold(true);
+        $sheet->getStyle('B3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Period - Row 4
+        $sheet->mergeCells('B4:S4');
+        $sheet->setCellValue('B4', 'TAHUN : ' . $tahun);
+        $sheet->getStyle('B4')->getFont()->setSize(12)->setBold(true);
+        $sheet->getStyle('B4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Branch - Row 5
+        $sheet->mergeCells('B5:S5');
+        $sheet->setCellValue('B5', 'CABANG : ' . strtoupper($cabang->name));
+        $sheet->getStyle('B5')->getFont()->setSize(12)->setBold(true);
+        $sheet->getStyle('B5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Empty row
+        $sheet->mergeCells('A6:S6');
+
+        // Table Header - Row 7
+        $headerRow = 7;
+        $headers = [
+            'NO', 'DIVISI', 'NIP', 'NO REK', 'NIK', 'NAMA PEGAWAI', 'STATUS',
+            'MASA KERJA', '', 'GAJI/UPAH SETAHUN', 'TUNJANGAN SETAHUN', 'ASTEK SETAHUN',
+            'INSENTIF/BONUS/THR', 'TOTAL', 'BIAYA JABATAN', 'IURAN JHT & PENSIUN (K)',
+            'PTKP', 'PENHASILAN KENA PAJAK SETAHUN', 'PAJAK TERHUTANG SETAHUN',
+            'PAJAK SUDAH DIBAYAR', 'PAJAK TERHUTANG DES'
+        ];
+
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . $headerRow, $header);
+            $column++;
+        }
+
+        // Style header
+        $sheet->getStyle('A' . $headerRow . ':S' . $headerRow)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $headerRow . ':S' . $headerRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0E0FF');
+        $sheet->getStyle('A' . $headerRow . ':S' . $headerRow)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A' . $headerRow . ':S' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Merge Masa Kerja header
+        $sheet->mergeCells('H' . $headerRow . ':I' . $headerRow);
+
+        // Data rows
+        $no = 1;
+        $row = $headerRow + 1;
+
+        $totalGaji = 0;
+        $totalTunjangan = 0;
+        $totalAstek = 0;
+        $totalInsentif = 0;
+        $totalSemua = 0;
+        $totalBiayaJabatan = 0;
+        $totalIuran = 0;
+        $totalPkp = 0;
+        $totalPajakTerhutang = 0;
+        $totalPajakDibayar = 0;
+        $totalPajakDes = 0;
+
+        foreach ($employeeData as $data) {
+            $employee = $data['employee'];
+            $bulanList = $data['bulan_list'];
+
+            // Calculate masa kerja
+            $bulanListSorted = array_unique($bulanList);
+            sort($bulanListSorted);
+            $bulanAwal = !empty($bulanListSorted) ? min($bulanListSorted) : 1;
+            $bulanAkhir = !empty($bulanListSorted) ? max($bulanListSorted) : 12;
+            if ($bulanAkhir === 'THR') {
+                $bulanAkhir = 12;
+            }
+
+            $gajiSetahun = $data['gaji_setahun'];
+            $tunjanganSetahun = $data['tunjangan_setahun'];
+            $astekSetahun = $data['astek_setahun'];
+            $insentifSetahun = $data['insentif_setahun'];
+            $total = $gajiSetahun + $tunjanganSetahun + $astekSetahun + $insentifSetahun;
+            $biayaJabatan = $total * 0.05;
+            $iuranJhtPensiun = $data['jht_karyawan'] + $data['pensiun_karyawan'];
+
+            // PTKP
+            $ptkpKode = $employee->ptkp ?? 'TK/0';
+            $ptkpNilai = $ptkpValues[$ptkpKode] ?? 54000000;
+
+            // Penghasilan Kena Pajak Setahun
+            $pkp = $ptkpNilai - $total - $biayaJabatan + $iuranJhtPensiun;
+            if ($pkp < 0) {
+                $pkp = 0;
+            }
+
+            // Pajak Terhutang Setahun (Tarif Pasal 17)
+            $pajakTerhutang = $this->calculatePph21Annual($pkp);
+
+            // Pajak Sudah Dibayar
+            $pajakDibayar = $data['pph21_dibayar'];
+
+            // Pajak Terhutang DES
+            $pajakDes = $pajakTerhutang - $pajakDibayar;
+
+            // Write data
+            $sheet->setCellValue('A' . $row, $no);
+            $sheet->setCellValue('B' . $row, $employee->kantorCabang?->name ?? '-');
+            $sheet->setCellValue('C' . $row, $employee->nip);
+            $sheet->setCellValue('D' . $row, $employee->nomor_rekening ?? '-');
+            $sheet->setCellValue('E' . $row, $employee->nik ?? '-');
+            $sheet->setCellValue('F' . $row, $employee->nama);
+            $sheet->setCellValue('G' . $row, $ptkpKode);
+            $sheet->setCellValue('H' . $row, str_pad($bulanAwal, 2, '0', STR_PAD_LEFT));
+            $sheet->setCellValue('I' . $row, str_pad($bulanAkhir, 2, '0', STR_PAD_LEFT));
+            $sheet->setCellValue('J' . $row, $gajiSetahun);
+            $sheet->setCellValue('K' . $row, $tunjanganSetahun);
+            $sheet->setCellValue('L' . $row, $astekSetahun);
+            $sheet->setCellValue('M' . $row, $insentifSetahun);
+            $sheet->setCellValue('N' . $row, $total);
+            $sheet->setCellValue('O' . $row, $biayaJabatan);
+            $sheet->setCellValue('P' . $row, $iuranJhtPensiun);
+            $sheet->setCellValue('Q' . $row, $ptkpNilai);
+            $sheet->setCellValue('R' . $row, $pkp);
+            $sheet->setCellValue('S' . $row, $pajakTerhutang);
+            $sheet->setCellValue('T' . $row, $pajakDibayar);
+            $sheet->setCellValue('U' . $row, $pajakDes);
+
+            // Style data row
+            $sheet->getStyle('A' . $row . ':U' . $row)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('A' . $row . ':G' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('H' . $row . ':U' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+            // Number format
+            $sheet->getStyle('J' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('L' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('M' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('N' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('O' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('P' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('Q' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('R' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('S' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('T' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('U' . $row)->getNumberFormat()->setFormatCode('#,##0');
+
+            // Totals
+            $totalGaji += $gajiSetahun;
+            $totalTunjangan += $tunjanganSetahun;
+            $totalAstek += $astekSetahun;
+            $totalInsentif += $insentifSetahun;
+            $totalSemua += $total;
+            $totalBiayaJabatan += $biayaJabatan;
+            $totalIuran += $iuranJhtPensiun;
+            $totalPkp += $pkp;
+            $totalPajakTerhutang += $pajakTerhutang;
+            $totalPajakDibayar += $pajakDibayar;
+            $totalPajakDes += $pajakDes;
+
+            $no++;
+            $row++;
+        }
+
+        // Total row
+        $sheet->mergeCells('A' . $row . ':I' . $row);
+        $sheet->setCellValue('A' . $row, 'JUMLAH :');
+        $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        $sheet->setCellValue('J' . $row, $totalGaji);
+        $sheet->setCellValue('K' . $row, $totalTunjangan);
+        $sheet->setCellValue('L' . $row, $totalAstek);
+        $sheet->setCellValue('M' . $row, $totalInsentif);
+        $sheet->setCellValue('N' . $row, $totalSemua);
+        $sheet->setCellValue('O' . $row, $totalBiayaJabatan);
+        $sheet->setCellValue('P' . $row, $totalIuran);
+        $sheet->setCellValue('Q' . $row, '');
+        $sheet->setCellValue('R' . $row, $totalPkp);
+        $sheet->setCellValue('S' . $row, $totalPajakTerhutang);
+        $sheet->setCellValue('T' . $row, $totalPajakDibayar);
+        $sheet->setCellValue('U' . $row, $totalPajakDes);
+
+        $sheet->getStyle('A' . $row . ':U' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $row . ':U' . $row)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A' . $row . ':U' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F5F5DC');
+
+        foreach (range('J', 'U') as $col) {
+            $sheet->getStyle($col . $row)->getNumberFormat()->setFormatCode('#,##0');
+        }
+
+        // Output file
+        $filename = 'PPH21_Tahunan_' . $tahun . '_' . strtoupper($cabang->name) . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Calculate PPH 21 Annual Tax using Pasal 17 tariff
+     */
+    private function calculatePph21Annual($pkp)
+    {
+        if ($pkp <= 0) {
+            return 0;
+        }
+
+        // Tarif Pasal 17 ayat 1
+        if ($pkp <= 60000000) {
+            return $pkp * 0.05;
+        } elseif ($pkp <= 250000000) {
+            return 3000000 + ($pkp - 60000000) * 0.10;
+        } elseif ($pkp <= 500000000) {
+            return 3000000 + 19000000 + ($pkp - 250000000) * 0.15;
+        } elseif ($pkp <= 5000000000) {
+            return 3000000 + 19000000 + 37500000 + ($pkp - 500000000) * 0.25;
+        } else {
+            return 3000000 + 19000000 + 37500000 + 1125000000 + ($pkp - 5000000000) * 0.30;
+        }
+    }
 }
