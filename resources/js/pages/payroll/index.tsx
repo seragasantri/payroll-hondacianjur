@@ -323,6 +323,14 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
         window.open(`/payroll/${bulan}/export-detail?${params.toString()}`, '_blank');
     };
 
+    const handleExportTunai = (bulan: string, statusPegawai?: string | null) => {
+        const params = new URLSearchParams({ bulan });
+        if (statusPegawai) {
+            params.append('status', statusPegawai);
+        }
+        window.open(`/payroll/${bulan}/export-tunai?${params.toString()}`, '_blank');
+    };
+
     // Special view for Karyawan (employee) role
     if (isKaryawan) {
         const formatCurrency = (amount: number) => {
@@ -516,6 +524,14 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                     )}
                                                     {isSuperAdmin && item.status === 'published' && (
                                                         <div className="flex items-center gap-1">
+                                                            <button
+                                                                onClick={() => handleExportTunai(item.bulan, item.status_pegawai)}
+                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-orange-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95"
+                                                                title="Export Tunai"
+                                                            >
+                                                                <Download className="size-3" />
+                                                                <span>Tunai</span>
+                                                            </button>
                                                             <button
                                                                 onClick={() => handleExport(item.bulan, item.status_pegawai)}
                                                                 className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"

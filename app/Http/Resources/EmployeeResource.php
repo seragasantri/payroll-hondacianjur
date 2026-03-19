@@ -24,6 +24,7 @@ class EmployeeResource extends JsonResource
             'kantor_cabang_id' => $this->kantor_cabang_id,
             'jabatan_id' => $this->jabatan_id,
             'nomor_rekening' => $this->nomor_rekening,
+            'via_bca' => $this->via_bca ?? true,
             'kjt' => $this->kjt,
             'status_pegawai' => $this->status_pegawai,
             'tanggal_mulai_kerja' => $this->tanggal_mulai_kerja,

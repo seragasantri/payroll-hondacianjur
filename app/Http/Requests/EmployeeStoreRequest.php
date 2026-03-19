@@ -21,6 +21,8 @@ class EmployeeStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $viaBca = $this->input('via_bca') == '1' || $this->input('via_bca') === true;
+
         return [
             'nip' => 'required|string|unique:employees,nip|unique:users,username',
             'nik' => 'required|string|max:20',
@@ -29,15 +31,16 @@ class EmployeeStoreRequest extends FormRequest
             'password' => 'nullable|string|min:6|confirmed',
             'kantor_cabang_id' => 'required|exists:kantor_cabangs,id',
             'jabatan_id' => 'required|exists:jabatans,id',
-            'nomor_rekening' => 'required|string|max:255',
+            'nomor_rekening' => $viaBca ? 'required|string|max:255' : 'nullable|string|max:255',
             'kjt' => 'required|string|max:255',
-            'status_pegawai' => 'required|string|in:tetap,kontrak,magang',
+            'status_pegawai' => 'required|string|in:Pegawai Tetap,Pegawai Kontrak,magang',
             'tanggal_mulai_kerja' => 'required|date',
             'ptkp' => 'required|string|in:TK/0,TK/1,TK/2,TK/3,K/0,K/1,K/2,K/3',
             'gaji_pokok' => 'required|numeric|min:0',
             'tunjangan_jabatan' => 'required|numeric|min:0',
             'potongan_tidak_masuk' => 'required|numeric|min:0',
             'potongan_terlambat' => 'required|numeric|min:0',
+            'via_bca' => 'nullable|boolean',
         ];
     }
 
@@ -48,7 +51,9 @@ class EmployeeStoreRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
+        $viaBca = $this->input('via_bca') == '1' || $this->input('via_bca') === true;
+
+        $messages = [
             'nip.required' => 'NIP wajib diisi',
             'nip.unique' => 'NIP sudah terdaftar',
             'nik.required' => 'NIK wajib diisi',
@@ -61,7 +66,6 @@ class EmployeeStoreRequest extends FormRequest
             'kantor_cabang_id.exists' => 'Kantor Cab tidak valid',
             'jabatan_id.required' => 'Jabatan wajib diisi',
             'jabatan_id.exists' => 'Jabatan tidak valid',
-            'nomor_rekening.required' => 'Nomor rekening wajib diisi',
             'kjt.required' => 'KJT (Kartu Peserta Jamsostek) wajib diisi',
             'status_pegawai.required' => 'Status pegwai wajib diisi',
             'tanggal_mulai_kerja.required' => 'Tanggal mulai kerja wajib diisi',
@@ -73,5 +77,11 @@ class EmployeeStoreRequest extends FormRequest
             'potongan_tidak_masuk.required' => 'Potongan tidak masuk wajib diisi',
             'potongan_terlambat.required' => 'Potongan terlambat wajib diisi',
         ];
+
+        if ($viaBca) {
+            $messages['nomor_rekening.required'] = 'Nomor rekening wajib diisi jika menerima gaji via BCA';
+        }
+
+        return $messages;
     }
 }

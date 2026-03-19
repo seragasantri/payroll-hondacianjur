@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('payroll/{bulan}/detail', [PayrollController::class, 'show'])->name('payroll.show');
     Route::get('payroll/{bulan}/export', [PayrollController::class, 'export'])->name('payroll.export');
     Route::get('payroll/{bulan}/export-detail', [PayrollController::class, 'exportDetail'])->name('payroll.export-detail');
+    Route::get('payroll/{bulan}/export-tunai', [PayrollController::class, 'exportTunai'])->name('payroll.export-tunai');
     Route::get('payroll/{bulan}/edit', [PayrollController::class, 'edit'])->name('payroll.edit');
     Route::put('payroll/{bulan}', [PayrollController::class, 'update'])->name('payroll.update');
     Route::delete('payroll/{bulan}', [PayrollController::class, 'destroy'])->name('payroll.destroy');

@@ -27,6 +27,7 @@ class Employee extends Model
         'kjt',
         'status_pegawai',
         'ptkp',
+        'via_bca',
     ];
 
     protected $casts = [

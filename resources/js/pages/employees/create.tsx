@@ -54,6 +54,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
         tunjangan_jabatan: string;
         potongan_tidak_masuk: string;
         potongan_terlambat: string;
+        via_bca: boolean;
     }>({
         nip: '',
         nik: '',
@@ -70,6 +71,7 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
         tunjangan_jabatan: '',
         potongan_tidak_masuk: '',
         potongan_terlambat: '',
+        via_bca: true,
     });
 
     const handleNipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,18 +243,31 @@ export default function EmployeeCreate({ kantorCabang, jabatan }: { kantorCabang
 
                                 {/* Nomor Rekening dan KJT */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Nomor Rekening */}
+                                    {/* Nomor Rekening dengan Checkbox Via BCA */}
                                     <div>
-                                        <label htmlFor="nomor_rekening" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Nomor Rekening <span className="text-red-500">*</span>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Nomor Rekening
                                         </label>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <input
+                                                id="via_bca"
+                                                type="checkbox"
+                                                checked={data.via_bca}
+                                                onChange={e => setData('via_bca', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="via_bca" className="text-sm text-gray-700 dark:text-gray-300">
+                                                Via BCA (Transfer ke Rekening)
+                                            </label>
+                                        </div>
                                         <input
                                             id="nomor_rekening"
                                             type="text"
                                             value={data.nomor_rekening}
                                             onChange={e => setData('nomor_rekening', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
-                                            placeholder="Contoh: 1234567890"
+                                            disabled={!data.via_bca}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            placeholder={data.via_bca ? "Contoh: 1234567890" : "Tidak ada rekening"}
                                         />
                                         {errors.nomor_rekening && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.nomor_rekening}</p>
