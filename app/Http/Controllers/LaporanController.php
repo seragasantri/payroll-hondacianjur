@@ -116,12 +116,21 @@ class LaporanController extends Controller
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
                     $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', true);
+                        ->where('bpjs_ketenagakerjaan', 1);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
+
+            // Filter out employees with empty tunjangan_lain
+            $payrollDetails = $payrollDetails->filter(function ($detail) {
+                $tunjanganLain = $detail->tunjangan_lain;
+                if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
+                    return false;
+                }
+                return true;
+            });
 
             if ($payrollDetails->isEmpty()) {
                 continue; // Skip months with no data
@@ -370,12 +379,21 @@ class LaporanController extends Controller
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
                     $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', true);
+                        ->where('bpjs_ketenagakerjaan', 1);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
+
+            // Filter out employees with empty tunjangan_lain
+            $payrollDetails = $payrollDetails->filter(function ($detail) {
+                $tunjanganLain = $detail->tunjangan_lain;
+                if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
+                    return false;
+                }
+                return true;
+            });
 
             if ($payrollDetails->isEmpty()) {
                 continue; // Skip months with no data
@@ -634,12 +652,21 @@ class LaporanController extends Controller
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
                     $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', true);
+                        ->where('bpjs_ketenagakerjaan', 1);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
+
+            // Filter out employees with empty tunjangan_lain
+            $payrollDetails = $payrollDetails->filter(function ($detail) {
+                $tunjanganLain = $detail->tunjangan_lain;
+                if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
+                    return false;
+                }
+                return true;
+            });
 
             if ($payrollDetails->isEmpty()) {
                 continue; // Skip months with no data
@@ -1096,11 +1123,27 @@ class LaporanController extends Controller
         // Table Header - Row 7
         $headerRow = 7;
         $headers = [
-            'NO', 'DIVISI', 'NIP', 'NO REK', 'NIK', 'NAMA PEGAWAI', 'STATUS',
-            'MASA KERJA', '', 'GAJI/UPAH SETAHUN', 'TUNJANGAN SETAHUN', 'ASTEK SETAHUN',
-            'INSENTIF/BONUS/THR', 'TOTAL', 'BIAYA JABATAN', 'IURAN JHT & PENSIUN (K)',
-            'PTKP', 'PENHASILAN KENA PAJAK SETAHUN', 'PAJAK TERHUTANG SETAHUN',
-            'PAJAK SUDAH DIBAYAR', 'PAJAK TERHUTANG DES'
+            'NO',
+            'DIVISI',
+            'NIP',
+            'NO REK',
+            'NIK',
+            'NAMA PEGAWAI',
+            'STATUS',
+            'MASA KERJA',
+            '',
+            'GAJI/UPAH SETAHUN',
+            'TUNJANGAN SETAHUN',
+            'ASTEK SETAHUN',
+            'INSENTIF/BONUS/THR',
+            'TOTAL',
+            'BIAYA JABATAN',
+            'IURAN JHT & PENSIUN (K)',
+            'PTKP',
+            'PENHASILAN KENA PAJAK SETAHUN',
+            'PAJAK TERHUTANG SETAHUN',
+            'PAJAK SUDAH DIBAYAR',
+            'PAJAK TERHUTANG DES'
         ];
 
         $column = 'A';
@@ -1357,7 +1400,7 @@ class LaporanController extends Controller
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
                     $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', true);
+                        ->where('bpjs_ketenagakerjaan', 1);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
