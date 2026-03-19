@@ -40,6 +40,13 @@ interface Employee {
     potongan_terlambat: number;
     total_gaji: number;
     total_potongan: number;
+    via_bca?: boolean;
+    bpjs_ketenagakerjaan?: boolean;
+    tunjangan_bpjs_kes?: boolean;
+    tunjangan_jht?: boolean;
+    tunjangan_jkk?: boolean;
+    tunjangan_jkm?: boolean;
+    tunjangan_pensiun?: boolean;
     user?: {
         id: number;
         name: string;

@@ -26,6 +26,7 @@ class EmployeeUpdateRequest extends FormRequest
     {
         $employee = Employee::find($this->route('employee'));
         $viaBca = $this->input('via_bca') == '1' || $this->input('via_bca') === true;
+        $bpjsKetenagakerjaan = $this->input('bpjs_ketenagakerjaan') == '1' || $this->input('bpjs_ketenagakerjaan') === true;
 
         return [
             'nip' => [
@@ -41,7 +42,7 @@ class EmployeeUpdateRequest extends FormRequest
             'kantor_cabang_id' => 'required|exists:kantor_cabangs,id',
             'jabatan_id' => 'required|exists:jabatans,id',
             'nomor_rekening' => $viaBca ? 'required|string|max:255' : 'nullable|string|max:255',
-            'kjt' => 'required|string|max:255',
+            'kjt' => $bpjsKetenagakerjaan ? 'required|string|max:255' : 'nullable|string|max:255',
             'status_pegawai' => 'required|string|in:Pegawai Tetap,Pegawai Kontrak,magang',
             'tanggal_mulai_kerja' => 'required|date',
             'ptkp' => 'required|string|in:TK/0,TK/1,TK/2,TK/3,K/0,K/1,K/2,K/3',
@@ -50,6 +51,12 @@ class EmployeeUpdateRequest extends FormRequest
             'potongan_tidak_masuk' => 'required|numeric|min:0',
             'potongan_terlambat' => 'required|numeric|min:0',
             'via_bca' => 'nullable|boolean',
+            'bpjs_ketenagakerjaan' => 'nullable|boolean',
+            'tunjangan_bpjs_kes' => 'nullable|boolean',
+            'tunjangan_jht' => 'nullable|boolean',
+            'tunjangan_jkk' => 'nullable|boolean',
+            'tunjangan_jkm' => 'nullable|boolean',
+            'tunjangan_pensiun' => 'nullable|boolean',
         ];
     }
 
@@ -98,6 +105,7 @@ class EmployeeUpdateRequest extends FormRequest
     public function messages(): array
     {
         $viaBca = $this->input('via_bca') == '1' || $this->input('via_bca') === true;
+        $bpjsKetenagakerjaan = $this->input('bpjs_ketenagakerjaan') == '1' || $this->input('bpjs_ketenagakerjaan') === true;
 
         $messages = [
             'nip.required' => 'NIP wajib diisi',
@@ -111,7 +119,7 @@ class EmployeeUpdateRequest extends FormRequest
             'kantor_cabang_id.exists' => 'Kantor Cab tidak valid',
             'jabatan_id.required' => 'Jabatan wajib diisi',
             'jabatan_id.exists' => 'Jabatan tidak valid',
-            'kjt.required' => 'KJT (Kartu Peserta Jamsostek) wajib diisi',
+            'kjt.required' => 'KJT wajib diisi jika terdaftar BPJS Ketenagakerjaan',
             'status_pegawai.required' => 'Status pegwai wajib diisi',
             'tanggal_mulai_kerja.required' => 'Tanggal mulai kerja wajib diisi',
             'ptkp.required' => 'Status PTKP wajib diisi',
@@ -125,6 +133,10 @@ class EmployeeUpdateRequest extends FormRequest
 
         if ($viaBca) {
             $messages['nomor_rekening.required'] = 'Nomor rekening wajib diisi jika menerima gaji via BCA';
+        }
+
+        if ($bpjsKetenagakerjaan) {
+            $messages['kjt.required'] = 'KJT wajib diisi jika terdaftar BPJS Ketenagakerjaan';
         }
 
         return $messages;

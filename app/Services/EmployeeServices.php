@@ -83,7 +83,7 @@ class EmployeeServices
                 'kantor_cabang_id' => $data['kantor_cabang_id'],
                 'jabatan_id' => $data['jabatan_id'],
                 'nomor_rekening' => $data['nomor_rekening'] ?? null,
-                'kjt' => $data['kjt'] ?? null,
+                'kjt' => !empty($data['kjt']) ? $data['kjt'] : '0',
                 'status_pegawai' => $data['status_pegawai'] ?? null,
                 'tanggal_mulai_kerja' => $data['tanggal_mulai_kerja'],
                 'ptkp' => $data['ptkp'] ?? null,
@@ -91,7 +91,19 @@ class EmployeeServices
                 'tunjangan_jabatan' => $data['tunjangan_jabatan'],
                 'potongan_tidak_masuk' => $data['potongan_tidak_masuk'],
                 'potongan_terlambat' => $data['potongan_terlambat'],
+                'via_bca' => isset($data['via_bca']) ? (bool) $data['via_bca'] : false,
+                'bpjs_ketenagakerjaan' => isset($data['bpjs_ketenagakerjaan']) ? (bool) $data['bpjs_ketenagakerjaan'] : false,
+                'tunjangan_bpjs_kes' => isset($data['tunjangan_bpjs_kes']) ? (bool) $data['tunjangan_bpjs_kes'] : false,
+                'tunjangan_jht' => isset($data['tunjangan_jht']) ? (bool) $data['tunjangan_jht'] : false,
+                'tunjangan_jkk' => isset($data['tunjangan_jkk']) ? (bool) $data['tunjangan_jkk'] : false,
+                'tunjangan_jkm' => isset($data['tunjangan_jkm']) ? (bool) $data['tunjangan_jkm'] : false,
+                'tunjangan_pensiun' => isset($data['tunjangan_pensiun']) ? (bool) $data['tunjangan_pensiun'] : false,
             ];
+
+            // If bpjs_ketenagakerjaan is not checked, set KJT to "0"
+            if (isset($employeeData['bpjs_ketenagakerjaan']) && !$employeeData['bpjs_ketenagakerjaan']) {
+                $employeeData['kjt'] = '0';
+            }
 
             $employee = $this->model->create($employeeData);
             DB::commit();
@@ -112,6 +124,7 @@ class EmployeeServices
             $employee = $this->findId($id);
 
             // Prepare employee data
+            // Handle checkbox values - if key exists in data, use it; otherwise keep existing value
             $employeeData = [
                 'nip' => $data['nip'] ?? $employee->nip,
                 'nik' => $data['nik'] ?? $employee->nik,
@@ -120,7 +133,7 @@ class EmployeeServices
                 'kantor_cabang_id' => $data['kantor_cabang_id'] ?? $employee->kantor_cabang_id,
                 'jabatan_id' => $data['jabatan_id'] ?? $employee->jabatan_id,
                 'nomor_rekening' => $data['nomor_rekening'] ?? $employee->nomor_rekening,
-                'kjt' => $data['kjt'] ?? $employee->kjt,
+                'kjt' => !empty($data['kjt']) ? $data['kjt'] : '0',
                 'status_pegawai' => $data['status_pegawai'] ?? $employee->status_pegawai,
                 'tanggal_mulai_kerja' => $data['tanggal_mulai_kerja'] ?? $employee->tanggal_mulai_kerja,
                 'ptkp' => $data['ptkp'] ?? $employee->ptkp,
@@ -129,6 +142,32 @@ class EmployeeServices
                 'potongan_tidak_masuk' => $data['potongan_tidak_masuk'] ?? $employee->potongan_tidak_masuk,
                 'potongan_terlambat' => $data['potongan_terlambat'] ?? $employee->potongan_terlambat,
             ];
+
+            // Handle checkbox fields - if key doesn't exist in request, set to false (unchecked)
+            // If key exists, use the value (could be true or false)
+            $checkboxFields = [
+                'via_bca',
+                'bpjs_ketenagakerjaan',
+                'tunjangan_bpjs_kes',
+                'tunjangan_jht',
+                'tunjangan_jkk',
+                'tunjangan_jkm',
+                'tunjangan_pensiun',
+            ];
+
+            foreach ($checkboxFields as $field) {
+                if (array_key_exists($field, $data)) {
+                    $employeeData[$field] = (bool) $data[$field];
+                } else {
+                    // Checkbox was unchecked (not sent in request), set to false
+                    $employeeData[$field] = false;
+                }
+            }
+
+            // If bpjs_ketenagakerjaan is not checked, set KJT to "0"
+            if (isset($employeeData['bpjs_ketenagakerjaan']) && !$employeeData['bpjs_ketenagakerjaan']) {
+                $employeeData['kjt'] = '0';
+            }
 
             // Update employee
             $employee->update($employeeData);

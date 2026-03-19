@@ -42,6 +42,12 @@ interface Employee {
     potongan_tidak_masuk: number;
     potongan_terlambat: number;
     via_bca?: boolean;
+    bpjs_ketenagakerjaan?: boolean;
+    tunjangan_bpjs_kes?: boolean;
+    tunjangan_jht?: boolean;
+    tunjangan_jkk?: boolean;
+    tunjangan_jkm?: boolean;
+    tunjangan_pensiun?: boolean;
 }
 
 interface PageProps {
@@ -70,6 +76,12 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
         potongan_tidak_masuk: string;
         potongan_terlambat: string;
         via_bca: boolean;
+        bpjs_ketenagakerjaan: boolean;
+        tunjangan_bpjs_kes: boolean;
+        tunjangan_jht: boolean;
+        tunjangan_jkk: boolean;
+        tunjangan_jkm: boolean;
+        tunjangan_pensiun: boolean;
     }>({
         nip: employee.nip || '',
         nik: employee.nik || '',
@@ -88,7 +100,13 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
         tunjangan_jabatan: String(employee.tunjangan_jabatan || 0),
         potongan_tidak_masuk: String(employee.potongan_tidak_masuk || 0),
         potongan_terlambat: String(employee.potongan_terlambat || 0),
-        via_bca: employee.via_bca !== false,
+        via_bca: !!employee.via_bca,
+        bpjs_ketenagakerjaan: !!employee.bpjs_ketenagakerjaan,
+        tunjangan_bpjs_kes: !!employee.tunjangan_bpjs_kes,
+        tunjangan_jht: !!employee.tunjangan_jht,
+        tunjangan_jkk: !!employee.tunjangan_jkk,
+        tunjangan_jkm: !!employee.tunjangan_jkm,
+        tunjangan_pensiun: !!employee.tunjangan_pensiun,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -221,23 +239,108 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                     </div>
                                 </div>
 
-                                {/* KJT (Kartu Peserta Jamsostek) */}
+                                {/* KJT (Kartu Peserta Jamsostek) dengan Checkbox BPJS Ketenagakerjaan */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label htmlFor="kjt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            KJT (Kartu Peserta Jamsostek) <span className="text-red-500">*</span>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            KJT (Kartu Peserta Jamsostek)
                                         </label>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <input
+                                                id="bpjs_ketenagakerjaan"
+                                                type="checkbox"
+                                                checked={data.bpjs_ketenagakerjaan}
+                                                onChange={e => setData('bpjs_ketenagakerjaan', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="bpjs_ketenagakerjaan" className="text-sm text-gray-700 dark:text-gray-300">
+                                                Terdaftar BPJS Ketenagakerjaan
+                                            </label>
+                                        </div>
                                         <input
                                             id="kjt"
                                             type="text"
                                             value={data.kjt}
                                             onChange={e => setData('kjt', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
-                                            placeholder="Contoh: 123456789012345678"
+                                            disabled={!data.bpjs_ketenagakerjaan}
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            placeholder={data.bpjs_ketenagakerjaan ? "Contoh: 123456789012345678" : "Tidak terdaftar BPJS"}
                                         />
                                         {errors.kjt && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.kjt}</p>
                                         )}
+                                    </div>
+                                </div>
+
+                                {/* Checklist Tunjangan */}
+                                <div className="mt-6">
+                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
+                                        Tunjangan Perusahaan
+                                    </h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                        Centang untuk menampilkan tunjangan di slip gaji
+                                    </p>
+                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="tunjangan_bpjs_kes"
+                                                type="checkbox"
+                                                checked={data.tunjangan_bpjs_kes}
+                                                onChange={e => setData('tunjangan_bpjs_kes', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="tunjangan_bpjs_kes" className="text-sm text-gray-700 dark:text-gray-300">
+                                                BPJS Kesehatan
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="tunjangan_jht"
+                                                type="checkbox"
+                                                checked={data.tunjangan_jht}
+                                                onChange={e => setData('tunjangan_jht', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="tunjangan_jht" className="text-sm text-gray-700 dark:text-gray-300">
+                                                JHT
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="tunjangan_jkk"
+                                                type="checkbox"
+                                                checked={data.tunjangan_jkk}
+                                                onChange={e => setData('tunjangan_jkk', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="tunjangan_jkk" className="text-sm text-gray-700 dark:text-gray-300">
+                                                JKK
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="tunjangan_jkm"
+                                                type="checkbox"
+                                                checked={data.tunjangan_jkm}
+                                                onChange={e => setData('tunjangan_jkm', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="tunjangan_jkm" className="text-sm text-gray-700 dark:text-gray-300">
+                                                JKM
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="tunjangan_pensiun"
+                                                type="checkbox"
+                                                checked={data.tunjangan_pensiun}
+                                                onChange={e => setData('tunjangan_pensiun', e.target.checked)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="tunjangan_pensiun" className="text-sm text-gray-700 dark:text-gray-300">
+                                                Pensiun
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 

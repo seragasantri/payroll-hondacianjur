@@ -49,6 +49,12 @@ interface Employee {
     tanggal_mulai_kerja: string;
     tunjangan: Tunjangan[];
     payroll: PayrollData | null;
+    bpjs_ketenagakerjaan?: boolean;
+    tunjangan_bpjs_kes?: boolean;
+    tunjangan_jht?: boolean;
+    tunjangan_jkk?: boolean;
+    tunjangan_jkm?: boolean;
+    tunjangan_pensiun?: boolean;
 }
 
 interface Props {
@@ -159,15 +165,32 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
             }, {})
             : tunjanganLainParsed;
 
-        const tunjanganList = employee.tunjangan.map(t => {
-            const key = String(t.id);
-            const existing = tunjanganLainRaw[key];
-            return {
-                ...t,
-                perusahaan: existing?.perusahaan ?? t.perusahaan,
-                karyawan: existing?.karyawan ?? t.karyawan
-            };
-        });
+        // Map tunjangan and filter based on employee checkbox settings
+        // Tunjangan IDs: 1=BPJS Kesehatan, 2=JHT, 3=JKK, 4=JKM, 5=Pensiun
+        // If bpjs_ketenagakerjaan is unchecked, don't show any bpjs-related tunjangan
+        const bpjsChecked = !!employee.bpjs_ketenagakerjaan;
+        const tunjanganList = (Array.isArray(employee.tunjangan) ? employee.tunjangan : [])
+            .filter(t => {
+                const id = String(t.id);
+                // If bpjs_ketenagakerjaan is not checked, don't show bpjs-related tunjangan
+                if (!bpjsChecked) return false;
+                // Filter based on checkbox settings - only show if explicitly checked
+                if (id === '1') return !!employee.tunjangan_bpjs_kes;
+                if (id === '2') return !!employee.tunjangan_jht;
+                if (id === '3') return !!employee.tunjangan_jkk;
+                if (id === '4') return !!employee.tunjangan_jkm;
+                if (id === '5') return !!employee.tunjangan_pensiun;
+                return true; // Other tunjangan always show
+            })
+            .map(t => {
+                const key = String(t.id);
+                const existing = tunjanganLainRaw[key];
+                return {
+                    ...t,
+                    perusahaan: existing?.perusahaan ?? t.perusahaan,
+                    karyawan: existing?.karyawan ?? t.karyawan
+                };
+            });
 
         const html = `
 <!doctype html>
@@ -333,10 +356,13 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
 
             <div class="col-left">
                 <table style="width: 100%">
-                  
+                  ${tunjanganList.length > 0 ? (
+                `
                     <tr>
                         <th class="text-left" colspan="3">TUNJANGAN PERUSAHAAN</th>
                     </tr>
+                    `
+            ) : ''}
                     ${tunjanganList.map((t: Tunjangan) => `
                     <tr>
                         <td class="text-left">${t.jenis}</td>

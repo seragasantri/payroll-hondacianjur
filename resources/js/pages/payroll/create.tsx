@@ -24,6 +24,12 @@ interface EmployeePayroll {
     tunjangan_jabatan: number;
     potongan_tidak_masuk: number;
     potongan_terlambat: number;
+    bpjs_ketenagakerjaan?: boolean;
+    tunjangan_bpjs_kes?: boolean;
+    tunjangan_jht?: boolean;
+    tunjangan_jkk?: boolean;
+    tunjangan_jkm?: boolean;
+    tunjangan_pensiun?: boolean;
     tunjangan: TunjanganItem[];
     payroll: {
         id: number;
@@ -314,18 +320,20 @@ export default function PayrollCreate({
                     karyawan: Number(t.karyawan) || 0
                 };
             });
-            emp.tunjangan?.forEach((t: TunjanganItem) => {
-                // Ensure id is converted to string for consistent key access
-                const key = String(Number(t.id));
-                // Get percentages from tunjanganList (not from stored tunjangan values)
-                const pct = tunjanganListMap[t.id] || { perusahaan: 0, karyawan: 0 };
-                const perusahaanVal = Math.round(gajiPokok * pct.perusahaan / 100);
-                const karyawanVal = Math.round(gajiPokok * pct.karyawan / 100);
-                tunjanganObj[key] = {
-                    perusahaan: perusahaanVal,
-                    karyawan: karyawanVal
-                };
-            });
+            if (Array.isArray(emp.tunjangan)) {
+                emp.tunjangan.forEach((t: TunjanganItem) => {
+                    // Ensure id is converted to string for consistent key access
+                    const key = String(Number(t.id));
+                    // Get percentages from tunjanganList (not from stored tunjangan values)
+                    const pct = tunjanganListMap[t.id] || { perusahaan: 0, karyawan: 0 };
+                    const perusahaanVal = Math.round(gajiPokok * pct.perusahaan / 100);
+                    const karyawanVal = Math.round(gajiPokok * pct.karyawan / 100);
+                    tunjanganObj[key] = {
+                        perusahaan: perusahaanVal,
+                        karyawan: karyawanVal
+                    };
+                });
+            }
 
             const existingHariMasuk = emp.payroll?.hari_masuk ?? 22;
             const existingHariKerja = emp.payroll?.hari_kerja ?? 22;

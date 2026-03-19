@@ -28,6 +28,12 @@ class Employee extends Model
         'status_pegawai',
         'ptkp',
         'via_bca',
+        'bpjs_ketenagakerjaan',
+        'tunjangan_bpjs_kes',
+        'tunjangan_jht',
+        'tunjangan_jkk',
+        'tunjangan_jkm',
+        'tunjangan_pensiun',
     ];
 
     protected $casts = [
