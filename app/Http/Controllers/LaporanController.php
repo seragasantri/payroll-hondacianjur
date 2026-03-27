@@ -1396,11 +1396,9 @@ class LaporanController extends Controller
             }
 
             // Get payroll details with employee data for this cabang
-            // Filter by bpjs_ketenagakerjaan = true for BPJS reports
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
-                    $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', 1);
+                    $query->where('kantor_cabang_id', $cabangId);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
