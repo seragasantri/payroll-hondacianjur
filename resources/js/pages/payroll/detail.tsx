@@ -506,19 +506,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                             </thead>
 
                             <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
-                                {!isPublished ? (
-                                    <tr>
-                                        <td colSpan={10} className="px-4 py-12 text-center">
-                                            <div className="flex flex-col items-center gap-3">
-                                                <div className="size-16 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
-                                                    <Lock className="size-8 text-yellow-500 dark:text-yellow-400" />
-                                                </div>
-                                                <p className="text-muted-foreground font-medium">Payroll belum dipublish</p>
-                                                <p className="text-sm text-muted-foreground">Data payroll akan muncul setelah status diubah menjadi Published</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : employeesWithPayroll.length === 0 ? (
+                                {!isPublished && employeesWithPayroll.length === 0 ? (
                                     <tr>
                                         <td colSpan={10} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
