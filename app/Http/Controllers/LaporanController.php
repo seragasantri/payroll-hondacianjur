@@ -75,6 +75,15 @@ class LaporanController extends Controller
                 ->with('error', 'Tidak ada data payroll untuk tahun tersebut!');
         }
 
+        // Get master tunjangan table (for fallback calculation)
+        $tunjanganMaster = \App\Models\Tunjangan::orderByRaw("CASE
+            WHEN jenis_tunjangan = 'BPJS Kesehatan' THEN 1
+            WHEN jenis_tunjangan = 'JKK' THEN 2
+            WHEN jenis_tunjangan = 'JKM' THEN 3
+            WHEN jenis_tunjangan = 'JHT' THEN 4
+            WHEN jenis_tunjangan = 'Pensiun' THEN 5
+            ELSE 6 END")->get()->keyBy('id');
+
         // Indonesian month names
         $bulanIndo = [
             '01' => 'JANUARI',
@@ -112,25 +121,17 @@ class LaporanController extends Controller
             }
 
             // Get payroll details with employee data for this cabang
-            // Filter by bpjs_ketenagakerjaan = true for BPJS reports
+            // Filter by bpjs_ketenagakerjaan AND tunjangan_bpjs_kes = true
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
                     $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', 1);
+                        ->where('bpjs_ketenagakerjaan', 1)
+                        ->where('tunjangan_bpjs_kes', 1);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
-
-            // Filter out employees with empty tunjangan_lain
-            $payrollDetails = $payrollDetails->filter(function ($detail) {
-                $tunjanganLain = $detail->tunjangan_lain;
-                if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
-                    return false;
-                }
-                return true;
-            });
 
             if ($payrollDetails->isEmpty()) {
                 continue; // Skip months with no data
@@ -141,7 +142,6 @@ class LaporanController extends Controller
             // Create new sheet
             $sheet = $spreadsheet->createSheet();
             $sheet->setTitle($bulanName);
-
             // Set column widths
             $sheet->getColumnDimension('A')->setWidth(5);
             $sheet->getColumnDimension('B')->setWidth(15);
@@ -151,8 +151,8 @@ class LaporanController extends Controller
             $sheet->getColumnDimension('F')->setWidth(8);
             $sheet->getColumnDimension('G')->setWidth(10);
             $sheet->getColumnDimension('H')->setWidth(15);
-            $sheet->getColumnDimension('I')->setWidth(15);
-            $sheet->getColumnDimension('J')->setWidth(15);
+            $sheet->getColumnDimension('I')->setWidth(18);
+            $sheet->getColumnDimension('J')->setWidth(18);
             $sheet->getColumnDimension('K')->setWidth(15);
 
             // Set row heights for header area
@@ -205,7 +205,7 @@ class LaporanController extends Controller
 
             // Table Header - Row 7
             $headerRow = 7;
-            $headers = ['NO', 'NIP', 'KPJ', 'NIK', 'NAMA', 'SEX', 'STATUS', 'UPAH POKOK', 'JPK PERUSAHAAN', 'JPK KARYAWAN', 'TOTAL PREMI'];
+            $headers = ['NO', 'NIP', 'KPJ', 'NIK', 'NAMA', 'SEX', 'STATUS', 'UPAH POKOK', 'JPKS PERUSAHAAN', 'JPKS KARYAWAN', 'TOTAL PREMI'];
             $column = 'A';
             foreach ($headers as $header) {
                 $sheet->setCellValue($column . $headerRow, $header);
@@ -216,29 +216,46 @@ class LaporanController extends Controller
             $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getFont()->setBold(true);
             $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
-            $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D8BFD8');
+            $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F5F5DC');
 
             // Data rows - Row 8 onwards
             $row = 8;
             $no = 1;
             $totalUpahPokok = 0;
-            $totalJpkPerusahaan = 0;
-            $totalJpkKaryawan = 0;
+            $totalBpjsPer = 0;
+            $totalBpjsKar = 0;
             $totalPremi = 0;
 
             foreach ($payrollDetails as $detail) {
                 $employee = $detail->employee;
 
-                // Getjk value from employee
+                // Get jk value from employee
                 $jk = $employee->jenis_kelamin === 'laki-laki' ? 'L' : 'P';
 
-                // Get tunjangan values from tunjangan_lain JSON
-                $tunjanganData = json_decode($detail->tunjangan_lain, true) ?? [];
+                // Get stored tunjangan_lain values
+                $tunjanganStored = json_decode($detail->tunjangan_lain, true) ?? [];
+                $tunjanganStored = is_array($tunjanganStored) && (array_key_exists('1', $tunjanganStored) || array_key_exists(1, $tunjanganStored))
+                    ? $tunjanganStored
+                    : (is_array($tunjanganStored) && isset($tunjanganStored[0]) ? ['1' => $tunjanganStored[0]] : []);
 
-                // BPJS Kesehatan id = 1 (server uses 1-5 instead of 5-9)
-                $bpjsPerusahaan = isset($tunjanganData['1']['perusahaan']) ? (float) $tunjanganData['1']['perusahaan'] : 0;
-                $bpjsKaryawan = isset($tunjanganData['1']['karyawan']) ? (float) $tunjanganData['1']['karyawan'] : 0;
-                $totalPremiRow = $bpjsPerusahaan + $bpjsKaryawan;
+                $gajiPokok = (float) $detail->gaji_pokok;
+
+                // Get BPJS Kesehatan benefit (perusahaan + karyawan), use stored values
+                $bpjsPer = 0;
+                $bpjsKar = 0;
+
+                if ($employee->tunjangan_bpjs_kes ?? false) {
+                    $bpjsPer = isset($tunjanganStored['1']['perusahaan']) ? (float) $tunjanganStored['1']['perusahaan'] : 0;
+                    $bpjsKar = isset($tunjanganStored['1']['karyawan']) ? (float) $tunjanganStored['1']['karyawan'] : 0;
+                    // If no stored values, fallback to master calculation
+                    if ($bpjsPer == 0) {
+                        $master = $tunjanganMaster->get('1');
+                        $bpjsPer = $master && $master->perusahaan > 0 ? round($master->perusahaan / 100 * $gajiPokok) : 0;
+                        $bpjsKar = $master && $master->karyawan > 0 ? round($master->karyawan / 100 * $gajiPokok) : 0;
+                    }
+                }
+
+                $totalPremiRow = $bpjsPer + $bpjsKar;
 
                 $sheet->setCellValue('A' . $row, $no);
                 $sheet->setCellValue('B' . $row, $employee->nip ?? '');
@@ -248,8 +265,8 @@ class LaporanController extends Controller
                 $sheet->setCellValue('F' . $row, $jk);
                 $sheet->setCellValue('G' . $row, $employee->ptkp ?? 'TK/0');
                 $sheet->setCellValue('H' . $row, $detail->gaji_pokok);
-                $sheet->setCellValue('I' . $row, $bpjsPerusahaan);
-                $sheet->setCellValue('J' . $row, $bpjsKaryawan);
+                $sheet->setCellValue('I' . $row, $bpjsPer);
+                $sheet->setCellValue('J' . $row, $bpjsKar);
                 $sheet->setCellValue('K' . $row, $totalPremiRow);
 
                 // Style data row
@@ -264,8 +281,8 @@ class LaporanController extends Controller
                 $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode('#,##0');
 
                 $totalUpahPokok += (float) $detail->gaji_pokok;
-                $totalJpkPerusahaan += $bpjsPerusahaan;
-                $totalJpkKaryawan += $bpjsKaryawan;
+                $totalBpjsPer += $bpjsPer;
+                $totalBpjsKar += $bpjsKar;
                 $totalPremi += $totalPremiRow;
 
                 $no++;
@@ -273,23 +290,27 @@ class LaporanController extends Controller
             }
 
             // Total row
-            $sheet->mergeCells('A' . $row . ':G' . $row);
-            $sheet->setCellValue('A' . $row, 'JUMLAH :');
-            $sheet->getStyle('A' . $row)->getFont()->setBold(true);
-            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $totalRow = $row;
+            $sheet->setCellValue('A' . $totalRow, '');
+            $sheet->setCellValue('B' . $totalRow, '');
+            $sheet->setCellValue('C' . $totalRow, '');
+            $sheet->setCellValue('D' . $totalRow, '');
+            $sheet->setCellValue('E' . $totalRow, 'TOTAL');
+            $sheet->setCellValue('F' . $totalRow, '');
+            $sheet->setCellValue('G' . $totalRow, '');
+            $sheet->setCellValue('H' . $totalRow, $totalUpahPokok);
+            $sheet->setCellValue('I' . $totalRow, $totalBpjsPer);
+            $sheet->setCellValue('J' . $totalRow, $totalBpjsKar);
+            $sheet->setCellValue('K' . $totalRow, $totalPremi);
 
-            $sheet->setCellValue('H' . $row, $totalUpahPokok);
-            $sheet->setCellValue('I' . $row, $totalJpkPerusahaan);
-            $sheet->setCellValue('J' . $row, $totalJpkKaryawan);
-            $sheet->setCellValue('K' . $row, $totalPremi);
+            $sheet->getStyle('A' . $totalRow . ':K' . $totalRow)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $totalRow . ':K' . $totalRow)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle('A' . $totalRow . ':K' . $totalRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F5F5DC');
 
-            $sheet->getStyle('A' . $row . ':K' . $row)->getFont()->setBold(true);
-            $sheet->getStyle('A' . $row . ':K' . $row)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
-            $sheet->getStyle('A' . $row . ':K' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D8BFD8');
-            $sheet->getStyle('H' . $row)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->getStyle('J' . $row)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $numberColumns = ['H', 'I', 'J', 'K'];
+            foreach ($numberColumns as $col) {
+                $sheet->getStyle($col . $totalRow)->getNumberFormat()->setFormatCode('#,##0');
+            }
         }
 
         if (!$hasData) {
@@ -330,6 +351,15 @@ class LaporanController extends Controller
                 ->with('error', 'Tidak ada data payroll untuk tahun tersebut!');
         }
 
+        // Get master tunjangan table (for fallback calculation)
+        $tunjanganMaster = \App\Models\Tunjangan::orderByRaw("CASE
+            WHEN jenis_tunjangan = 'BPJS Kesehatan' THEN 1
+            WHEN jenis_tunjangan = 'JKK' THEN 2
+            WHEN jenis_tunjangan = 'JKM' THEN 3
+            WHEN jenis_tunjangan = 'JHT' THEN 4
+            WHEN jenis_tunjangan = 'Pensiun' THEN 5
+            ELSE 6 END")->get()->keyBy('id');
+
         // Indonesian month names
         $bulanIndo = [
             '01' => 'JANUARI',
@@ -344,14 +374,6 @@ class LaporanController extends Controller
             '10' => 'OKTOBER',
             '11' => 'NOVEMBER',
             '12' => 'DESEMBER'
-        ];
-
-        // BPJS TK tunjangan IDs (server uses 1-5: 1=BPJS Kes, 2=JHT, 3=JKK, 4=JKM, 5=Pensiun)
-        $bpjsTkIds = [
-            'jkk' => '3',
-            'jkm' => '4',
-            'jht' => '2',
-            'pensiun' => '5',
         ];
 
         // Create Excel
@@ -499,15 +521,41 @@ class LaporanController extends Controller
                 // Get jk value from employee
                 $jk = $employee->jenis_kelamin === 'laki-laki' ? 'L' : 'P';
 
-                // Get tunjangan values from tunjangan_lain JSON
-                $tunjanganData = json_decode($detail->tunjangan_lain, true) ?? [];
+                // Parse stored tunjangan_lain values, handling int/string key mismatch
+                $tunjanganStored = json_decode($detail->tunjangan_lain, true) ?? [];
+                $hasStoredData = is_array($tunjanganStored) && (
+                    array_key_exists('1', $tunjanganStored) || array_key_exists(1, $tunjanganStored) ||
+                    array_key_exists('2', $tunjanganStored) || array_key_exists(2, $tunjanganStored) ||
+                    array_key_exists('3', $tunjanganStored) || array_key_exists(3, $tunjanganStored) ||
+                    array_key_exists('4', $tunjanganStored) || array_key_exists(4, $tunjanganStored) ||
+                    array_key_exists('5', $tunjanganStored) || array_key_exists(5, $tunjanganStored)
+                );
+                if (!$hasStoredData && is_array($tunjanganStored) && isset($tunjanganStored[0])) {
+                    $tunjanganStored = ['1' => $tunjanganStored[0]];
+                } elseif (!$hasStoredData) {
+                    $tunjanganStored = [];
+                }
 
-                // Get BPJS TK values (perusahaan + karyawan for each)
-                // ID: 5=Pensiun, 6=JKM, 7=JKK, 8=JHT
-                $jkk = ((float) ($tunjanganData['3']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['3']['karyawan'] ?? 0));
-                $jkm = ((float) ($tunjanganData['4']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['4']['karyawan'] ?? 0));
-                $jht = ((float) ($tunjanganData['2']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['2']['karyawan'] ?? 0));
-                $pensiun = ((float) ($tunjanganData['5']['perusahaan'] ?? 0)) + ((float) ($tunjanganData['5']['karyawan'] ?? 0));
+                $gajiPokok = (float) $detail->gaji_pokok;
+
+                // Get each TK benefit (perusahaan + karyawan), filtered by employee checkbox
+                $jkk = 0;
+                $jkm = 0;
+                $jht = 0;
+                $pensiun = 0;
+
+                if ($employee->tunjangan_jkk ?? false) {
+                    $jkk = $this->getStoredOrCalculated($tunjanganStored, '3', $tunjanganMaster, $gajiPokok);
+                }
+                if ($employee->tunjangan_jkm ?? false) {
+                    $jkm = $this->getStoredOrCalculated($tunjanganStored, '4', $tunjanganMaster, $gajiPokok);
+                }
+                if ($employee->tunjangan_jht ?? false) {
+                    $jht = $this->getStoredOrCalculated($tunjanganStored, '2', $tunjanganMaster, $gajiPokok);
+                }
+                if ($employee->tunjangan_pensiun ?? false) {
+                    $pensiun = $this->getStoredOrCalculated($tunjanganStored, '5', $tunjanganMaster, $gajiPokok);
+                }
 
                 $totalPremiRow = $jkk + $jkm + $jht + $pensiun;
 
@@ -1782,4 +1830,24 @@ class LaporanController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    /**
+     * Helper to get tunjangan value: use stored value if available, otherwise calculate from master percentage.
+     */
+    private function getStoredOrCalculated(array $tunjanganStored, string $id, $tunjanganMaster, float $gajiPokok): float
+    {
+        $storedPer = isset($tunjanganStored[$id]['perusahaan']) ? (float) $tunjanganStored[$id]['perusahaan'] : 0;
+        $storedKar = isset($tunjanganStored[$id]['karyawan']) ? (float) $tunjanganStored[$id]['karyawan'] : 0;
+
+        if ($storedPer > 0) {
+            return $storedPer + $storedKar;
+        }
+
+        // Fallback: calculate from master percentage
+        $master = $tunjanganMaster->get($id);
+        $per = $master && $master->perusahaan > 0 ? round($master->perusahaan / 100 * $gajiPokok) : 0;
+        $kar = $master && $master->karyawan > 0 ? round($master->karyawan / 100 * $gajiPokok) : 0;
+        return $per + $kar;
+    }
+
 }
