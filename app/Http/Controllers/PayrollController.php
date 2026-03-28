@@ -963,7 +963,8 @@ class PayrollController extends Controller
             $nip = $employee->nip ?? '-';
             $cabang = $employee->kantorCabang->name ?? '-';
             $jabatan = $employee->jabatan->name ?? '-';
-            $gaji = $detail->gaji_pokok ?? 0;
+            // Gaji bersih = total pendapatan - semua potongan (termasuk pajak pph21)
+            $gaji = $detail->gaji_bersih ?? 0;
 
             $sheet->setCellValue('A' . $row, $no);
             $sheet->setCellValue('B' . $row, $nama);
