@@ -129,7 +129,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function PayrollDetail({ bulan, status_pegawai, status, employees }: Props) {
-    console.log("🚀 ~ PayrollDetail ~ employees:", employees)
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
     const [expandedEmployee, setExpandedEmployee] = useState<number | null>(null);
@@ -140,9 +139,14 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
         setExpandedEmployee(expandedEmployee === employeeId ? null : employeeId);
     };
 
-    const handleExport = () => {
+    const handleExportNonTunai = () => {
         const params = new URLSearchParams({ bulan, status: status_pegawai });
-        window.open(`/payroll/${bulan}/export?${params.toString()}`, '_blank');
+        window.open(`/payroll/${bulan}/export-non-tunai?${params.toString()}`, '_blank');
+    };
+
+    const handleExportTunai = () => {
+        const params = new URLSearchParams({ bulan, status: status_pegawai });
+        window.open(`/payroll/${bulan}/export-tunai?${params.toString()}`, '_blank');
     };
 
     const handleExportDetail = () => {
@@ -151,7 +155,6 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
     };
 
     const handlePrintSlip = (employee: Employee) => {
-        console.log("🚀 ~ handlePrintSlip ~ employee:", employee.payroll)
         const printWindow = window.open('', '_blank', 'width=800,height=600');
         if (!printWindow) return;
 
@@ -474,17 +477,31 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                             </div>
                         </div>
                     </div>
-                    {isPublished && (
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={handleExportDetail}
-                                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
-                            >
-                                <Download className="size-4" />
-                                Detail
-                            </button>
-                        </div>
-                    )}
+
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleExportTunai}
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-orange-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95"
+                        >
+                            <Download className="size-4" />
+                            Tunai
+                        </button>
+                        <button
+                            onClick={handleExportNonTunai}
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                        >
+                            <Download className="size-4" />
+                            Non Tunai
+                        </button>
+                        <button
+                            onClick={handleExportDetail}
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
+                        >
+                            <Download className="size-4" />
+                            Detail
+                        </button>
+                    </div>
+
                 </div>
 
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">

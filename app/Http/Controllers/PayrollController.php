@@ -731,10 +731,10 @@ class PayrollController extends Controller
             })
             ->first();
 
-        if (!$payrollHeader || $payrollHeader->status !== 'published') {
-            return redirect()->route('payroll.index')
-                ->with('error', 'Payroll belum dipublish!');
-        }
+        // if (!$payrollHeader || $payrollHeader->status !== 'published') {
+        //     return redirect()->route('payroll.index')
+        //         ->with('error', 'Payroll belum dipublish!');
+        // }
 
         // Get payroll details (include soft-deleted employees)
         $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
@@ -896,10 +896,10 @@ class PayrollController extends Controller
             })
             ->first();
 
-        if (!$payrollHeader || $payrollHeader->status !== 'published') {
-            return redirect()->route('payroll.index')
-                ->with('error', 'Payroll belum dipublish!');
-        }
+        // if (!$payrollHeader || $payrollHeader->status !== 'published') {
+        //     return redirect()->route('payroll.index')
+        //         ->with('error', 'Payroll belum dipublish!');
+        // }
 
         // Get payroll details - filter by via_bca = false (Tunai)
         $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
@@ -944,10 +944,18 @@ class PayrollController extends Controller
             $bulanDisplay = 'THR ' . $tahun;
         } else {
             $bulanName = [
-                '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
-                '04' => 'April', '05' => 'Mei', '06' => 'Juni',
-                '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
-                '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+                '01' => 'Januari',
+                '02' => 'Februari',
+                '03' => 'Maret',
+                '04' => 'April',
+                '05' => 'Mei',
+                '06' => 'Juni',
+                '07' => 'Juli',
+                '08' => 'Agustus',
+                '09' => 'September',
+                '10' => 'Oktober',
+                '11' => 'November',
+                '12' => 'Desember'
             ];
             $bulanParts = explode('-', $bulan);
             if (count($bulanParts) == 2) {
@@ -1028,16 +1036,13 @@ class PayrollController extends Controller
             })
             ->first();
 
-        if (!$payrollHeader || $payrollHeader->status !== 'published') {
-            return redirect()->route('payroll.index')
-                ->with('error', 'Payroll belum dipublish!');
-        }
+        // if (!$payrollHeader || $payrollHeader->status !== 'published') {
+        //     return redirect()->route('payroll.index')
+        //         ->with('error', 'Payroll belum dipublish!');
+        // }
 
         // Get payroll details (include soft-deleted employees)
         $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
-            ->whereHas('employee', function ($query) {
-                $query->where('via_bca', true);
-            })
             ->with(['employee' => function ($query) {
                 $query->withTrashed();
             }, 'employee.kantorCabang', 'employee.jabatan', 'employee.user']);
@@ -1256,6 +1261,148 @@ class PayrollController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    public function exportNonTunai($bulan, Request $request)
+    {
+        $user = Auth::user();
+        $isUsersRole = $user->hasRole('users');
+
+        // Manual authorization check
+        $roleNames = $user->getRoleNames()->toArray();
+        $hasAccess = $user->hasPermissionTo('payroll.view any')
+            || in_array('Super Admin', $roleNames);
+
+        if (!$hasAccess) {
+            abort(403, 'Unauthorized');
+        }
+
+        $status = $request->get('status');
+
+        // Get payrolls header
+        $payrollHeader = Payrolls::where('bulan', $bulan)
+            ->when($status && !str_starts_with($status, 'THR'), function ($query) use ($status) {
+                $query->where('status_pegawai', $status);
+            })
+            ->first();
+
+        // Get payroll details - filter by via_bca = true (Non Tunai / Transfer)
+        $payrollDetailsQuery = PayrollDetail::where('payroll_id', $payrollHeader->id)
+            ->whereHas('employee', function ($query) {
+                $query->where('via_bca', true);
+            })
+            ->with(['employee' => function ($query) {
+                $query->withTrashed();
+            }, 'employee.kantorCabang', 'employee.jabatan', 'employee.user']);
+
+        // If user has 'users' role, only export their own data
+        if ($isUsersRole) {
+            $employee = Employee::withTrashed()->where('user_id', $user->id)->first();
+            if (!$employee) {
+                return redirect()->route('payroll.index')
+                    ->with('error', 'Data karyawan tidak ditemukan!');
+            }
+            $payrollDetailsQuery->where('employee_id', $employee->id);
+        }
+
+        $payrollDetails = $payrollDetailsQuery->get();
+
+        // Use PhpSpreadsheet to create real Excel file
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header styles
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E0E0E0']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+            ],
+        ];
+
+        // Headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama');
+        $sheet->setCellValue('C1', 'NIP');
+        $sheet->setCellValue('D1', 'Cabang');
+        $sheet->setCellValue('E1', 'Jabatan');
+        $sheet->setCellValue('F1', 'Keterangan');
+        $sheet->setCellValue('G1', 'Gaji');
+
+        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+
+        // Format bulan for display
+        $bulanDisplay = $bulan;
+        if (str_starts_with($bulan, 'THR ')) {
+            $tahun = str_replace('THR ', '', $bulan);
+            $bulanDisplay = 'THR ' . $tahun;
+        } else {
+            $bulanName = [
+                '01' => 'Januari',
+                '02' => 'Februari',
+                '03' => 'Maret',
+                '04' => 'April',
+                '05' => 'Mei',
+                '06' => 'Juni',
+                '07' => 'Juli',
+                '08' => 'Agustus',
+                '09' => 'September',
+                '10' => 'Oktober',
+                '11' => 'November',
+                '12' => 'Desember'
+            ];
+            $bulanParts = explode('-', $bulan);
+            if (count($bulanParts) == 2) {
+                $bulanDisplay = ($bulanName[$bulanParts[1]] ?? $bulanParts[1]) . ' ' . $bulanParts[0];
+            }
+        }
+
+        $row = 2;
+        $no = 1;
+        foreach ($payrollDetails as $detail) {
+            $employee = $detail->employee;
+            $nama = $employee->nama ?? '-';
+            $nip = $employee->nip ?? '-';
+            $cabang = $employee->kantorCabang->name ?? '-';
+            $jabatan = $employee->jabatan->name ?? '-';
+            // Gaji bersih = total pendapatan - semua potongan (termasuk pajak pph21)
+            $gaji = $detail->gaji_bersih ?? 0;
+
+            $sheet->setCellValue('A' . $row, $no);
+            $sheet->setCellValue('B' . $row, $nama);
+            $sheet->setCellValue('C' . $row, $nip);
+            $sheet->setCellValue('D' . $row, $cabang);
+            $sheet->setCellValue('E' . $row, $jabatan);
+            $sheet->setCellValue('F' . $row, 'Gaji ' . $bulanDisplay);
+            $sheet->setCellValue('G' . $row, $gaji);
+
+            $row++;
+            $no++;
+        }
+
+        // Auto-size columns
+        foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Format currency column
+        $sheet->getStyle('G2:G' . ($row - 1))
+            ->getNumberFormat()
+            ->setFormatCode('#,##0');
+
+        // Set title
+        $sheet->setTitle('Non Tunai');
+
+        // Download file
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Payroll_NonTunai_' . $bulan . '.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
 
     /**
      * Show payroll for editing.
