@@ -179,7 +179,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                         >
                             <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <title>Close</title>
-                                <path d="M14.348 14.849a1.2 1.2 0 01-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 11-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 111.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 111.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 010 1.698z"/>
+                                <path d="M14.348 14.849a1.2 1.2 0 01-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 11-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 111.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 111.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 010 1.698z" />
                             </svg>
                         </button>
                     </div>
@@ -192,28 +192,6 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                             Laporan
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Export laporan payroll dan pajak per cabang</p>
-                    </div>
-
-                    {/* Filter Tahun */}
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="tahun" className="text-sm font-medium">
-                            Tahun:
-                        </label>
-                        <select
-                            id="tahun"
-                            defaultValue={tahun}
-                            onChange={(e) => {
-                                const selectedTahun = e.target.value;
-                                window.location.href = `/laporan?tahun=${selectedTahun}`;
-                            }}
-                            className="border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900"
-                        >
-                            {years.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
-                        </select>
                     </div>
                 </div>
 
@@ -237,6 +215,28 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                 <option value="100">100</option>
                             </select>
                             <span className="text-sm text-gray-600 dark:text-gray-400">data per halaman</span>
+                        </div>
+
+                        {/* Filter Tahun */}
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="tahun" className="text-sm font-medium">
+                                Tahun:
+                            </label>
+                            <select
+                                id="tahun"
+                                defaultValue={tahun}
+                                onChange={(e) => {
+                                    const selectedTahun = e.target.value;
+                                    window.location.href = `/laporan?tahun=${selectedTahun}`;
+                                }}
+                                className="border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900"
+                            >
+                                {years.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 
