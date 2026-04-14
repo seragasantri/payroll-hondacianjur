@@ -773,9 +773,9 @@ export default function PayrollCreate({
 
                 {/* Table dengan Fixed Columns - Single scrollable wrapper */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                    <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+                    <div className="flex" style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
                         {/* Tabel Fixed (kolom kiri yang tidak akan bergerak) */}
-                        <div className="inline-block border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 align-top">
+                        <div className="flex-shrink-0 border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900">
                             <table className='w-auto'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                     <tr>
@@ -914,7 +914,7 @@ export default function PayrollCreate({
                         </div>
 
                         {/* Tabel Scrollable (kolom kanan yang bisa di-scroll) */}
-                        <div className="inline-block align-top">
+                        <div className="flex-1 overflow-x-auto">
                             <table className='w-full'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
                                     <tr>
