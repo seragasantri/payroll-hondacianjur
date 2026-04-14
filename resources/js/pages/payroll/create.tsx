@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Loader2, Save, Send } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
@@ -100,6 +100,27 @@ export default function PayrollCreate({
     const [sortField, setSortField] = useState<'nama' | 'nip' | 'kantorCabang' | null>(null);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+    // Filter states
+    const [filterNip, setFilterNip] = useState('');
+    const [filterCabang, setFilterCabang] = useState('');
+
+    // Scroll sync refs
+    const leftTableRef = useRef<HTMLDivElement>(null);
+    const rightTableRef = useRef<HTMLDivElement>(null);
+
+    // Sync scroll handler
+    const handleRightScroll = () => {
+        if (rightTableRef.current && leftTableRef.current) {
+            leftTableRef.current.scrollTop = rightTableRef.current.scrollTop;
+        }
+    };
+
+    const handleLeftScroll = () => {
+        if (rightTableRef.current && leftTableRef.current) {
+            rightTableRef.current.scrollTop = leftTableRef.current.scrollTop;
+        }
+    };
+
     // Sort handler
     const handleSort = (field: 'nama' | 'nip' | 'kantorCabang') => {
         if (sortField === field) {
@@ -110,8 +131,14 @@ export default function PayrollCreate({
         }
     };
 
-    // Sort employees
-    const sortedEmployees = [...employees].sort((a, b) => {
+    // Sort and filter employees
+    const filteredEmployees = employees.filter(emp => {
+        const matchNip = filterNip === '' || emp.nip.toLowerCase().includes(filterNip.toLowerCase());
+        const matchCabang = filterCabang === '' || emp.kantorCabang === filterCabang;
+        return matchNip && matchCabang;
+    });
+
+    const sortedEmployees = [...filteredEmployees].sort((a, b) => {
         if (!sortField) return 0;
         const aVal = a[sortField] || '';
         const bVal = b[sortField] || '';
@@ -703,7 +730,7 @@ export default function PayrollCreate({
                                     {status}
                                 </span>
                                 <span className="text-muted-foreground text-sm">
-                                    {employees.length} Karyawan
+                                    {filteredEmployees.length} / {employees.length} Karyawan
                                 </span>
                             </div>
                         </div>
@@ -728,12 +755,50 @@ export default function PayrollCreate({
                     </div>
                 </div>
 
+                {/* Filter Section */}
+                <div className="mb-4 flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                    <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Filter NIP</label>
+                        <input
+                            type="text"
+                            value={filterNip}
+                            onChange={(e) => setFilterNip(e.target.value)}
+                            placeholder="Cari NIP..."
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-blue-500"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Filter Cabang</label>
+                        <select
+                            value={filterCabang}
+                            onChange={(e) => setFilterCabang(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-blue-500"
+                        >
+                            <option value="">Semua Cabang</option>
+                            {[...new Set(employees.map(e => e.kantorCabang))].map(cabang => (
+                                <option key={cabang} value={cabang}>{cabang}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <button
+                        onClick={() => { setFilterNip(''); setFilterCabang(''); }}
+                        className="mt-5 px-4 py-2 text-sm bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg transition-colors"
+                    >
+                        Reset
+                    </button>
+                </div>
+
                 {/* Table dengan Fixed Columns - Kolom freeze tidak akan bergerak saat di-scroll */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
                     {/* Container untuk sync scroll */}
                     <div className="flex" style={{ maxHeight: 'calc(100vh - 300px)' }}>
                         {/* Tabel Fixed (kolom kiri yang tidak akan bergerak) */}
-                        <div className="flex-shrink-0 border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 z-10 overflow-hidden" style={{ width: 'fit-content' }}>
+                        <div
+                            ref={leftTableRef}
+                            className="flex-shrink-0 border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 z-10 overflow-auto"
+                            style={{ width: 'fit-content' }}
+                            onScroll={handleLeftScroll}
+                        >
                             <table className='w-full'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                     <tr className='h-10'>
@@ -873,7 +938,12 @@ export default function PayrollCreate({
                         </div>
 
                         {/* Tabel Scrollable (kolom kanan yang bisa di-scroll) */}
-                        <div className="flex-1 overflow-x-auto" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+                        <div
+                            ref={rightTableRef}
+                            className="flex-1 overflow-x-auto"
+                            style={{ maxHeight: 'calc(100vh - 300px)' }}
+                            onScroll={handleRightScroll}
+                        >
                             <table className='w-full'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
                                     <tr>
