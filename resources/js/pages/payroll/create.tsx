@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Loader2, Save, Send } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
@@ -103,23 +103,6 @@ export default function PayrollCreate({
     // Filter states
     const [filterNip, setFilterNip] = useState('');
     const [filterCabang, setFilterCabang] = useState('');
-
-    // Scroll sync refs
-    const leftTableRef = useRef<HTMLDivElement>(null);
-    const rightTableRef = useRef<HTMLDivElement>(null);
-
-    // Sync scroll handler
-    const handleRightScroll = () => {
-        if (rightTableRef.current && leftTableRef.current) {
-            leftTableRef.current.scrollTop = rightTableRef.current.scrollTop;
-        }
-    };
-
-    const handleLeftScroll = () => {
-        if (rightTableRef.current && leftTableRef.current) {
-            rightTableRef.current.scrollTop = leftTableRef.current.scrollTop;
-        }
-    };
 
     // Sort handler
     const handleSort = (field: 'nama' | 'nip' | 'kantorCabang') => {
@@ -788,50 +771,44 @@ export default function PayrollCreate({
                     </button>
                 </div>
 
-                {/* Table dengan Fixed Columns - Kolom freeze tidak akan bergerak saat di-scroll */}
+                {/* Table dengan Fixed Columns - Single scrollable wrapper */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                    {/* Container untuk sync scroll */}
-                    <div className="flex" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+                    <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 300px)' }}>
                         {/* Tabel Fixed (kolom kiri yang tidak akan bergerak) */}
-                        <div
-                            ref={leftTableRef}
-                            className="flex-shrink-0 border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 z-10 overflow-auto"
-                            style={{ width: 'fit-content' }}
-                            onScroll={handleLeftScroll}
-                        >
-                            <table className='w-full'>
+                        <div className="inline-block border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 align-top">
+                            <table className='w-auto'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
-                                    <tr className='h-10'>
-                                        <th className='px-2 py-11 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
-                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[150px] cursor-pointer hover:bg-blue-600/50' rowSpan={2} onClick={() => handleSort('nama')}>
+                                    <tr>
+                                        <th className='px-2 py-3 text-center text-xs font-bold text-white w-10'>#</th>
+                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[150px] cursor-pointer hover:bg-blue-600/50' onClick={() => handleSort('nama')}>
                                             <div className='flex items-center gap-1'>
                                                 Nama
                                                 {sortField === 'nama' && (sortDirection === 'asc' ? '↑' : '↓')}
                                             </div>
                                         </th>
-                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' rowSpan={2} onClick={() => handleSort('nip')}>
+                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' onClick={() => handleSort('nip')}>
                                             <div className='flex items-center gap-1'>
                                                 NIP
                                                 {sortField === 'nip' && (sortDirection === 'asc' ? '↑' : '↓')}
                                             </div>
                                         </th>
-                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' rowSpan={2} onClick={() => handleSort('kantorCabang')}>
+                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' onClick={() => handleSort('kantorCabang')}>
                                             <div className='flex items-center gap-1'>
                                                 Cabang
                                                 {sortField === 'kantorCabang' && (sortDirection === 'asc' ? '↑' : '↓')}
                                             </div>
                                         </th>
-                                        <th className='px-3 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Gaji Pokok</th>
-                                        <th className='px-3 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Tunjangan</th>
-                                        <th className='px-3 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Insentif</th>
-                                        <th className='px-1 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Uang Hadir</th>
-                                        <th className='px-1 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Lembur</th>
-                                        <th className='px-1 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Reward</th>
-                                        <th className='px-1 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Lain-lain</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Gaji Pokok</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Tunjangan</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Insentif</th>
+                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Uang Hadir</th>
+                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Lembur</th>
+                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Reward</th>
+                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Lain-Lain</th>
                                     </tr>
                                 </thead>
                                 <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
-                                    {/* Footer row - antara header dan body */}
+                                    {/* Footer row - TOTAL */}
                                     <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
                                         <td colSpan={4} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
                                         <td className="px-3 py-4 text-right text-gray-900 dark:text-white">{formatCurrency(totalGajiPokok)}</td>
@@ -849,12 +826,12 @@ export default function PayrollCreate({
                                                     {index + 1}
                                                 </span>
                                             </td>
-                                            <td className="px-3 py-4.25">
+                                            <td className="px-3 py-3">
                                                 <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
                                             </td>
-                                            <td className="px-3 py-4.25 text-sm text-gray-700 dark:text-gray-300">{employee.nip}</td>
-                                            <td className="px-3 py-4.25 text-sm text-gray-700 dark:text-gray-300">{employee.kantorCabang}</td>
-                                            <td className="px-3 py-4.25">
+                                            <td className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">{employee.nip}</td>
+                                            <td className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">{employee.kantorCabang}</td>
+                                            <td className="px-3 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.gaji_pokok ?? ''}
@@ -876,7 +853,7 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            <td className="px-3 py-4.25">
+                                            <td className="px-3 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.tunjangan_jabatan ?? ''}
@@ -885,7 +862,7 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            <td className="px-3 py-4.25">
+                                            <td className="px-3 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.insentif ?? ''}
@@ -894,7 +871,7 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            <td className="px-1 py-4.25">
+                                            <td className="px-1 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.uang_hadir ?? ''}
@@ -903,7 +880,7 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            <td className="px-1 py-4.25">
+                                            <td className="px-1 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.lembur ?? ''}
@@ -912,7 +889,7 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            <td className="px-1 py-4.25">
+                                            <td className="px-1 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.reward ?? ''}
@@ -921,7 +898,7 @@ export default function PayrollCreate({
                                                     placeholder="0"
                                                 />
                                             </td>
-                                            <td className="px-1 py-4.25">
+                                            <td className="px-1 py-3">
                                                 <input
                                                     type="text"
                                                     value={formData[employee.id]?.lain_lain ?? ''}
@@ -933,17 +910,11 @@ export default function PayrollCreate({
                                         </tr>
                                     ))}
                                 </tbody>
-
                             </table>
                         </div>
 
                         {/* Tabel Scrollable (kolom kanan yang bisa di-scroll) */}
-                        <div
-                            ref={rightTableRef}
-                            className="flex-1 overflow-x-auto"
-                            style={{ maxHeight: 'calc(100vh - 300px)' }}
-                            onScroll={handleRightScroll}
-                        >
+                        <div className="inline-block align-top">
                             <table className='w-full'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
                                     <tr>
