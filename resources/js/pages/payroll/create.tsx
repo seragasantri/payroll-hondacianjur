@@ -119,6 +119,13 @@ export default function PayrollCreate({
         return sortDirection === 'asc' ? comparison : -comparison;
     });
 
+    // Helper function to check if tunjangan is enabled for an employee
+    // Check if the tunjangan ID exists in emp.tunjangan array
+    const isTunjanganEnabled = (emp: EmployeePayroll, tunjanganId: number): boolean => {
+        if (!Array.isArray(emp.tunjangan)) return false;
+        return emp.tunjangan.some(t => Number(t.id) === tunjanganId);
+    };
+
     const formatBulan = (bulan: string) => {
         // Handle THR case (e.g., "THR 2026")
         if (bulan.startsWith('THR')) {
@@ -898,7 +905,10 @@ export default function PayrollCreate({
                                     <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const tunjanganKey = String(Number(t.id));
-                                            const totalPerusahaan = sortedEmployees.reduce((sum, e) => sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0), 0);
+                                            const totalPerusahaan = sortedEmployees.reduce((sum, e) => {
+                                                if (!isTunjanganEnabled(e, Number(t.id))) return sum;
+                                                return sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0);
+                                            }, 0);
                                             return (
                                                 <td key={t.id} className="px-2 py-4 text-right text-green-600 text-sm">{formatCurrency(totalPerusahaan)}</td>
                                             );
@@ -910,7 +920,10 @@ export default function PayrollCreate({
                                         <td className="px-3 py-4 text-right text-orange-600">{formatCurrency(sortedEmployees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}</td>
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const karyawanPercent = t.karyawan || 0;
-                                            const totalTjKaryawan = sortedEmployees.reduce((sum, e) => sum + Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * karyawanPercent / 100), 0);
+                                            const totalTjKaryawan = sortedEmployees.reduce((sum, e) => {
+                                                if (!isTunjanganEnabled(e, Number(t.id))) return sum;
+                                                return sum + Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * karyawanPercent / 100);
+                                            }, 0);
                                             return (
                                                 <td key={t.id + '_tj'} className="px-1 py-4 text-right text-purple-600 text-xs">{formatCurrency(totalTjKaryawan)}</td>
                                             );
@@ -918,6 +931,7 @@ export default function PayrollCreate({
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const tunjanganKey = String(Number(t.id));
                                             const totalPotongan = sortedEmployees.reduce((sum, e) => {
+                                                if (!isTunjanganEnabled(e, Number(t.id))) return sum;
                                                 const perusahaan = formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                 const tjKaryawan = Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * (t.karyawan || 0) / 100);
                                                 return sum + perusahaan + tjKaryawan;
@@ -932,9 +946,11 @@ export default function PayrollCreate({
                                     </tr>
                                     {sortedEmployees.map((employee, index) => {
                                         const empGajiBersih = getGajiBersih(employee.id);
+                                        // Filter tunjangan yang tidak di-checklist
+                                        const enabledTunjangan = tunjanganCols.filter((t) => isTunjanganEnabled(employee, Number(t.id)));
                                         return (
                                             <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
-                                                {tunjanganCols.map((t: TunjanganList) => {
+                                                {enabledTunjangan.map((t: TunjanganList) => {
                                                     const tunjanganKey = String(Number(t.id));
                                                     const currentValue = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                     return (
@@ -965,6 +981,12 @@ export default function PayrollCreate({
                                                         </td>
                                                     );
                                                 })}
+                                                {/* Placeholder cells for disabled tunjangan */}
+                                                {tunjanganCols
+                                                    .filter((t) => !isTunjanganEnabled(employee, Number(t.id)))
+                                                    .map((t: TunjanganList) => (
+                                                        <td key={t.id} className="px-2 py-3 bg-gray-100 dark:bg-gray-800"></td>
+                                                    ))}
                                                 <td className="px-3 py-3">
                                                     <input
                                                         type="text"
@@ -1014,7 +1036,7 @@ export default function PayrollCreate({
                                                     />
                                                 </td>
                                                 <td className="px-3 py-3 text-right text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-900/20">{formatCurrency(getCalculatedTax(employee.id))}</td>
-                                                {tunjanganCols.map((t: TunjanganList) => {
+                                                {enabledTunjangan.map((t: TunjanganList) => {
                                                     const tunjanganKey = String(Number(t.id));
                                                     const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                     const karyawanPercent = t.karyawan || 0;
@@ -1024,7 +1046,13 @@ export default function PayrollCreate({
                                                         <td key={t.id + '_tj'} className="px-1 py-3 bg-purple-50/30 dark:bg-purple-900/10 text-right text-xs font-medium text-purple-700 dark:text-purple-400">{formatCurrency(tjKaryawan)}</td>
                                                     );
                                                 })}
-                                                {tunjanganCols.map((t: TunjanganList) => {
+                                                {/* Placeholder for disabled TJ Karyawan */}
+                                                {tunjanganCols
+                                                    .filter((t) => !isTunjanganEnabled(employee, Number(t.id)))
+                                                    .map((t: TunjanganList) => (
+                                                        <td key={t.id + '_tj'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>
+                                                    ))}
+                                                {enabledTunjangan.map((t: TunjanganList) => {
                                                     const tunjanganKey = String(Number(t.id));
                                                     const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                     const karyawanPercent = t.karyawan || 0;
@@ -1034,6 +1062,12 @@ export default function PayrollCreate({
                                                         <td key={t.id + '_pot'} className="px-1 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-xs font-medium text-red-700 dark:text-red-400">{formatCurrency(perusahaan + tjKaryawan)}</td>
                                                     );
                                                 })}
+                                                {/* Placeholder for disabled Potongan */}
+                                                {tunjanganCols
+                                                    .filter((t) => !isTunjanganEnabled(employee, Number(t.id)))
+                                                    .map((t: TunjanganList) => (
+                                                        <td key={t.id + '_pot'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>
+                                                    ))}
                                                 <td className="px-3 py-3 text-right text-sm font-bold text-green-600">{formatCurrency(getTotalTunjangan(employee.id) + parseRupiah(String(formData[employee.id]?.gaji_pokok || 0)))}</td>
                                                 <td className="px-3 py-3 text-right text-sm font-bold text-red-600">{formatCurrency(getTotalPotongan(employee.id))}</td>
                                                 <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">{formatCurrency(empGajiBersih)}</td>
