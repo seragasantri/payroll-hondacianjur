@@ -97,6 +97,27 @@ export default function PayrollCreate({
     const { auth } = usePage().props;
     const isSuperAdmin = auth.user?.is_super_admin ?? false;
     const [saving, setSaving] = useState(false);
+    const [sortField, setSortField] = useState<'nama' | 'nip' | 'kantorCabang' | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+    // Sort handler
+    const handleSort = (field: 'nama' | 'nip' | 'kantorCabang') => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    };
+
+    // Sort employees
+    const sortedEmployees = [...employees].sort((a, b) => {
+        if (!sortField) return 0;
+        const aVal = a[sortField] || '';
+        const bVal = b[sortField] || '';
+        const comparison = aVal.toString().localeCompare(bVal.toString());
+        return sortDirection === 'asc' ? comparison : -comparison;
+    });
 
     const formatBulan = (bulan: string) => {
         // Handle THR case (e.g., "THR 2026")
@@ -710,7 +731,24 @@ export default function PayrollCreate({
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                     <tr className='h-10'>
                                         <th className='px-2 py-11 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
-                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[180px]' rowSpan={2}>Nama</th>
+                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[150px] cursor-pointer hover:bg-blue-600/50' rowSpan={2} onClick={() => handleSort('nama')}>
+                                            <div className='flex items-center gap-1'>
+                                                Nama
+                                                {sortField === 'nama' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                            </div>
+                                        </th>
+                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' rowSpan={2} onClick={() => handleSort('nip')}>
+                                            <div className='flex items-center gap-1'>
+                                                NIP
+                                                {sortField === 'nip' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                            </div>
+                                        </th>
+                                        <th className='px-3 py-11 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' rowSpan={2} onClick={() => handleSort('kantorCabang')}>
+                                            <div className='flex items-center gap-1'>
+                                                Cabang
+                                                {sortField === 'kantorCabang' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                            </div>
+                                        </th>
                                         <th className='px-3 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Gaji Pokok</th>
                                         <th className='px-3 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Tunjangan</th>
                                         <th className='px-3 py-11 text-right text-xs font-bold text-white' rowSpan={2}>Insentif</th>
@@ -723,7 +761,7 @@ export default function PayrollCreate({
                                 <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
                                     {/* Footer row - antara header dan body */}
                                     <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
-                                        <td colSpan={2} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
+                                        <td colSpan={4} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
                                         <td className="px-3 py-4 text-right text-gray-900 dark:text-white">{formatCurrency(totalGajiPokok)}</td>
                                         <td className="px-3 py-4 text-right text-green-600">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0)), 0))}</td>
                                         <td className="px-3 py-4 text-right text-green-600">{formatCurrency(totalInsentif)}</td>
@@ -732,7 +770,7 @@ export default function PayrollCreate({
                                         <td className="px-1 py-4 text-right text-green-600 text-sm">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.reward || 0)), 0))}</td>
                                         <td className="px-1 py-4 text-right text-green-600 text-sm">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lain_lain || 0)), 0))}</td>
                                     </tr>
-                                    {employees.map((employee, index) => (
+                                    {sortedEmployees.map((employee, index) => (
                                         <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
                                             <td className="px-2 py-3 text-center">
                                                 <span className="inline-flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
@@ -740,11 +778,10 @@ export default function PayrollCreate({
                                                 </span>
                                             </td>
                                             <td className="px-3 py-4.25">
-                                                <div>
-                                                    <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
-                                                    <div className="text-xs text-gray-500">{employee.nip} | {employee.jabatan}</div>
-                                                </div>
+                                                <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
                                             </td>
+                                            <td className="px-3 py-4.25 text-sm text-gray-700 dark:text-gray-300">{employee.nip}</td>
+                                            <td className="px-3 py-4.25 text-sm text-gray-700 dark:text-gray-300">{employee.kantorCabang}</td>
                                             <td className="px-3 py-4.25">
                                                 <input
                                                     type="text"
@@ -861,7 +898,7 @@ export default function PayrollCreate({
                                     <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const tunjanganKey = String(Number(t.id));
-                                            const totalPerusahaan = employees.reduce((sum, e) => sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0), 0);
+                                            const totalPerusahaan = sortedEmployees.reduce((sum, e) => sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0), 0);
                                             return (
                                                 <td key={t.id} className="px-2 py-4 text-right text-green-600 text-sm">{formatCurrency(totalPerusahaan)}</td>
                                             );
@@ -870,17 +907,17 @@ export default function PayrollCreate({
                                         <td className="px-3 py-4"></td>
                                         <td className="px-3 py-4"></td>
                                         <td className="px-3 py-4"></td>
-                                        <td className="px-3 py-4 text-right text-orange-600">{formatCurrency(employees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}</td>
+                                        <td className="px-3 py-4 text-right text-orange-600">{formatCurrency(sortedEmployees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}</td>
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const karyawanPercent = t.karyawan || 0;
-                                            const totalTjKaryawan = employees.reduce((sum, e) => sum + Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * karyawanPercent / 100), 0);
+                                            const totalTjKaryawan = sortedEmployees.reduce((sum, e) => sum + Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * karyawanPercent / 100), 0);
                                             return (
                                                 <td key={t.id + '_tj'} className="px-1 py-4 text-right text-purple-600 text-xs">{formatCurrency(totalTjKaryawan)}</td>
                                             );
                                         })}
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const tunjanganKey = String(Number(t.id));
-                                            const totalPotongan = employees.reduce((sum, e) => {
+                                            const totalPotongan = sortedEmployees.reduce((sum, e) => {
                                                 const perusahaan = formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                 const tjKaryawan = Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * (t.karyawan || 0) / 100);
                                                 return sum + perusahaan + tjKaryawan;
@@ -893,7 +930,7 @@ export default function PayrollCreate({
                                         <td className="px-3 py-4 text-right text-red-600">{formatCurrency(totalPotongan)}</td>
                                         <td className="px-3 py-4 text-right text-blue-600">{formatCurrency(totalGajiBersih)}</td>
                                     </tr>
-                                    {employees.map((employee, index) => {
+                                    {sortedEmployees.map((employee, index) => {
                                         const empGajiBersih = getGajiBersih(employee.id);
                                         return (
                                             <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
