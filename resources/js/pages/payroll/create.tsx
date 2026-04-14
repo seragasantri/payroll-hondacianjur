@@ -773,177 +773,88 @@ export default function PayrollCreate({
 
                 {/* Table dengan Fixed Columns - Single scrollable wrapper */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                    <div className="flex" style={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-                        {/* Tabel Fixed (kolom kiri yang tidak akan bergerak) */}
-                        <div className="flex-shrink-0 border-r-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900">
+                    <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+                        {/* Tabel Scrollable */}
+                        <div className="overflow-x-auto">
                             <table className='w-auto'>
                                 <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
                                     <tr>
-                                        <th className='px-2 py-3 text-center text-xs font-bold text-white w-10'>#</th>
-                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[150px] cursor-pointer hover:bg-blue-600/50' onClick={() => handleSort('nama')}>
-                                            <div className='flex items-center gap-1'>
-                                                Nama
-                                                {sortField === 'nama' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                            </div>
-                                        </th>
-                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' onClick={() => handleSort('nip')}>
-                                            <div className='flex items-center gap-1'>
-                                                NIP
-                                                {sortField === 'nip' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                            </div>
-                                        </th>
-                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[120px] cursor-pointer hover:bg-blue-600/50' onClick={() => handleSort('kantorCabang')}>
-                                            <div className='flex items-center gap-1'>
-                                                Cabang
-                                                {sortField === 'kantorCabang' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                            </div>
-                                        </th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Gaji Pokok</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Tunjangan</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Insentif</th>
-                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Uang Hadir</th>
-                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Lembur</th>
-                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Reward</th>
-                                        <th className='px-1 py-3 text-right text-xs font-bold text-white'>Lain-Lain</th>
-                                    </tr>
-                                </thead>
-                                <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
-                                    {/* Footer row - TOTAL */}
-                                    <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
-                                        <td colSpan={4} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
-                                        <td className="px-3 py-4 text-right text-gray-900 dark:text-white">{formatCurrency(totalGajiPokok)}</td>
-                                        <td className="px-3 py-4 text-right text-green-600">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0)), 0))}</td>
-                                        <td className="px-3 py-4 text-right text-green-600">{formatCurrency(totalInsentif)}</td>
-                                        <td className="px-1 py-4 text-right text-green-600 text-sm">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.uang_hadir || 0)), 0))}</td>
-                                        <td className="px-1 py-4 text-right text-green-600 text-sm">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lembur || 0)), 0))}</td>
-                                        <td className="px-1 py-4 text-right text-green-600 text-sm">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.reward || 0)), 0))}</td>
-                                        <td className="px-1 py-4 text-right text-green-600 text-sm">{formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lain_lain || 0)), 0))}</td>
-                                    </tr>
-                                    {sortedEmployees.map((employee, index) => (
-                                        <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
-                                            <td className="px-2 py-3 text-center">
-                                                <span className="inline-flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
-                                                    {index + 1}
-                                                </span>
-                                            </td>
-                                            <td className="px-3 py-3">
-                                                <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
-                                            </td>
-                                            <td className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">{employee.nip}</td>
-                                            <td className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">{employee.kantorCabang}</td>
-                                            <td className="px-3 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.gaji_pokok ?? ''}
-                                                    onChange={(e) => {
-                                                        const formatted = formatRupiahInput(e.target.value);
-                                                        const newGaji = parseRupiah(formatted);
-                                                        const newTunjangan: Record<string, { perusahaan: number; karyawan: number }> = {};
-                                                        tunjanganList.forEach((tunjangan) => {
-                                                            const key = String(Number(tunjangan.id));
-                                                            const perusahaanPct = Number(tunjangan.perusahaan) || 0;
-                                                            const karyawanPct = Number(tunjangan.karyawan) || 0;
-                                                            const tunjanganPerusahaan = Math.round(newGaji * perusahaanPct / 100);
-                                                            const tunjanganKaryawan = Math.round(newGaji * karyawanPct / 100);
-                                                            newTunjangan[key] = { perusahaan: tunjanganPerusahaan, karyawan: tunjanganKaryawan };
-                                                        });
-                                                        setFormData({ ...formData, [employee.id]: { ...formData[employee.id], gaji_pokok: formatted, tunjangan: newTunjangan } });
-                                                    }}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                            <td className="px-3 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.tunjangan_jabatan ?? ''}
-                                                    onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], tunjangan_jabatan: formatRupiahInput(e.target.value) } })}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                            <td className="px-3 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.insentif ?? ''}
-                                                    onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], insentif: formatRupiahInput(e.target.value) } })}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                            <td className="px-1 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.uang_hadir ?? ''}
-                                                    onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], uang_hadir: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                            <td className="px-1 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.lembur ?? ''}
-                                                    onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], lembur: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                            <td className="px-1 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.reward ?? ''}
-                                                    onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], reward: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                            <td className="px-1 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={formData[employee.id]?.lain_lain ?? ''}
-                                                    onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], lain_lain: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
-                                                    placeholder="0"
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                        <th className='px-2 py-3 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
+                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[180px]' rowSpan={2}>Nama</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Gaji Pokok</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Tunjangan</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Insentif</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Uang Hadir</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lembur</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Reward</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lain-lain</th>
 
-                        {/* Tabel Scrollable (kolom kanan yang bisa di-scroll) */}
-                        <div className="flex-1 overflow-x-auto">
-                            <table className='w-full'>
-                                <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
-                                    <tr>
-                                        <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>TUNJANGAN (PERUSAHAAN)</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Mangkir</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Terlambat</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Kasbon</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Potongan Lain</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500'>Pajak</th>
-                                        <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length * 2}>TUNJANGAN KARYAWAN & POTONGAN</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Total Pendapatan</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Total Pengurangan</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white'>Total</th>
+                                        {/* ✅ colSpan = tunjanganCols.length (hanya kolom perusahaan) */}
+                                        <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>
+                                            TUNJANGAN (PERUSAHAAN)
+                                        </th>
+
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Mangkir</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500' rowSpan={2}>Pajak</th>
+
+                                        {/* ✅ colSpan = tunjanganCols.length * 2 (TJ Karyawan + Potongan) */}
+                                        <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length * 2}>
+                                            TUNJANGAN KARYAWAN & POTONGAN
+                                        </th>
+
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pendapatan</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pengurangan</th>
+                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
                                     </tr>
                                     <tr>
+                                        {/* Sub-header: Tunjangan Perusahaan */}
                                         {tunjanganCols.map((t: TunjanganList) => (
-                                            <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-blue-400 dark:bg-blue-600 min-w-[80px]'>{t.jenis_tunjangan}</th>
+                                            <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-blue-400 dark:bg-blue-600 min-w-[80px]'>
+                                                {t.jenis_tunjangan}
+                                            </th>
                                         ))}
+                                        {/* Sub-header: TJ Karyawan */}
                                         {tunjanganCols.map((t: TunjanganList) => (
-                                            <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-purple-400 dark:bg-purple-600 min-w-[70px]'>TJ {t.jenis_tunjangan}</th>
+                                            <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-purple-400 dark:bg-purple-600 min-w-[70px]'>
+                                                TJ {t.jenis_tunjangan}
+                                            </th>
                                         ))}
+                                        {/* Sub-header: Potongan */}
                                         {tunjanganCols.map((t: TunjanganList) => (
-                                            <th key={t.id + '_pot'} className='px-1 py-2 text-right text-xs font-bold text-white bg-red-400 dark:bg-red-600 min-w-[70px]'>Potongan</th>
+                                            <th key={t.id + '_pot'} className='px-1 py-2 text-right text-xs font-bold text-white bg-red-400 dark:bg-red-600 min-w-[70px]'>
+                                                Potongan
+                                            </th>
                                         ))}
                                     </tr>
                                 </thead>
+
                                 <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
-                                    {/* Footer row - antara header dan body */}
+
+                                    {/* ✅ BARIS TOTAL — langsung di <tbody>, bukan di dalam <td> */}
                                     <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
+                                        <td colSpan={2} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
+                                        <td className="px-3 py-4 text-right text-gray-900 dark:text-white">{formatCurrency(totalGajiPokok)}</td>
+                                        <td className="px-3 py-4 text-right text-green-600">
+                                            {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0)), 0))}
+                                        </td>
+                                        <td className="px-3 py-4 text-right text-green-600">{formatCurrency(totalInsentif)}</td>
+                                        <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                            {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.uang_hadir || 0)), 0))}
+                                        </td>
+                                        <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                            {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lembur || 0)), 0))}
+                                        </td>
+                                        <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                            {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.reward || 0)), 0))}
+                                        </td>
+                                        <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                            {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lain_lain || 0)), 0))}
+                                        </td>
+
+                                        {/* Total per tunjangan perusahaan */}
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const tunjanganKey = String(Number(t.id));
                                             const totalPerusahaan = sortedEmployees.reduce((sum, e) => {
@@ -951,14 +862,21 @@ export default function PayrollCreate({
                                                 return sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0);
                                             }, 0);
                                             return (
-                                                <td key={t.id} className="px-2 py-4 text-right text-green-600 text-sm">{formatCurrency(totalPerusahaan)}</td>
+                                                <td key={t.id} className="px-2 py-4 text-right text-green-600 text-sm">
+                                                    {formatCurrency(totalPerusahaan)}
+                                                </td>
                                             );
                                         })}
-                                        <td className="px-3 py-4"></td>
-                                        <td className="px-3 py-4"></td>
-                                        <td className="px-3 py-4"></td>
-                                        <td className="px-3 py-4"></td>
-                                        <td className="px-3 py-4 text-right text-orange-600">{formatCurrency(sortedEmployees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}</td>
+
+                                        <td className="px-3 py-4"></td>{/* Mangkir */}
+                                        <td className="px-3 py-4"></td>{/* Terlambat */}
+                                        <td className="px-3 py-4"></td>{/* Kasbon */}
+                                        <td className="px-3 py-4"></td>{/* Potongan Lain */}
+                                        <td className="px-3 py-4 text-right text-orange-600">
+                                            {formatCurrency(sortedEmployees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}
+                                        </td>
+
+                                        {/* Total TJ Karyawan */}
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const karyawanPercent = t.karyawan || 0;
                                             const totalTjKaryawan = sortedEmployees.reduce((sum, e) => {
@@ -966,9 +884,13 @@ export default function PayrollCreate({
                                                 return sum + Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * karyawanPercent / 100);
                                             }, 0);
                                             return (
-                                                <td key={t.id + '_tj'} className="px-1 py-4 text-right text-purple-600 text-xs">{formatCurrency(totalTjKaryawan)}</td>
+                                                <td key={t.id + '_tj'} className="px-1 py-4 text-right text-purple-600 text-xs">
+                                                    {formatCurrency(totalTjKaryawan)}
+                                                </td>
                                             );
                                         })}
+
+                                        {/* Total Potongan per tunjangan */}
                                         {tunjanganCols.map((t: TunjanganList) => {
                                             const tunjanganKey = String(Number(t.id));
                                             const totalPotongan = sortedEmployees.reduce((sum, e) => {
@@ -978,21 +900,115 @@ export default function PayrollCreate({
                                                 return sum + perusahaan + tjKaryawan;
                                             }, 0);
                                             return (
-                                                <td key={t.id + '_pot'} className="px-1 py-4 text-right text-red-600 text-xs">{formatCurrency(totalPotongan)}</td>
+                                                <td key={t.id + '_pot'} className="px-1 py-4 text-right text-red-600 text-xs">
+                                                    {formatCurrency(totalPotongan)}
+                                                </td>
                                             );
                                         })}
+
                                         <td className="px-3 py-4 text-right text-green-600">{formatCurrency(totalTunjangan + totalGajiPokok)}</td>
                                         <td className="px-3 py-4 text-right text-red-600">{formatCurrency(totalPotongan)}</td>
                                         <td className="px-3 py-4 text-right text-blue-600">{formatCurrency(totalGajiBersih)}</td>
                                     </tr>
+
+                                    {/* ✅ BARIS DATA — langsung di <tbody>, bukan nested di dalam <td> */}
                                     {sortedEmployees.map((employee, index) => {
                                         const empGajiBersih = getGajiBersih(employee.id);
-                                        // Filter tunjangan yang tidak di-checklist
-                                        const enabledTunjangan = tunjanganCols.filter((t) => isTunjanganEnabled(employee, Number(t.id)));
                                         return (
                                             <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
-                                                {enabledTunjangan.map((t: TunjanganList) => {
+                                                <td className="px-2 py-3 text-center">
+                                                    <span className="inline-flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
+                                                        {index + 1}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-3">
+                                                    <div className="font-semibold text-gray-900 dark:text-white text-sm">{employee.nama}</div>
+                                                </td>
+                                                <td className="px-3 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.gaji_pokok ?? ''}
+                                                        onChange={(e) => {
+                                                            const formatted = formatRupiahInput(e.target.value);
+                                                            const newGaji = parseRupiah(formatted);
+                                                            const newTunjangan: Record<string, { perusahaan: number; karyawan: number }> = {};
+                                                            tunjanganList.forEach((tunjangan) => {
+                                                                const key = String(Number(tunjangan.id));
+                                                                const perusahaanPct = Number(tunjangan.perusahaan) || 0;
+                                                                const karyawanPct = Number(tunjangan.karyawan) || 0;
+                                                                newTunjangan[key] = {
+                                                                    perusahaan: Math.round(newGaji * perusahaanPct / 100),
+                                                                    karyawan: Math.round(newGaji * karyawanPct / 100),
+                                                                };
+                                                            });
+                                                            setFormData({ ...formData, [employee.id]: { ...formData[employee.id], gaji_pokok: formatted, tunjangan: newTunjangan } });
+                                                        }}
+                                                        className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.tunjangan_jabatan ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], tunjangan_jabatan: formatRupiahInput(e.target.value) } })}
+                                                        className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.insentif ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], insentif: formatRupiahInput(e.target.value) } })}
+                                                        className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+                                                <td className="px-1 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.uang_hadir ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], uang_hadir: formatRupiahInput(e.target.value) } })}
+                                                        className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+                                                <td className="px-1 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.lembur ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], lembur: formatRupiahInput(e.target.value) } })}
+                                                        className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+                                                <td className="px-1 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.reward ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], reward: formatRupiahInput(e.target.value) } })}
+                                                        className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+                                                <td className="px-1 py-3">
+                                                    <input
+                                                        type="text"
+                                                        value={formData[employee.id]?.lain_lain ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], lain_lain: formatRupiahInput(e.target.value) } })}
+                                                        className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                        placeholder="0"
+                                                    />
+                                                </td>
+
+                                                {/* ✅ Kolom Tunjangan Perusahaan — render SEMUA, disabled = cell abu */}
+                                                {tunjanganCols.map((t: TunjanganList) => {
                                                     const tunjanganKey = String(Number(t.id));
+                                                    const isEnabled = isTunjanganEnabled(employee, Number(t.id));
+                                                    if (!isEnabled) {
+                                                        return <td key={t.id} className="px-2 py-3 bg-gray-100 dark:bg-gray-800"></td>;
+                                                    }
                                                     const currentValue = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                     return (
                                                         <td key={t.id} className="px-2 py-3 bg-green-50/30 dark:bg-green-900/10">
@@ -1003,15 +1019,14 @@ export default function PayrollCreate({
                                                                     const formatted = formatRupiahInput(e.target.value);
                                                                     const newValue = parseRupiah(formatted);
                                                                     const currentGaji = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
-                                                                    const karyawanPct = Number(t.karyawan) || 0;
-                                                                    const newPotonganKaryawan = Math.round(currentGaji * karyawanPct / 100);
+                                                                    const newPotonganKaryawan = Math.round(currentGaji * (Number(t.karyawan) || 0) / 100);
                                                                     setFormData({
                                                                         ...formData,
                                                                         [employee.id]: {
                                                                             ...formData[employee.id],
                                                                             tunjangan: {
                                                                                 ...formData[employee.id].tunjangan,
-                                                                                [tunjanganKey]: { ...formData[employee.id].tunjangan?.[tunjanganKey], perusahaan: newValue, karyawan: newPotonganKaryawan }
+                                                                                [tunjanganKey]: { perusahaan: newValue, karyawan: newPotonganKaryawan }
                                                                             }
                                                                         }
                                                                     });
@@ -1022,12 +1037,8 @@ export default function PayrollCreate({
                                                         </td>
                                                     );
                                                 })}
-                                                {/* Placeholder cells for disabled tunjangan */}
-                                                {tunjanganCols
-                                                    .filter((t) => !isTunjanganEnabled(employee, Number(t.id)))
-                                                    .map((t: TunjanganList) => (
-                                                        <td key={t.id} className="px-2 py-3 bg-gray-100 dark:bg-gray-800"></td>
-                                                    ))}
+
+                                                {/* Mangkir */}
                                                 <td className="px-3 py-3">
                                                     <input
                                                         type="text"
@@ -1043,6 +1054,8 @@ export default function PayrollCreate({
                                                     />
                                                     <div className="text-xs text-red-500">{formatCurrency(getPotonganTidakMasuk(employee.id))}</div>
                                                 </td>
+
+                                                {/* Terlambat */}
                                                 <td className="px-3 py-3 text-right">
                                                     <input
                                                         type="text"
@@ -1058,6 +1071,8 @@ export default function PayrollCreate({
                                                     />
                                                     <div className="text-xs text-red-500">{formatCurrency(getPotonganTerlambat(employee.id))}</div>
                                                 </td>
+
+                                                {/* Kasbon */}
                                                 <td className="px-3 py-3">
                                                     <input
                                                         type="text"
@@ -1067,6 +1082,8 @@ export default function PayrollCreate({
                                                         placeholder="0"
                                                     />
                                                 </td>
+
+                                                {/* Potongan Lain */}
                                                 <td className="px-3 py-3">
                                                     <input
                                                         type="text"
@@ -1076,47 +1093,59 @@ export default function PayrollCreate({
                                                         placeholder="0"
                                                     />
                                                 </td>
-                                                <td className="px-3 py-3 text-right text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-900/20">{formatCurrency(getCalculatedTax(employee.id))}</td>
-                                                {enabledTunjangan.map((t: TunjanganList) => {
-                                                    const tunjanganKey = String(Number(t.id));
-                                                    const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
-                                                    const karyawanPercent = t.karyawan || 0;
+
+                                                {/* Pajak */}
+                                                <td className="px-3 py-3 text-right text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-900/20">
+                                                    {formatCurrency(getCalculatedTax(employee.id))}
+                                                </td>
+
+                                                {/* ✅ TJ Karyawan — render SEMUA kolom */}
+                                                {tunjanganCols.map((t: TunjanganList) => {
+                                                    const isEnabled = isTunjanganEnabled(employee, Number(t.id));
+                                                    if (!isEnabled) {
+                                                        return <td key={t.id + '_tj'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>;
+                                                    }
                                                     const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
-                                                    const tjKaryawan = Math.round(gajiPokok * karyawanPercent / 100);
+                                                    const tjKaryawan = Math.round(gajiPokok * (t.karyawan || 0) / 100);
                                                     return (
-                                                        <td key={t.id + '_tj'} className="px-1 py-3 bg-purple-50/30 dark:bg-purple-900/10 text-right text-xs font-medium text-purple-700 dark:text-purple-400">{formatCurrency(tjKaryawan)}</td>
+                                                        <td key={t.id + '_tj'} className="px-1 py-3 bg-purple-50/30 dark:bg-purple-900/10 text-right text-xs font-medium text-purple-700 dark:text-purple-400">
+                                                            {formatCurrency(tjKaryawan)}
+                                                        </td>
                                                     );
                                                 })}
-                                                {/* Placeholder for disabled TJ Karyawan */}
-                                                {tunjanganCols
-                                                    .filter((t) => !isTunjanganEnabled(employee, Number(t.id)))
-                                                    .map((t: TunjanganList) => (
-                                                        <td key={t.id + '_tj'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>
-                                                    ))}
-                                                {enabledTunjangan.map((t: TunjanganList) => {
+
+                                                {/* ✅ Potongan — render SEMUA kolom */}
+                                                {tunjanganCols.map((t: TunjanganList) => {
                                                     const tunjanganKey = String(Number(t.id));
+                                                    const isEnabled = isTunjanganEnabled(employee, Number(t.id));
+                                                    if (!isEnabled) {
+                                                        return <td key={t.id + '_pot'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>;
+                                                    }
                                                     const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
-                                                    const karyawanPercent = t.karyawan || 0;
                                                     const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
-                                                    const tjKaryawan = Math.round(gajiPokok * karyawanPercent / 100);
+                                                    const tjKaryawan = Math.round(gajiPokok * (t.karyawan || 0) / 100);
                                                     return (
-                                                        <td key={t.id + '_pot'} className="px-1 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-xs font-medium text-red-700 dark:text-red-400">{formatCurrency(perusahaan + tjKaryawan)}</td>
+                                                        <td key={t.id + '_pot'} className="px-1 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-xs font-medium text-red-700 dark:text-red-400">
+                                                            {formatCurrency(perusahaan + tjKaryawan)}
+                                                        </td>
                                                     );
                                                 })}
-                                                {/* Placeholder for disabled Potongan */}
-                                                {tunjanganCols
-                                                    .filter((t) => !isTunjanganEnabled(employee, Number(t.id)))
-                                                    .map((t: TunjanganList) => (
-                                                        <td key={t.id + '_pot'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>
-                                                    ))}
-                                                <td className="px-3 py-3 text-right text-sm font-bold text-green-600">{formatCurrency(getTotalTunjangan(employee.id) + parseRupiah(String(formData[employee.id]?.gaji_pokok || 0)))}</td>
-                                                <td className="px-3 py-3 text-right text-sm font-bold text-red-600">{formatCurrency(getTotalPotongan(employee.id))}</td>
-                                                <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">{formatCurrency(empGajiBersih)}</td>
+
+                                                {/* Total Pendapatan, Pengurangan, Gaji Bersih */}
+                                                <td className="px-3 py-3 text-right text-sm font-bold text-green-600">
+                                                    {formatCurrency(getTotalTunjangan(employee.id) + parseRupiah(String(formData[employee.id]?.gaji_pokok || 0)))}
+                                                </td>
+                                                <td className="px-3 py-3 text-right text-sm font-bold text-red-600">
+                                                    {formatCurrency(getTotalPotongan(employee.id))}
+                                                </td>
+                                                <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">
+                                                    {formatCurrency(empGajiBersih)}
+                                                </td>
                                             </tr>
                                         );
                                     })}
-                                </tbody>
 
+                                </tbody>
                             </table>
                         </div>
                     </div>
