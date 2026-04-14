@@ -773,8 +773,8 @@ export default function PayrollCreate({
 
                 {/* Table dengan Header Fixed - Body Scrollable */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                    {/* Horizontal scroll container - scrollbar di bawah header */}
-                    <div className="overflow-x-auto">
+                    {/* Vertical scroll container + Horizontal scroll */}
+                    <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
                         <table className='w-auto'>
                             <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
                                 <tr>
