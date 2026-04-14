@@ -771,71 +771,69 @@ export default function PayrollCreate({
                     </button>
                 </div>
 
-                {/* Table dengan Fixed Columns - Single scrollable wrapper */}
+                {/* Table dengan Header Fixed - Body Scrollable */}
                 <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                    <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 300px)' }}>
-                        {/* Tabel Scrollable */}
-                        <div className="overflow-x-auto">
-                            <table className='w-auto'>
-                                <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
-                                    <tr>
-                                        <th className='px-2 py-3 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
-                                        <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[180px]' rowSpan={2}>Nama</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Gaji Pokok</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Tunjangan</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Insentif</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Uang Hadir</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lembur</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Reward</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lain-lain</th>
+                    {/* Horizontal scroll container - scrollbar di bawah header */}
+                    <div className="overflow-x-auto">
+                        <table className='w-auto'>
+                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
+                                <tr>
+                                    <th className='px-2 py-3 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
+                                    <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[180px]' rowSpan={2}>Nama</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Gaji Pokok</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Tunjangan</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Insentif</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Uang Hadir</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lembur</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Reward</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Lain-Lain</th>
 
-                                        {/* ✅ colSpan = tunjanganCols.length (hanya kolom perusahaan) */}
-                                        <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>
-                                            TUNJANGAN (PERUSAHAAN)
+                                    {/* colSpan = tunjanganCols.length (hanya kolom perusahaan) */}
+                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length}>
+                                        TUNJANGAN (PERUSAHAAN)
+                                    </th>
+
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Mangkir</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500' rowSpan={2}>Pajak</th>
+
+                                    {/* colSpan = tunjanganCols.length * 2 (TJ Karyawan + Potongan) */}
+                                    <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length * 2}>
+                                        TUNJANGAN KARYAWAN & POTONGAN
+                                    </th>
+
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pendapatan</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pengurangan</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
+                                </tr>
+                                <tr>
+                                    {/* Sub-header: Tunjangan Perusahaan */}
+                                    {tunjanganCols.map((t: TunjanganList) => (
+                                        <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-blue-400 dark:bg-blue-600 min-w-[80px]'>
+                                            {t.jenis_tunjangan}
                                         </th>
-
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Mangkir</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500' rowSpan={2}>Pajak</th>
-
-                                        {/* ✅ colSpan = tunjanganCols.length * 2 (TJ Karyawan + Potongan) */}
-                                        <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length * 2}>
-                                            TUNJANGAN KARYAWAN & POTONGAN
+                                    ))}
+                                    {/* Sub-header: TJ Karyawan */}
+                                    {tunjanganCols.map((t: TunjanganList) => (
+                                        <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-purple-400 dark:bg-purple-600 min-w-[70px]'>
+                                            TJ {t.jenis_tunjangan}
                                         </th>
+                                    ))}
+                                    {/* Sub-header: Potongan */}
+                                    {tunjanganCols.map((t: TunjanganList) => (
+                                        <th key={t.id + '_pot'} className='px-1 py-2 text-right text-xs font-bold text-white bg-red-400 dark:bg-red-600 min-w-[70px]'>
+                                            Potongan
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
 
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pendapatan</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total Pengurangan</th>
-                                        <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Total</th>
-                                    </tr>
-                                    <tr>
-                                        {/* Sub-header: Tunjangan Perusahaan */}
-                                        {tunjanganCols.map((t: TunjanganList) => (
-                                            <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-blue-400 dark:bg-blue-600 min-w-[80px]'>
-                                                {t.jenis_tunjangan}
-                                            </th>
-                                        ))}
-                                        {/* Sub-header: TJ Karyawan */}
-                                        {tunjanganCols.map((t: TunjanganList) => (
-                                            <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-purple-400 dark:bg-purple-600 min-w-[70px]'>
-                                                TJ {t.jenis_tunjangan}
-                                            </th>
-                                        ))}
-                                        {/* Sub-header: Potongan */}
-                                        {tunjanganCols.map((t: TunjanganList) => (
-                                            <th key={t.id + '_pot'} className='px-1 py-2 text-right text-xs font-bold text-white bg-red-400 dark:bg-red-600 min-w-[70px]'>
-                                                Potongan
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-
-                                <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
-
-                                    {/* ✅ BARIS TOTAL — langsung di <tbody>, bukan di dalam <td> */}
-                                    <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
-                                        <td colSpan={2} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
+                                {/* BARIS TOTAL — langsung di <tbody>, bukan di dalam <td> */}
+                                <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
+                                    <td colSpan={2} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
                                         <td className="px-3 py-4 text-right text-gray-900 dark:text-white">{formatCurrency(totalGajiPokok)}</td>
                                         <td className="px-3 py-4 text-right text-green-600">
                                             {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0)), 0))}
