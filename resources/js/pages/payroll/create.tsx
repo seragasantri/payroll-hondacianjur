@@ -129,13 +129,6 @@ export default function PayrollCreate({
         return sortDirection === 'asc' ? comparison : -comparison;
     });
 
-    // Helper function to check if tunjangan is enabled for an employee
-    // Check if the tunjangan ID exists in emp.tunjangan array
-    const isTunjanganEnabled = (emp: EmployeePayroll, tunjanganId: number): boolean => {
-        if (!Array.isArray(emp.tunjangan)) return false;
-        return emp.tunjangan.some(t => Number(t.id) === tunjanganId);
-    };
-
     const formatBulan = (bulan: string) => {
         // Handle THR case (e.g., "THR 2026")
         if (bulan.startsWith('THR')) {
@@ -565,7 +558,12 @@ export default function PayrollCreate({
 
     const tunjanganCols = tunjanganList || [];
 
-    // Total pendapatan excluding JHT (id=8) and Pensiun (id=5), minus absen (tidak masuk + terlambat)
+    // Helper: cek apakah tunjanganID enabled untuk employee tertentu
+    const isTunjanganEnabled = (emp: EmployeePayroll, tunjanganId: number): boolean => {
+        if (!Array.isArray(emp.tunjangan)) return false;
+        return emp.tunjangan.some(t => Number(t.id) === tunjanganId);
+    };
+
     const totalPendapatanKenaPajak = employees.reduce((sum, e) => {
         const emp = employees.find(emp => emp.id === e.id);
         const gajiPokok = parseRupiah(String(formData[e.id]?.gaji_pokok || 0));
@@ -1004,20 +1002,19 @@ export default function PayrollCreate({
                                                 />
                                             </td>
 
-                                            {/* ✅ Kolom Tunjangan Perusahaan — render SEMUA, disabled = cell abu */}
+                                            {/* ✅ Kolom Tunjangan Perusahaan — tampilkan semua, disable jika tidak dicentang */}
                                             {tunjanganCols.map((t: TunjanganList) => {
                                                 const tunjanganKey = String(Number(t.id));
                                                 const isEnabled = isTunjanganEnabled(employee, Number(t.id));
-                                                if (!isEnabled) {
-                                                    return <td key={t.id} className="px-2 py-3 bg-gray-100 dark:bg-gray-800"></td>;
-                                                }
                                                 const currentValue = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                 return (
-                                                    <td key={t.id} className="px-2 py-3 bg-green-50/30 dark:bg-green-900/10">
+                                                    <td key={t.id} className={`px-2 py-3 ${isEnabled ? 'bg-green-50/30 dark:bg-green-900/10' : 'bg-gray-100 dark:bg-gray-800'}`}>
                                                         <input
                                                             type="text"
                                                             value={currentValue === 0 ? '' : formatRupiahInput(String(currentValue))}
+                                                            disabled={!isEnabled}
                                                             onChange={(e) => {
+                                                                if (!isEnabled) return;
                                                                 const formatted = formatRupiahInput(e.target.value);
                                                                 const newValue = parseRupiah(formatted);
                                                                 const currentGaji = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
@@ -1033,7 +1030,7 @@ export default function PayrollCreate({
                                                                     }
                                                                 });
                                                             }}
-                                                            className="w-20 px-1 py-1 text-right text-sm rounded border border-green-200 dark:border-green-800 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                            className={`w-20 px-1 py-1 text-right text-sm rounded border focus:outline-none ${isEnabled ? 'border-green-200 dark:border-green-800 bg-white dark:bg-gray-800 focus:border-green-500' : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'}`}
                                                             placeholder="0"
                                                         />
                                                     </td>
@@ -1101,33 +1098,27 @@ export default function PayrollCreate({
                                                 {formatCurrency(getCalculatedTax(employee.id))}
                                             </td>
 
-                                            {/* ✅ TJ Karyawan — render SEMUA kolom */}
+                                            {/* ✅ TJ Karyawan — tampilkan semua, disable jika tidak dicentang */}
                                             {tunjanganCols.map((t: TunjanganList) => {
                                                 const isEnabled = isTunjanganEnabled(employee, Number(t.id));
-                                                if (!isEnabled) {
-                                                    return <td key={t.id + '_tj'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>;
-                                                }
                                                 const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
-                                                const tjKaryawan = Math.round(gajiPokok * (t.karyawan || 0) / 100);
+                                                const tjKaryawan = isEnabled ? Math.round(gajiPokok * (t.karyawan || 0) / 100) : 0;
                                                 return (
-                                                    <td key={t.id + '_tj'} className="px-1 py-3 bg-purple-50/30 dark:bg-purple-900/10 text-right text-xs font-medium text-purple-700 dark:text-purple-400">
+                                                    <td key={t.id + '_tj'} className={`px-1 py-3 text-right text-xs font-medium ${isEnabled ? 'bg-purple-50/30 dark:bg-purple-900/10 text-purple-700 dark:text-purple-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
                                                         {formatCurrency(tjKaryawan)}
                                                     </td>
                                                 );
                                             })}
 
-                                            {/* ✅ Potongan — render SEMUA kolom */}
+                                            {/* ✅ Potongan — tampilkan semua, disable jika tidak dicentang */}
                                             {tunjanganCols.map((t: TunjanganList) => {
-                                                const tunjanganKey = String(Number(t.id));
                                                 const isEnabled = isTunjanganEnabled(employee, Number(t.id));
-                                                if (!isEnabled) {
-                                                    return <td key={t.id + '_pot'} className="px-1 py-3 bg-gray-100 dark:bg-gray-800"></td>;
-                                                }
+                                                const tunjanganKey = String(Number(t.id));
                                                 const perusahaan = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                 const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
-                                                const tjKaryawan = Math.round(gajiPokok * (t.karyawan || 0) / 100);
+                                                const tjKaryawan = isEnabled ? Math.round(gajiPokok * (t.karyawan || 0) / 100) : 0;
                                                 return (
-                                                    <td key={t.id + '_pot'} className="px-1 py-3 bg-red-50/30 dark:bg-red-900/10 text-right text-xs font-medium text-red-700 dark:text-red-400">
+                                                    <td key={t.id + '_pot'} className={`px-1 py-3 text-right text-xs font-medium ${isEnabled ? 'bg-red-50/30 dark:bg-red-900/10 text-red-700 dark:text-red-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
                                                         {formatCurrency(perusahaan + tjKaryawan)}
                                                     </td>
                                                 );

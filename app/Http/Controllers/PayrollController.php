@@ -196,13 +196,8 @@ class PayrollController extends Controller
                 'tunjangan_jkk' => $tunjanganJkk,
                 'tunjangan_jkm' => $tunjanganJkm,
                 'tunjangan_pensiun' => $tunjanganPensiun,
-                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok, $bpjsChecked, $tunjanganBpjsKes, $tunjanganJht, $tunjanganJkk, $tunjanganJkm, $tunjanganPensiun) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok, $tunjanganBpjsKes, $tunjanganJht, $tunjanganJkk, $tunjanganJkm, $tunjanganPensiun) {
                     $tunjanganId = (string) $tunjangan->id;
-
-                    // If bpjs_ketenagakerjaan is not checked, don't show any bpjs-related tunjangan
-                    if (!$bpjsChecked) {
-                        return null;
-                    }
 
                     // Filter based on individual tunjangan checkbox settings
                     if ($tunjanganId === '1' && !$tunjanganBpjsKes) return null;
@@ -225,7 +220,7 @@ class PayrollController extends Controller
                         'perusahaan' => (float) $nilaiPerusahaan,
                         'karyawan' => (float) $nilaiKaryawan
                     ];
-                })->filter(),
+                })->filter()->values()->all(),
                 'payroll' => $existing ? [
                     'id' => $existing->id,
                     'hari_kerja' => (int) $existing->hari_kerja,
@@ -639,13 +634,8 @@ class PayrollController extends Controller
                 'tunjangan_jkk' => $tunjanganJkk,
                 'tunjangan_jkm' => $tunjanganJkm,
                 'tunjangan_pensiun' => $tunjanganPensiun,
-                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok, $bpjsChecked, $tunjanganBpjsKes, $tunjanganJht, $tunjanganJkk, $tunjanganJkm, $tunjanganPensiun) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok, $tunjanganBpjsKes, $tunjanganJht, $tunjanganJkk, $tunjanganJkm, $tunjanganPensiun) {
                     $tunjanganId = (string) $tunjangan->id;
-
-                    // If bpjs_ketenagakerjaan is not checked, don't show any bpjs-related tunjangan
-                    if (!$bpjsChecked) {
-                        return null;
-                    }
 
                     // Filter based on individual tunjangan checkbox settings
                     if ($tunjanganId === '1' && !$tunjanganBpjsKes) return null;
@@ -668,7 +658,7 @@ class PayrollController extends Controller
                         'perusahaan' => (float) $nilaiPerusahaan,
                         'karyawan' => (float) $nilaiKaryawan
                     ];
-                })->filter(),
+                })->filter()->values()->all(),
                 'payroll' => $existing ? [
                     'id' => $existing->id,
                     'hari_kerja' => (int) $existing->hari_kerja,

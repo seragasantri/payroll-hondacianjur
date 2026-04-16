@@ -121,17 +121,31 @@ class LaporanController extends Controller
             }
 
             // Get payroll details with employee data for this cabang
-            // Filter by bpjs_ketenagakerjaan AND tunjangan_bpjs_kes = true
+            // Note: do NOT filter by employee checkboxes - use stored payroll data
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
-                    $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', 1)
-                        ->where('tunjangan_bpjs_kes', 1);
+                    $query->where('kantor_cabang_id', $cabangId);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
+
+            // Filter out employees with empty tunjangan_lain (no bpjs kesehatan data)
+            $payrollDetails = $payrollDetails->filter(function ($detail) {
+                $tunjanganLain = $detail->tunjangan_lain;
+                if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
+                    return false;
+                }
+                $parsed = json_decode($tunjanganLain, true);
+                if (!is_array($parsed) || empty($parsed)) return false;
+                foreach ($parsed as $item) {
+                    if (isset($item['perusahaan']) || isset($item['jenis'])) {
+                        return true;
+                    }
+                }
+                return false;
+            });
 
             if ($payrollDetails->isEmpty()) {
                 continue; // Skip months with no data
@@ -397,24 +411,30 @@ class LaporanController extends Controller
             }
 
             // Get payroll details with employee data for this cabang
-            // Filter by bpjs_ketenagakerjaan = true for BPJS reports
+            // Note: do NOT filter by employee checkboxes - use stored payroll data
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
-                    $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', 1);
+                    $query->where('kantor_cabang_id', $cabangId);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
 
-            // Filter out employees with empty tunjangan_lain
+            // Filter out employees with empty tunjangan_lain (no bpjs tk data)
             $payrollDetails = $payrollDetails->filter(function ($detail) {
                 $tunjanganLain = $detail->tunjangan_lain;
                 if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
                     return false;
                 }
-                return true;
+                $parsed = json_decode($tunjanganLain, true);
+                if (!is_array($parsed) || empty($parsed)) return false;
+                foreach ($parsed as $item) {
+                    if (isset($item['perusahaan']) || isset($item['jenis'])) {
+                        return true;
+                    }
+                }
+                return false;
             });
 
             if ($payrollDetails->isEmpty()) {
@@ -696,24 +716,30 @@ class LaporanController extends Controller
             }
 
             // Get payroll details with employee data for this cabang
-            // Filter by bpjs_ketenagakerjaan = true for BPJS reports
+            // Note: do NOT filter by employee checkboxes - use stored payroll data
             $payrollDetails = PayrollDetail::where('payroll_id', $payrollHeader->id)
                 ->whereHas('employee', function ($query) use ($cabangId) {
-                    $query->where('kantor_cabang_id', $cabangId)
-                        ->where('bpjs_ketenagakerjaan', 1);
+                    $query->where('kantor_cabang_id', $cabangId);
                 })
                 ->with(['employee' => function ($query) {
                     $query->withTrashed();
                 }, 'employee.kantorCabang', 'employee.jabatan'])
                 ->get();
 
-            // Filter out employees with empty tunjangan_lain
+            // Filter out employees with empty tunjangan_lain (no bpjs tk data)
             $payrollDetails = $payrollDetails->filter(function ($detail) {
                 $tunjanganLain = $detail->tunjangan_lain;
                 if (empty($tunjanganLain) || $tunjanganLain === '[]' || $tunjanganLain === 'null') {
                     return false;
                 }
-                return true;
+                $parsed = json_decode($tunjanganLain, true);
+                if (!is_array($parsed) || empty($parsed)) return false;
+                foreach ($parsed as $item) {
+                    if (isset($item['perusahaan']) || isset($item['jenis'])) {
+                        return true;
+                    }
+                }
+                return false;
             });
 
             if ($payrollDetails->isEmpty()) {
@@ -844,14 +870,6 @@ class LaporanController extends Controller
                 }
 
                 $astek = $bpjsKesehatan + $jkk + $jkm;
-                Log::info([
-                    'employee_nip' => $employee->nip,
-                    'employee_nama' => $employee->nama,
-                    'astek' => $astek,
-                    'bpjs_kes' => $bpjsKesehatan,
-                    'jkk' => $jkk,
-                    'jkm' => $jkm
-                ]);
 
                 // GAJI/UPAH = gaji_pokok - potongan_tidak_masuk - potongan_terlambat
                 $gaji_upah = $detail->gaji_pokok - $detail->potongan_tidak_masuk - $detail->potongan_terlambat;
