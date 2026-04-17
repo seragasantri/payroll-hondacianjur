@@ -136,7 +136,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
                 <div>
-                    <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                    <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                         Pengaturan Pajak (PPH 21)
                     </h1>
                     <p className="text-muted-foreground text-sm mt-1">
@@ -150,7 +150,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                         onClick={() => setActiveTab('ptkp')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'ptkp'
-                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                ? 'border-red-500 text-sky-600 dark:text-sky-400'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                         }`}
                     >
@@ -161,7 +161,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                         onClick={() => setActiveTab('ter')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'ter'
-                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                ? 'border-red-500 text-sky-600 dark:text-sky-400'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                         }`}
                     >
@@ -172,7 +172,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                         onClick={() => setActiveTab('pasal17')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'pasal17'
-                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                ? 'border-red-500 text-sky-600 dark:text-sky-400'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                         }`}
                     >
@@ -183,7 +183,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                         onClick={() => setActiveTab('kalkulator')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'kalkulator'
-                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                ? 'border-red-500 text-sky-600 dark:text-sky-400'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                         }`}
                     >
@@ -197,7 +197,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                     {activeTab === 'ptkp' && (
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800">
+                                <thead className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-bold text-white">Kode PTKP</th>
                                         <th className="px-4 py-3 text-right text-xs font-bold text-white">Nominal</th>
@@ -206,11 +206,11 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                                     {ptkp?.map((item) => (
-                                        <tr key={item.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
+                                        <tr key={item.id} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50">
                                             <td className="px-4 py-3 font-medium">{item.ptkp_code}</td>
                                             <td className="px-4 py-3 text-right">{formatRupiah(item.amount)}</td>
                                             <td className="px-4 py-3 text-center">
-                                                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 text-xs font-semibold">
+                                                <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold">
                                                     {item.ter_category}
                                                 </span>
                                             </td>
@@ -240,7 +240,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                                 </div>
                             </div>
                             <table className="w-full">
-                                <thead className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800">
+                                <thead className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800">
                                     <tr>
                                         <th className="px-4 py-3 text-center text-xs font-bold text-white">Kategori</th>
                                         <th className="px-4 py-3 text-right text-xs font-bold text-white">Min Gross</th>
@@ -250,9 +250,9 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                                     {filteredTer?.map((item) => (
-                                        <tr key={item.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
+                                        <tr key={item.id} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50">
                                             <td className="px-4 py-3 text-center">
-                                                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 text-xs font-semibold">
+                                                <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold">
                                                     {item.category}
                                                 </span>
                                             </td>
@@ -269,7 +269,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                     {activeTab === 'pasal17' && (
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800">
+                                <thead className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-bold text-white">Min PKP</th>
                                         <th className="px-4 py-3 text-right text-xs font-bold text-white">Max PKP</th>
@@ -278,7 +278,7 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                                     {Pasal17?.map((item) => (
-                                        <tr key={item.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
+                                        <tr key={item.id} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50">
                                             <td className="px-4 py-3">{formatRupiah(item.min_pkp)}</td>
                                             <td className="px-4 py-3 text-right">{item.max_pkp ? formatRupiah(item.max_pkp) : 'diatas'}</td>
                                             <td className="px-4 py-3 text-right font-bold">{item.percentage}%</td>
@@ -322,25 +322,25 @@ export default function TaxIndex({ ptkp, ter, Pasal17, tab }: TaxData) {
                                 <button
                                     onClick={handleCalculate}
                                     disabled={calculating || !gajiGross}
-                                    className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {calculating ? 'Menghitung...' : 'Hitung PPh 21'}
                                 </button>
 
                                 {result && (
                                     <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                                            <h3 className="font-bold text-green-700 dark:text-green-400 mb-2">Metode TER</h3>
+                                        <div className="p-4 bg-sky-50 dark:bg-sky-900/20 rounded-lg border border-sky-200 dark:border-sky-800">
+                                            <h3 className="font-bold text-sky-700 dark:text-sky-400 mb-2">Metode TER</h3>
                                             <p className="text-sm">Tarif: {result.ter.tarif_ter}%</p>
-                                            <p className="text-lg font-bold text-green-700 dark:text-green-400">
+                                            <p className="text-lg font-bold text-sky-700 dark:text-sky-400">
                                                 {formatRupiah(result.ter.pph21_bulanan)}
                                             </p>
                                         </div>
-                                        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                            <h3 className="font-bold text-blue-700 dark:text-blue-400 mb-2">Metode Pasal 17</h3>
+                                        <div className="p-4 bg-sky-50 dark:bg-sky-900/20 rounded-lg border border-sky-200 dark:border-sky-800">
+                                            <h3 className="font-bold text-sky-700 dark:text-sky-400 mb-2">Metode Pasal 17</h3>
                                             <p className="text-sm">PKP Tahunan: {formatRupiah(result.pasal17.pkp_tahunan)}</p>
                                             <p className="text-sm">Tarif: {result.pasal17.tarif_pasal17}%</p>
-                                            <p className="text-lg font-bold text-blue-700 dark:text-blue-400">
+                                            <p className="text-lg font-bold text-sky-700 dark:text-sky-400">
                                                 {formatRupiah(result.pasal17.pph21_bulanan)}
                                             </p>
                                         </div>

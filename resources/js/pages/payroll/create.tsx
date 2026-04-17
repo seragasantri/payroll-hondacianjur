@@ -703,11 +703,11 @@ export default function PayrollCreate({
                     </Link>
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300">
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300">
                                 Payroll {formatBulan(bulan)}
                             </h1>
                             <div className="flex items-center gap-3 mt-2">
-                                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-3 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300">
                                     {status}
                                 </span>
                                 <span className="text-muted-foreground text-sm">
@@ -719,7 +719,7 @@ export default function PayrollCreate({
                             <button
                                 onClick={() => handleSubmit(false)}
                                 disabled={saving}
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium shadow-lg shadow-blue-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium shadow-lg shadow-red-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
                             >
                                 {saving ? <Loader2 className="size-5 animate-spin" /> : <Save className="size-5" />}
                                 <span>Simpan Draft</span>
@@ -727,7 +727,7 @@ export default function PayrollCreate({
                             <button
                                 onClick={() => handleSubmit(true)}
                                 disabled={saving}
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium shadow-lg shadow-green-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white font-medium shadow-lg shadow-sky-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
                             >
                                 {saving ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
                                 <span>Simpan & Publish</span>
@@ -745,7 +745,7 @@ export default function PayrollCreate({
                             value={filterNip}
                             onChange={(e) => setFilterNip(e.target.value)}
                             placeholder="Cari NIP..."
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-red-500"
                         />
                     </div>
                     <div className="flex-1">
@@ -753,7 +753,7 @@ export default function PayrollCreate({
                         <select
                             value={filterCabang}
                             onChange={(e) => setFilterCabang(e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-red-500"
                         >
                             <option value="">Semua Cabang</option>
                             {[...new Set(employees.map(e => e.kantorCabang))].map(cabang => (
@@ -774,7 +774,7 @@ export default function PayrollCreate({
                     {/* Vertical scroll container + Horizontal scroll */}
                     <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
                         <table className='w-auto'>
-                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 sticky top-0 z-30'>
+                            <thead className='bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800 sticky top-0 z-30'>
                                 <tr>
                                     <th className='px-2 py-3 text-center text-xs font-bold text-white w-10' rowSpan={2}>#</th>
                                     <th className='px-3 py-3 text-left text-xs font-bold text-white min-w-[180px]' rowSpan={2}>Nama</th>
@@ -795,7 +795,7 @@ export default function PayrollCreate({
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Terlambat</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Kasbon</th>
                                     <th className='px-3 py-3 text-right text-xs font-bold text-white' rowSpan={2}>Potongan Lain</th>
-                                    <th className='px-3 py-3 text-right text-xs font-bold text-white bg-orange-500' rowSpan={2}>Pajak</th>
+                                    <th className='px-3 py-3 text-right text-xs font-bold text-white bg-sky-500' rowSpan={2}>Pajak</th>
 
                                     {/* colSpan = tunjanganCols.length * 2 (TJ Karyawan + Potongan) */}
                                     <th className='px-3 py-3 text-center text-xs font-bold text-white' colSpan={tunjanganCols.length * 2}>
@@ -809,13 +809,13 @@ export default function PayrollCreate({
                                 <tr>
                                     {/* Sub-header: Tunjangan Perusahaan */}
                                     {tunjanganCols.map((t: TunjanganList) => (
-                                        <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-blue-400 dark:bg-blue-600 min-w-[80px]'>
+                                        <th key={t.id} className='px-2 py-2 text-right text-xs font-bold text-white bg-sky-400 dark:bg-red-600 min-w-[80px]'>
                                             {t.jenis_tunjangan}
                                         </th>
                                     ))}
                                     {/* Sub-header: TJ Karyawan */}
                                     {tunjanganCols.map((t: TunjanganList) => (
-                                        <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-purple-400 dark:bg-purple-600 min-w-[70px]'>
+                                        <th key={t.id + '_tj'} className='px-1 py-2 text-right text-xs font-bold text-white bg-sky-400 dark:bg-sky-600 min-w-[70px]'>
                                             TJ {t.jenis_tunjangan}
                                         </th>
                                     ))}
@@ -831,20 +831,20 @@ export default function PayrollCreate({
                                 <tr className="bg-gray-100 dark:bg-gray-800 font-bold">
                                     <td colSpan={2} className="px-3 py-4 text-right text-gray-900 dark:text-white">TOTAL</td>
                                     <td className="px-3 py-4 text-right text-gray-900 dark:text-white">{formatCurrency(totalGajiPokok)}</td>
-                                    <td className="px-3 py-4 text-right text-green-600">
+                                    <td className="px-3 py-4 text-right text-sky-600">
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.tunjangan_jabatan || 0)), 0))}
                                     </td>
-                                    <td className="px-3 py-4 text-right text-green-600">{formatCurrency(totalInsentif)}</td>
-                                    <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                    <td className="px-3 py-4 text-right text-sky-600">{formatCurrency(totalInsentif)}</td>
+                                    <td className="px-1 py-4 text-right text-sky-600 text-sm">
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.uang_hadir || 0)), 0))}
                                     </td>
-                                    <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                    <td className="px-1 py-4 text-right text-sky-600 text-sm">
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lembur || 0)), 0))}
                                     </td>
-                                    <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                    <td className="px-1 py-4 text-right text-sky-600 text-sm">
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.reward || 0)), 0))}
                                     </td>
-                                    <td className="px-1 py-4 text-right text-green-600 text-sm">
+                                    <td className="px-1 py-4 text-right text-sky-600 text-sm">
                                         {formatCurrency(employees.reduce((sum, e) => sum + parseRupiah(String(formData[e.id]?.lain_lain || 0)), 0))}
                                     </td>
 
@@ -856,7 +856,7 @@ export default function PayrollCreate({
                                             return sum + (formData[e.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0);
                                         }, 0);
                                         return (
-                                            <td key={t.id} className="px-2 py-4 text-right text-green-600 text-sm">
+                                            <td key={t.id} className="px-2 py-4 text-right text-sky-600 text-sm">
                                                 {formatCurrency(totalPerusahaan)}
                                             </td>
                                         );
@@ -866,7 +866,7 @@ export default function PayrollCreate({
                                     <td className="px-3 py-4"></td>{/* Terlambat */}
                                     <td className="px-3 py-4"></td>{/* Kasbon */}
                                     <td className="px-3 py-4"></td>{/* Potongan Lain */}
-                                    <td className="px-3 py-4 text-right text-orange-600">
+                                    <td className="px-3 py-4 text-right text-sky-600">
                                         {formatCurrency(sortedEmployees.reduce((sum, e) => sum + getCalculatedTax(e.id), 0))}
                                     </td>
 
@@ -878,7 +878,7 @@ export default function PayrollCreate({
                                             return sum + Math.round(parseRupiah(String(formData[e.id]?.gaji_pokok || 0)) * karyawanPercent / 100);
                                         }, 0);
                                         return (
-                                            <td key={t.id + '_tj'} className="px-1 py-4 text-right text-purple-600 text-xs">
+                                            <td key={t.id + '_tj'} className="px-1 py-4 text-right text-sky-600 text-xs">
                                                 {formatCurrency(totalTjKaryawan)}
                                             </td>
                                         );
@@ -900,9 +900,9 @@ export default function PayrollCreate({
                                         );
                                     })}
 
-                                    <td className="px-3 py-4 text-right text-green-600">{formatCurrency(totalTunjangan + totalGajiPokok)}</td>
+                                    <td className="px-3 py-4 text-right text-sky-600">{formatCurrency(totalTunjangan + totalGajiPokok)}</td>
                                     <td className="px-3 py-4 text-right text-red-600">{formatCurrency(totalPotongan)}</td>
-                                    <td className="px-3 py-4 text-right text-blue-600">{formatCurrency(totalGajiBersih)}</td>
+                                    <td className="px-3 py-4 text-right text-sky-600">{formatCurrency(totalGajiBersih)}</td>
                                 </tr>
                             </thead>
                             {/* tempate geser/scroll horizontal tetap, hanya body yang scroll vertikal */}
@@ -915,9 +915,9 @@ export default function PayrollCreate({
                                 {sortedEmployees.map((employee, index) => {
                                     const empGajiBersih = getGajiBersih(employee.id);
                                     return (
-                                        <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50">
+                                        <tr key={employee.id} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50">
                                             <td className="px-2 py-3 text-center">
-                                                <span className="inline-flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
+                                                <span className="inline-flex items-center justify-center size-6 rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 font-bold text-xs">
                                                     {index + 1}
                                                 </span>
                                             </td>
@@ -943,7 +943,7 @@ export default function PayrollCreate({
                                                         });
                                                         setFormData({ ...formData, [employee.id]: { ...formData[employee.id], gaji_pokok: formatted, tunjangan: newTunjangan } });
                                                     }}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -952,7 +952,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.tunjangan_jabatan ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], tunjangan_jabatan: formatRupiahInput(e.target.value) } })}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-sky-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -961,7 +961,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.insentif ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], insentif: formatRupiahInput(e.target.value) } })}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -970,7 +970,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.uang_hadir ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], uang_hadir: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-sky-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -979,7 +979,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.lembur ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], lembur: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-sky-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -988,7 +988,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.reward ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], reward: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-sky-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -997,7 +997,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.lain_lain ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], lain_lain: formatRupiahInput(e.target.value) } })}
-                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-green-500"
+                                                    className="w-20 px-1 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-sky-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -1008,7 +1008,7 @@ export default function PayrollCreate({
                                                 const isEnabled = isTunjanganEnabled(employee, Number(t.id));
                                                 const currentValue = formData[employee.id]?.tunjangan?.[tunjanganKey]?.perusahaan || 0;
                                                 return (
-                                                    <td key={t.id} className={`px-2 py-3 ${isEnabled ? 'bg-green-50/30 dark:bg-green-900/10' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                                                    <td key={t.id} className={`px-2 py-3 ${isEnabled ? 'bg-sky-50/30 dark:bg-sky-900/10' : 'bg-gray-100 dark:bg-gray-800'}`}>
                                                         <input
                                                             type="text"
                                                             value={currentValue === 0 ? '' : formatRupiahInput(String(currentValue))}
@@ -1030,7 +1030,7 @@ export default function PayrollCreate({
                                                                     }
                                                                 });
                                                             }}
-                                                            className={`w-20 px-1 py-1 text-right text-sm rounded border focus:outline-none ${isEnabled ? 'border-green-200 dark:border-green-800 bg-white dark:bg-gray-800 focus:border-green-500' : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'}`}
+                                                            className={`w-20 px-1 py-1 text-right text-sm rounded border focus:outline-none ${isEnabled ? 'border-sky-200 dark:border-sky-800 bg-white dark:bg-gray-800 focus:border-sky-500' : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'}`}
                                                             placeholder="0"
                                                         />
                                                     </td>
@@ -1049,7 +1049,7 @@ export default function PayrollCreate({
                                                         setFormData({ ...formData, [employee.id]: { ...formData[employee.id], hari_tidak_masuk: val === '' ? 0 : parseInt(val) || 0 } });
                                                     }}
                                                     onFocus={(e) => e.target.select()}
-                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
                                                 />
                                                 <div className="text-xs text-red-500">{formatCurrency(getPotonganTidakMasuk(employee.id))}</div>
                                             </td>
@@ -1066,7 +1066,7 @@ export default function PayrollCreate({
                                                         setFormData({ ...formData, [employee.id]: { ...formData[employee.id], jam_terlambat: val === '' ? 0 : parseInt(val) || 0 } });
                                                     }}
                                                     onFocus={(e) => e.target.select()}
-                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    className="w-14 px-2 py-1 text-center text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
                                                 />
                                                 <div className="text-xs text-red-500">{formatCurrency(getPotonganTerlambat(employee.id))}</div>
                                             </td>
@@ -1077,7 +1077,7 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.kasbon ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], kasbon: formatRupiahInput(e.target.value) } })}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
                                                     placeholder="0"
                                                 />
                                             </td>
@@ -1088,13 +1088,13 @@ export default function PayrollCreate({
                                                     type="text"
                                                     value={formData[employee.id]?.potongan_lain ?? ''}
                                                     onChange={(e) => setFormData({ ...formData, [employee.id]: { ...formData[employee.id], potongan_lain: formatRupiahInput(e.target.value) } })}
-                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-500"
+                                                    className="w-28 px-2 py-1 text-right text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:border-red-500"
                                                     placeholder="0"
                                                 />
                                             </td>
 
                                             {/* Pajak */}
-                                            <td className="px-3 py-3 text-right text-sm font-bold text-orange-600 bg-orange-50 dark:bg-orange-900/20">
+                                            <td className="px-3 py-3 text-right text-sm font-bold text-sky-600 bg-sky-50 dark:bg-sky-900/20">
                                                 {formatCurrency(getCalculatedTax(employee.id))}
                                             </td>
 
@@ -1104,7 +1104,7 @@ export default function PayrollCreate({
                                                 const gajiPokok = parseRupiah(String(formData[employee.id]?.gaji_pokok || 0));
                                                 const tjKaryawan = isEnabled ? Math.round(gajiPokok * (t.karyawan || 0) / 100) : 0;
                                                 return (
-                                                    <td key={t.id + '_tj'} className={`px-1 py-3 text-right text-xs font-medium ${isEnabled ? 'bg-purple-50/30 dark:bg-purple-900/10 text-purple-700 dark:text-purple-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
+                                                    <td key={t.id + '_tj'} className={`px-1 py-3 text-right text-xs font-medium ${isEnabled ? 'bg-sky-50/30 dark:bg-sky-900/10 text-sky-700 dark:text-sky-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
                                                         {formatCurrency(tjKaryawan)}
                                                     </td>
                                                 );
@@ -1125,13 +1125,13 @@ export default function PayrollCreate({
                                             })}
 
                                             {/* Total Pendapatan, Pengurangan, Gaji Bersih */}
-                                            <td className="px-3 py-3 text-right text-sm font-bold text-green-600">
+                                            <td className="px-3 py-3 text-right text-sm font-bold text-sky-600">
                                                 {formatCurrency(getTotalTunjangan(employee.id) + parseRupiah(String(formData[employee.id]?.gaji_pokok || 0)))}
                                             </td>
                                             <td className="px-3 py-3 text-right text-sm font-bold text-red-600">
                                                 {formatCurrency(getTotalPotongan(employee.id))}
                                             </td>
-                                            <td className="px-3 py-3 text-right text-sm font-bold text-blue-600">
+                                            <td className="px-3 py-3 text-right text-sm font-bold text-sky-600">
                                                 {formatCurrency(empGajiBersih)}
                                             </td>
                                         </tr>

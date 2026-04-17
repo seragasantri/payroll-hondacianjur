@@ -27,11 +27,11 @@
         }
 
         html.dark {
-            background-color: oklch(0.145 0 0);
+            background-color: oklch(0.15 0 0);
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'Honda Payroll') }}</title>
 
     <link rel="icon" type="image/png" href="/assets/images/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />

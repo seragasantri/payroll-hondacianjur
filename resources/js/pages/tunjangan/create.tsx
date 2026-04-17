@@ -77,7 +77,7 @@ export default function TunjanganCreate() {
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                             Tambah Tunjangan
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Form tambah data Tunjangan baru</p>
@@ -92,10 +92,10 @@ export default function TunjanganCreate() {
                 </div>
 
                 {/* Form Card */}
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
-                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-sky-100 dark:shadow-none">
+                    <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800 px-6 py-4">
                         <h2 className="text-xl font-bold text-white">Informasi Tunjangan</h2>
-                        <p className="text-blue-100 text-sm">Isi data Tunjangan dengan lengkap dan benar</p>
+                        <p className="text-sky-100 text-sm">Isi data Tunjangan dengan lengkap dan benar</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6">
@@ -110,7 +110,7 @@ export default function TunjanganCreate() {
                                     id="jenis_tunjangan"
                                     value={data.jenis_tunjangan}
                                     onChange={(e) => setData('jenis_tunjangan', e.target.value)}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-900 transition-colors"
                                     placeholder="Contoh: Tunjangan Kesehatan"
                                 />
                                 {errors.jenis_tunjangan && (
@@ -131,7 +131,7 @@ export default function TunjanganCreate() {
                                     max="100"
                                     value={data.perusahaan}
                                     onChange={handlePerusahaanChange}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-900 transition-colors"
                                     placeholder="0.00"
                                 />
                                 {errors.perusahaan && (
@@ -153,7 +153,7 @@ export default function TunjanganCreate() {
                                     max="100"
                                     value={data.karyawan}
                                     onChange={handleKaryawanChange}
-                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors"
+                                    className="w-full border-2 border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-900 transition-colors"
                                     placeholder="0.00"
                                 />
                                 {errors.karyawan && (
@@ -165,28 +165,28 @@ export default function TunjanganCreate() {
                             {/* Total (Readonly) */}
                             <div className="space-y-2">
                                 <label htmlFor="total" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    Total (%) <span className="text-blue-500 text-xs">(Otomatis)</span>
+                                    Total (%) <span className="text-red-500 text-xs">(Otomatis)</span>
                                 </label>
                                 <input
                                     type="text"
                                     id="total"
                                     value={`${data.total}%`}
                                     readOnly
-                                    className="w-full border-2 border-blue-300 dark:border-blue-700 rounded-lg px-4 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 font-bold cursor-not-allowed"
+                                    className="w-full border-2 border-sky-300 dark:border-sky-700 rounded-lg px-4 py-3 bg-sky-50 dark:bg-sky-900/20 text-sky-900 dark:text-sky-100 font-bold cursor-not-allowed"
                                 />
                                 <p className="text-xs text-gray-500">Total persentase kontribusi (Perusahaan + Karyawan)</p>
                             </div>
                         </div>
 
                         {/* Info Box */}
-                        <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                        <div className="mt-6 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-lg p-4">
                             <div className="flex items-start gap-3">
-                                <svg className="size-5 text-green-500 dark:text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="size-5 text-sky-500 dark:text-sky-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <div className="flex-1">
-                                    <p className="text-sm text-green-800 dark:text-green-300 font-semibold">Informasi</p>
-                                    <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+                                    <p className="text-sm text-sky-800 dark:text-sky-300 font-semibold">Informasi</p>
+                                    <p className="text-sm text-sky-700 dark:text-sky-400 mt-1">
                                         Total persentase akan dihitung otomatis dari penjumlahan Perusahaan + Karyawan.
                                     </p>
                                 </div>
@@ -205,7 +205,7 @@ export default function TunjanganCreate() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className='inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
+                                className='inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 dark:from-red-600 dark:to-red-500 dark:hover:from-red-700 dark:hover:to-red-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-red-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/40 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
                             >
                                 {processing ? (
                                     <>

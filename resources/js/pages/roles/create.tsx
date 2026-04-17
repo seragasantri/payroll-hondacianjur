@@ -86,7 +86,7 @@ export default function RoleCreate() {
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                             Tambah Role Baru
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Isi formulir di bawah untuk membuat role baru</p>
@@ -101,11 +101,11 @@ export default function RoleCreate() {
                 </div>
 
                 {/* Form Card */}
-                <div className="border-2 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-xl shadow-blue-100/50 dark:shadow-none max-w-4xl mx-auto">
+                <div className="border-2 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-xl shadow-sky-100/50 dark:shadow-none max-w-4xl mx-auto">
                     {/* Form Header */}
-                    <div className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4'>
+                    <div className='bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800 px-6 py-4'>
                         <h2 className='text-xl font-bold text-white'>Informasi Role</h2>
-                        <p className='text-blue-50 text-sm'>Lengkapi data role dengan benar</p>
+                        <p className='text-sky-50 text-sm'>Lengkapi data role dengan benar</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
@@ -113,7 +113,7 @@ export default function RoleCreate() {
                         {/* Nama Role */}
                         <div className="space-y-2">
                             <label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <div className="flex items-center justify-center size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                <div className="flex items-center justify-center size-6 rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400">
                                     <Shield className="size-3.5" />
                                 </div>
                                 Nama Role
@@ -124,7 +124,7 @@ export default function RoleCreate() {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-800 transition-colors"
+                                className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-800 transition-colors"
                                 placeholder="Contoh: Admin, Manager, Staff"
                             />
                             {errors.name && (
@@ -205,14 +205,14 @@ export default function RoleCreate() {
                         </div>
 
                         {/* Info Box */}
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded-r-xl">
+                        <div className="bg-sky-50 dark:bg-sky-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded-r-xl">
                             <div className="flex items-start gap-3">
-                                <svg className="size-5 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="size-5 text-red-500 dark:text-sky-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                 </svg>
                                 <div>
-                                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Informasi Permissions</p>
-                                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                    <p className="text-sm font-medium text-sky-800 dark:text-sky-200">Informasi Permissions</p>
+                                    <p className="text-xs text-sky-600 dark:text-sky-400 mt-1">
                                         <strong>View:</strong> Lihat data milik sendiri | <strong>View Any:</strong> Lihat semua data | <strong>Create:</strong> Buat data baru | <strong>Edit:</strong> Edit data | <strong>Delete:</strong> Hapus data
                                     </p>
                                 </div>
@@ -224,7 +224,7 @@ export default function RoleCreate() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 disabled:from-blue-300 disabled:to-blue-400 text-white font-medium px-8 py-3 rounded-xl shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95"
+                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 dark:from-red-600 dark:to-red-500 dark:hover:from-red-700 dark:hover:to-red-600 disabled:from-sky-300 disabled:to-sky-400 text-white font-medium px-8 py-3 rounded-xl shadow-lg shadow-red-500/30 dark:shadow-red-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/40 hover:scale-105 active:scale-95"
                             >
                                 <Save className="size-5" />
                                 {processing ? 'Menyimpan...' : 'Simpan Role'}
