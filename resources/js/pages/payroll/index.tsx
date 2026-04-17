@@ -61,11 +61,11 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'draft':
-                return <span className="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 text-xs font-semibold text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800">Draft</span>;
+                return <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">Draft</span>;
             case 'published':
-                return <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">Published</span>;
+                return <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">Published</span>;
             case 'paid':
-                return <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">Lunas</span>;
+                return <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">Lunas</span>;
             default:
                 return null;
         }
@@ -355,7 +355,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                 <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 sm:p-6">
                     {/* Header */}
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                             Payroll Saya
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Riwayat gaji Anda</p>
@@ -363,7 +363,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
 
                     {/* Payroll History */}
                     <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
-                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-4 flex items-center justify-between">
+                        <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800 px-6 py-4 flex items-center justify-between">
                             <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                 <Wallet className="size-5" />
                                 Riwayat Gaji
@@ -380,8 +380,8 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                     {payrollSummary.data.map((payroll) => (
                                         <div key={payroll.bulan} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                                             <div className="flex items-center gap-4">
-                                                <div className="size-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                                    <Calendar className="size-5 text-green-600 dark:text-green-400" />
+                                                <div className="size-10 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+                                                    <Calendar className="size-5 text-sky-600 dark:text-sky-400" />
                                                 </div>
                                                 <div>
                                                     <p className="font-semibold text-gray-900 dark:text-white">{formatBulanPayroll(payroll.bulan)}</p>
@@ -391,7 +391,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                             <div className="text-right">
                                                 <Link
                                                     href={`/payroll/${payroll.bulan}/detail`}
-                                                    className="text-sm font-bold text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
+                                                    className="text-sm font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
                                                 >
                                                     <Eye className="size-4" />
                                                     Lihat Slip
@@ -416,7 +416,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                             {isKaryawan ? 'Payroll Saya' : 'Manajemen Payroll'}
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">{isKaryawan ? 'Riwayat gaji Anda' : 'Kelola data payroll karyawan per bulan'}</p>
@@ -425,7 +425,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                         {(isSuperAdmin || can('payroll.create')) && !isKaryawan && (
                             <button
                                 onClick={handleCreate}
-                                className='inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95'
+                                className='inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 dark:from-red-600 dark:to-red-500 dark:hover:from-red-700 dark:hover:to-red-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-red-500/30 dark:shadow-red-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/40 hover:scale-105 active:scale-95'
                             >
                                 <PlusCircle className='size-5' />
                                 <span>Buat Payroll</span>
@@ -434,14 +434,14 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                     </div>
                 </div>
 
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-sky-100 dark:shadow-none">
                     <div className="overflow-x-auto">
                         <table className='w-full min-w-[600px]'>
-                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
+                            <thead className='bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800'>
                                 <tr>
                                     <th className='rounded-tl-2xl px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>
-                                        <button className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'>
+                                        <button className='flex items-center gap-2 hover:text-sky-100 transition-colors cursor-pointer'>
                                             <Calendar className="size-4" />
                                             <span>Bulan Payroll</span>
                                         </button>
@@ -457,8 +457,8 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                     <tr>
                                         <td colSpan={5} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="size-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                                                    <FileText className="size-8 text-blue-500 dark:text-blue-400" />
+                                                <div className="size-16 rounded-full bg-sky-100 dark:bg-sky-900/20 flex items-center justify-center">
+                                                    <FileText className="size-8 text-red-500 dark:text-sky-400" />
                                                 </div>
                                                 <p className="text-muted-foreground font-medium">{isKaryawan ? 'Belum ada riwayat gaji' : 'Belum ada payroll'}</p>
                                                 <p className="text-sm text-muted-foreground">{isKaryawan ? 'Gaji akan muncul di sini setelah di publish' : 'Klik "Buat Payroll" untuk memulai'}</p>
@@ -467,23 +467,23 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                     </tr>
                                 ) : (
                                     payrollSummary.data.map((item, index) => (
-                                        <tr key={item.bulan} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <tr key={item.bulan} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50 transition-colors">
                                             <td className="px-4 py-4 text-center">
-                                                <span className="inline-flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                                                <span className="inline-flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/30 dark:to-sky-800/30 text-sky-600 dark:text-sky-400 font-bold text-sm">
                                                     {payrollSummary.meta?.from ? payrollSummary.meta.from + index : index + 1}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="size-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                                        <Calendar className="size-5 text-blue-600 dark:text-blue-400" />
+                                                    <div className="size-10 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+                                                        <Calendar className="size-5 text-sky-600 dark:text-sky-400" />
                                                     </div>
                                                     <span className="font-semibold text-gray-900 dark:text-white">{formatBulan(item.bulan)}</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4">
                                                 {item.status_pegawai ? (
-                                                    <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                                    <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-3 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300">
                                                         {item.status_pegawai}
                                                     </span>
                                                 ) : (
@@ -499,7 +499,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                 <div className="flex items-center justify-center gap-2">
                                                     <button
                                                         onClick={() => handleDetail(item.bulan, item.status_pegawai)}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                                                     >
                                                         <Eye className="size-3" />
                                                         <span>Detail</span>
@@ -507,7 +507,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                     {(isSuperAdmin || can('payroll.update')) && item.status === 'draft' && !isKaryawan && (
                                                         <button
                                                             onClick={() => handleEdit(item.bulan, item.status_pegawai)}
-                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-amber-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105 active:scale-95"
+                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-sky-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/30 hover:scale-105 active:scale-95"
                                                         >
                                                             <Pencil className="size-3" />
                                                             <span>Edit</span>
@@ -516,7 +516,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                     {(isSuperAdmin || can('payroll.publish')) && item.status === 'draft' && !isKaryawan && (
                                                         <button
                                                             onClick={() => handlePublish(item.bulan, item.status_pegawai)}
-                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
+                                                            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-sky-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/30 hover:scale-105 active:scale-95"
                                                         >
                                                             <Send className="size-3" />
                                                             <span>Publish</span>
@@ -526,7 +526,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                         <div className="flex items-center gap-1">
                                                             <button
                                                                 onClick={() => handleExportTunai(item.bulan, item.status_pegawai)}
-                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-orange-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95"
+                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                                                                 title="Export Tunai"
                                                             >
                                                                 <Download className="size-3" />
@@ -534,7 +534,7 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                                                             </button>
                                                             <button
                                                                 onClick={() => handleExport(item.bulan, item.status_pegawai)}
-                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
+                                                                className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-sky-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/30 hover:scale-105 active:scale-95"
                                                                 title="Export BCA"
                                                             >
                                                                 <Download className="size-3" />
@@ -560,9 +560,9 @@ export default function PayrollIndex({ payrollSummary, isKaryawan = false }: { p
                     </div>
 
                     {payrollSummary?.meta && payrollSummary.data.length > 0 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-blue-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-sky-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                Menampilkan <span className='font-bold text-blue-600 dark:text-blue-400'>{payrollSummary.meta?.from}</span> sampai <span className='font-bold text-blue-600 dark:text-blue-400'>{payrollSummary.meta?.to}</span> dari <span className='font-bold text-blue-600 dark:text-blue-400'>{payrollSummary.meta?.total}</span> data
+                                Menampilkan <span className='font-bold text-sky-600 dark:text-sky-400'>{payrollSummary.meta?.from}</span> sampai <span className='font-bold text-sky-600 dark:text-sky-400'>{payrollSummary.meta?.to}</span> dari <span className='font-bold text-sky-600 dark:text-sky-400'>{payrollSummary.meta?.total}</span> data
                             </div>
                         </div>
                     )}

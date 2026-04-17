@@ -143,7 +143,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                         <ArrowLeft className="size-5" />
                         <span>Kembali</span>
                     </Link>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300">
                         Edit Data Karyawan
                     </h1>
                     <p className="text-muted-foreground mt-2">Edit informasi karyawan di bawah ini</p>
@@ -155,7 +155,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                         {/* Section: Informasi Pribadi */}
                         <div>
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-sm">1</span>
+                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white font-bold text-sm">1</span>
                                 Informasi Pribadi
                             </h2>
 
@@ -171,7 +171,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={data.nip}
                                             onChange={e => setData('nip', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="Contoh: 12345678"
                                         />
                                         {errors.nip && (
@@ -189,7 +189,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={data.nama}
                                             onChange={e => setData('nama', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="Contoh: John Doe"
                                         />
                                         {errors.nama && (
@@ -210,7 +210,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={data.nik}
                                             onChange={e => setData('nik', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="Contoh: 1234567890123456"
                                         />
                                         {errors.nik && (
@@ -227,7 +227,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             id="jenis_kelamin"
                                             value={data.jenis_kelamin}
                                             onChange={e => setData('jenis_kelamin', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                         >
                                             <option value="">Pilih Jenis Kelamin</option>
                                             <option value="laki-laki">Laki-laki</option>
@@ -251,7 +251,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.bpjs_ketenagakerjaan}
                                                 onChange={e => setData('bpjs_ketenagakerjaan', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="bpjs_ketenagakerjaan" className="text-sm text-gray-700 dark:text-gray-300">
                                                 Terdaftar BPJS Ketenagakerjaan
@@ -263,7 +263,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             value={data.kjt}
                                             onChange={e => setData('kjt', e.target.value)}
                                             disabled={!data.bpjs_ketenagakerjaan}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                                             placeholder={data.bpjs_ketenagakerjaan ? "Contoh: 123456789012345678" : "Tidak terdaftar BPJS"}
                                         />
                                         {errors.kjt && (
@@ -287,7 +287,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.tunjangan_bpjs_kes}
                                                 onChange={e => setData('tunjangan_bpjs_kes', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="tunjangan_bpjs_kes" className="text-sm text-gray-700 dark:text-gray-300">
                                                 BPJS Kesehatan
@@ -299,7 +299,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.tunjangan_jht}
                                                 onChange={e => setData('tunjangan_jht', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="tunjangan_jht" className="text-sm text-gray-700 dark:text-gray-300">
                                                 JHT
@@ -311,7 +311,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.tunjangan_jkk}
                                                 onChange={e => setData('tunjangan_jkk', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="tunjangan_jkk" className="text-sm text-gray-700 dark:text-gray-300">
                                                 JKK
@@ -323,7 +323,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.tunjangan_jkm}
                                                 onChange={e => setData('tunjangan_jkm', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="tunjangan_jkm" className="text-sm text-gray-700 dark:text-gray-300">
                                                 JKM
@@ -335,7 +335,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.tunjangan_pensiun}
                                                 onChange={e => setData('tunjangan_pensiun', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="tunjangan_pensiun" className="text-sm text-gray-700 dark:text-gray-300">
                                                 Pensiun
@@ -355,7 +355,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="password"
                                             value={data.password}
                                             onChange={e => setData('password', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="Kosongkan jika tidak diubah"
                                         />
                                         {errors.password && (
@@ -372,7 +372,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="password"
                                             value={data.password_confirmation}
                                             onChange={e => setData('password_confirmation', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="Ulangi password baru"
                                         />
                                         {errors.password_confirmation && (
@@ -393,7 +393,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             id="kantor_cabang_id"
                                             value={data.kantor_cabang_id}
                                             onChange={e => setData('kantor_cabang_id', e.target.value ? Number(e.target.value) : '')}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                         >
                                             <option value="">Pilih KantorCabang</option>
                                             {kantorCabang.map((d) => (
@@ -416,7 +416,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             id="jabatan_id"
                                             value={data.jabatan_id}
                                             onChange={e => setData('jabatan_id', e.target.value ? Number(e.target.value) : '')}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                         >
                                             <option value="">Pilih Jabatan</option>
                                             {jabatan.map((j) => (
@@ -444,7 +444,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                                 type="checkbox"
                                                 checked={data.via_bca}
                                                 onChange={e => setData('via_bca', e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-red-500"
                                             />
                                             <label htmlFor="via_bca" className="text-sm text-gray-700 dark:text-gray-300">
                                                 Via BCA (Transfer ke Rekening)
@@ -456,7 +456,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             value={data.nomor_rekening}
                                             onChange={e => setData('nomor_rekening', e.target.value)}
                                             disabled={!data.via_bca}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                                             placeholder={data.via_bca ? "Contoh: 1234567890" : "Tidak ada rekening"}
                                         />
                                         {errors.nomor_rekening && (
@@ -473,7 +473,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             id="status_pegawai"
                                             value={data.status_pegawai}
                                             onChange={e => setData('status_pegawai', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                         >
                                             <option value="">Pilih Status</option>
                                             <option value="Pegawai Tetap">Pegawai Tetap</option>
@@ -497,7 +497,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="date"
                                             value={data.tanggal_mulai_kerja}
                                             onChange={e => setData('tanggal_mulai_kerja', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                         />
                                         {errors.tanggal_mulai_kerja && (
                                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.tanggal_mulai_kerja}</p>
@@ -513,7 +513,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             id="ptkp"
                                             value={data.ptkp}
                                             onChange={e => setData('ptkp', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                         >
                                             <option value="">Pilih PTKP</option>
                                             <option value="TK/0">TK/0 - Tidak Kawin Tanpa Tanggungan</option>
@@ -536,7 +536,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                         {/* Section: Gaji */}
                         <div>
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white font-bold text-sm">2</span>
+                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-sky-600 text-white font-bold text-sm">2</span>
                                 Informasi Gaji
                             </h2>
 
@@ -553,7 +553,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={formatRupiah(data.gaji_pokok)}
                                             onChange={e => setData('gaji_pokok', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="0"
                                         />
                                     </div>
@@ -574,7 +574,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={formatRupiah(data.tunjangan_jabatan)}
                                             onChange={e => setData('tunjangan_jabatan', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="0"
                                         />
                                     </div>
@@ -595,7 +595,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={formatRupiah(data.potongan_tidak_masuk)}
                                             onChange={e => setData('potongan_tidak_masuk', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="0"
                                         />
                                     </div>
@@ -616,7 +616,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                                             type="text"
                                             value={formatRupiah(data.potongan_terlambat)}
                                             onChange={e => setData('potongan_terlambat', parseRupiah(e.target.value))}
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:border-red-500 dark:focus:border-red-400 transition-colors"
                                             placeholder="0"
                                         />
                                     </div>
@@ -628,12 +628,12 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                         </div>
 
                         {/* Info Box */}
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                        <div className="bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl p-4">
                             <div className="flex items-start gap-3">
-                                <svg className="size-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="size-5 text-sky-600 dark:text-sky-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <div className="text-sm text-blue-800 dark:text-blue-300">
+                                <div className="text-sm text-sky-800 dark:text-sky-300">
                                     <p className="font-medium mb-1">Informasi:</p>
                                     <ul className="space-y-1 text-xs">
                                         <li>• Gaji Bersih = Gaji Pokok + Tunjangan Jabatan - Total Potongan</li>
@@ -656,7 +656,7 @@ export default function EmployeeEdit({ employee, kantorCabang, jabatan }: PagePr
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 dark:from-blue-600 dark:to-blue-500 dark:hover:from-blue-700 dark:hover:to-blue-600 text-white font-medium shadow-lg shadow-blue-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 dark:from-red-600 dark:to-red-500 dark:hover:from-red-700 dark:hover:to-red-600 text-white font-medium shadow-lg shadow-red-500/30 transition-all duration-200 hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {processing ? (
                                     <>

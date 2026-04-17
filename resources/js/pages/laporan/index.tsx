@@ -188,7 +188,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                        <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                             Laporan
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1">Export laporan payroll dan pajak per cabang</p>
@@ -196,7 +196,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                 </div>
 
                 {/* Table Card */}
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-sky-100 dark:shadow-none">
 
                     {/* Show Data Per Page */}
                     <div className="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -207,7 +207,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                             <select
                                 value={currentPerPage.toString()}
                                 onChange={(e) => handlePerPageChange(e.target.value)}
-                                className="border-2 border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900"
+                                className="border-2 border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-900"
                             >
                                 <option value="10">10</option>
                                 <option value="25">25</option>
@@ -229,7 +229,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     const selectedTahun = e.target.value;
                                     window.location.href = `/laporan?tahun=${selectedTahun}`;
                                 }}
-                                className="border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900"
+                                className="border-2 border-sky-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-900"
                             >
                                 {years.map((year) => (
                                     <option key={year} value={year}>
@@ -242,13 +242,13 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
 
                     <div className="overflow-x-auto">
                         <table className='w-full min-w-[800px]'>
-                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
+                            <thead className='bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800'>
                                 <tr>
                                     <th className='rounded-tl-2xl px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>
                                         <button
                                             onClick={() => handleSort('name')}
-                                            className='flex items-center gap-2 hover:text-blue-100 transition-colors cursor-pointer'
+                                            className='flex items-center gap-2 hover:text-sky-100 transition-colors cursor-pointer'
                                         >
                                             Nama Kantor cabang
                                             <span className='ml-1'>{getSortIcon('name')}</span>
@@ -259,19 +259,19 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                             </thead>
 
                             {/* Search Row */}
-                            <thead className='bg-blue-50 dark:bg-gray-800/50'>
+                            <thead className='bg-sky-50 dark:bg-gray-800/50'>
                                 <tr>
                                     <th className='px-4 py-4'></th>
                                     <th className='px-4 py-4'>
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                className='w-full border-2 border-blue-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 transition-colors'
+                                                className='w-full border-2 border-sky-200 dark:border-gray-700 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:border-red-500 dark:focus:border-red-400 bg-white dark:bg-gray-900 transition-colors'
                                                 value={getSearchValue('searchName')}
                                                 onChange={(e) => debouncedSearch('searchName', e.target.value, laporanIndex().url)}
                                                 placeholder='Cari Kantor cabang...'
                                             />
-                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-blue-400">
+                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sky-400">
                                                 <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                 </svg>
@@ -299,8 +299,8 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                         <td colSpan={3} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center justify-center gap-3">
                                                 <div className="relative">
-                                                    <div className="size-12 rounded-full border-4 border-blue-200 dark:border-gray-700"></div>
-                                                    <Loader2 className="absolute top-0 left-0 size-12 animate-spin text-blue-500 dark:text-blue-400" />
+                                                    <div className="size-12 rounded-full border-4 border-sky-200 dark:border-gray-700"></div>
+                                                    <Loader2 className="absolute top-0 left-0 size-12 animate-spin text-red-500 dark:text-sky-400" />
                                                 </div>
                                                 <span className="text-muted-foreground font-medium">Mencari data...</span>
                                             </div>
@@ -310,8 +310,8 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     <tr>
                                         <td colSpan={3} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="size-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                                                    <svg className="size-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div className="size-16 rounded-full bg-sky-100 dark:bg-sky-900/20 flex items-center justify-center">
+                                                    <svg className="size-8 text-red-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                 </div>
@@ -322,9 +322,9 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     </tr>
                                 ) : (
                                     cabangs.data.map((cabang, index) => (
-                                        <tr key={cabang.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <tr key={cabang.id} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50 transition-colors">
                                             <td className="px-4 py-3 text-center">
-                                                <span className="inline-flex items-center justify-center size-7 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 font-bold text-xs">
+                                                <span className="inline-flex items-center justify-center size-7 rounded-full bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/30 dark:to-sky-800/30 text-sky-600 dark:text-sky-400 font-bold text-xs">
                                                     {index + 1}
                                                 </span>
                                             </td>
@@ -336,7 +336,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                     {/* Button 1: Penggajian - Blue */}
                                                     <button
                                                         onClick={() => handleExport(cabang.id, 'penggajian')}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
                                                         title="Penggajian"
                                                     >
                                                         <Briefcase className="size-3" />
@@ -346,7 +346,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                     {/* Button 2: PPH21 Bulanan - Purple */}
                                                     <button
                                                         onClick={() => handleExport(cabang.id, 'pph21-bulanan')}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
                                                         title="PPH21 Bulanan"
                                                     >
                                                         <Calculator className="size-3" />
@@ -366,7 +366,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                     {/* Button 4: BPJS TK - Orange */}
                                                     <button
                                                         onClick={() => handleExport(cabang.id, 'bpjs-ketenaga')}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
                                                         title="BPJS Ketenaga kerjaan"
                                                     >
                                                         <FileSpreadsheet className="size-3" />
@@ -376,7 +376,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                                     {/* Button 5: BPJS Kesehatan - Green */}
                                                     <button
                                                         onClick={() => handleExport(cabang.id, 'bpjs-kes')}
-                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+                                                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 px-2 py-1 text-xs font-semibold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
                                                         title="BPJS Kesehatan"
                                                     >
                                                         <HeartPulse className="size-3" />
@@ -393,10 +393,10 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
 
                     {/* Pagination */}
                     {cabangs?.meta && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-blue-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-sky-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
                             {/* Info Data */}
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                Menampilkan <span className='font-bold text-blue-600 dark:text-blue-400'>{cabangs.meta.from}</span> sampai <span className='font-bold text-blue-600 dark:text-blue-400'>{cabangs.meta.to}</span> dari <span className='font-bold text-blue-600 dark:text-blue-400'>{cabangs.meta.total}</span> data
+                                Menampilkan <span className='font-bold text-sky-600 dark:text-sky-400'>{cabangs.meta.from}</span> sampai <span className='font-bold text-sky-600 dark:text-sky-400'>{cabangs.meta.to}</span> dari <span className='font-bold text-sky-600 dark:text-sky-400'>{cabangs.meta.total}</span> data
                             </div>
 
                             {/* Pagination Buttons */}
@@ -405,7 +405,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     href={buildUrl(1)}
                                     className={cabangs.meta.current_page === 1
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-4 py-2 text-sm font-medium'
-                                        : 'inline-flex items-center gap-1 border-2 border-blue-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
+                                        : 'inline-flex items-center gap-1 border-2 border-sky-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white hover:border-red-500 dark:hover:bg-red-600 dark:hover:border-red-600 transition-all duration-200'
                                     }
                                 >
                                     <span>Awal</span>
@@ -415,7 +415,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     href={cabangs.links.prev ? buildUrl(cabangs.meta.current_page - 1) : '#'}
                                     className={!cabangs.links.prev
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-3 py-2'
-                                        : 'inline-flex items-center border-2 border-blue-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
+                                        : 'inline-flex items-center border-2 border-sky-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white hover:border-red-500 dark:hover:bg-red-600 dark:hover:border-red-600 transition-all duration-200'
                                     }
                                 >
                                     <ArrowBigLeftIcon className="size-4" />
@@ -438,8 +438,8 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                             key={pageNum}
                                             href={buildUrl(pageNum)}
                                             className={`min-w-[2.5rem] h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 ${pageNum === cabangs.meta.current_page
-                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/30'
-                                                : 'border-2 border-blue-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-gray-600'
+                                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-500/30'
+                                                : 'border-2 border-sky-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-sky-100 dark:hover:bg-gray-700 hover:border-sky-400 dark:hover:border-gray-600'
                                                 }`}
                                         >
                                             {pageNum}
@@ -451,7 +451,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     href={cabangs.links.next ? buildUrl(cabangs.meta.current_page + 1) : '#'}
                                     className={!cabangs.links.next
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-3 py-2'
-                                        : 'inline-flex items-center border-2 border-blue-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
+                                        : 'inline-flex items-center border-2 border-sky-200 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white hover:border-red-500 dark:hover:bg-red-600 dark:hover:border-red-600 transition-all duration-200'
                                     }
                                 >
                                     <ArrowBigRight className="size-4" />
@@ -461,7 +461,7 @@ export default function LaporanIndex({ cabangs, tahun, availableMonths, filters 
                                     href={buildUrl(cabangs.meta.last_page)}
                                     className={cabangs.meta.current_page === cabangs.meta.last_page
                                         ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-500 rounded-xl px-4 py-2 text-sm font-medium'
-                                        : 'inline-flex items-center gap-1 border-2 border-blue-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 dark:hover:bg-blue-600 dark:hover:border-blue-600 transition-all duration-200'
+                                        : 'inline-flex items-center gap-1 border-2 border-sky-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white hover:border-red-500 dark:hover:bg-red-600 dark:hover:border-red-600 transition-all duration-200'
                                     }
                                 >
                                     <span>Akhir</span>

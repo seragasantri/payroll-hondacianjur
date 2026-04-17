@@ -17,8 +17,8 @@ type Props = {
 export default function Login({ status }: Props) {
     return (
         <AuthLayout
-            title="Welcome Back"
-            description="Sign in to your account to continue"
+            title="Selamat Datang"
+            description="Masuk untuk mengakses sistem payroll"
         >
             <Head title="Log in" />
 
@@ -90,7 +90,7 @@ export default function Login({ status }: Props) {
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="mt-2 h-11 text-base font-medium shadow-lg shadow-primary/20 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30"
+                                className="mt-2 h-11 text-base font-medium shadow-lg shadow-red-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-red-500/30"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"

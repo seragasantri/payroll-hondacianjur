@@ -134,7 +134,7 @@ export default function Password() {
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="flex text-sm text-green-600">
+                                        <p className="flex text-sm text-sky-600">
                                             Saved{' '}
                                             <CheckCircle className="ml-2" />
                                         </p>

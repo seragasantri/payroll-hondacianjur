@@ -455,19 +455,19 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                             Kembali
                         </button>
                         <div>
-                            <h1 className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300'>
+                            <h1 className='text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent dark:from-red-400 dark:to-red-300'>
                                 Payroll {formatBulan(bulan)}
                             </h1>
                             <div className="flex items-center gap-3 mt-1">
-                                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-3 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300">
                                     {status_pegawai}
                                 </span>
                                 {isPublished ? (
-                                    <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-3 py-1 text-xs font-semibold text-green-700 dark:text-green-300">
+                                    <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-3 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300">
                                         Published
                                     </span>
                                 ) : (
-                                    <span className="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-3 py-1 text-xs font-semibold text-yellow-700 dark:text-yellow-300">
+                                    <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-3 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300">
                                         Draft
                                     </span>
                                 )}
@@ -481,21 +481,21 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     <div className="flex items-center gap-3">
                         <button
                             onClick={handleExportTunai}
-                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-orange-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95"
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                         >
                             <Download className="size-4" />
                             Tunai
                         </button>
                         <button
                             onClick={handleExportNonTunai}
-                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95"
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-red-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 active:scale-95"
                         >
                             <Download className="size-4" />
                             Non Tunai
                         </button>
                         <button
                             onClick={handleExportDetail}
-                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-green-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105 active:scale-95"
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-sky-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-sky-500/30 hover:scale-105 active:scale-95"
                         >
                             <Download className="size-4" />
                             Detail
@@ -504,10 +504,10 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
 
                 </div>
 
-                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-blue-100 dark:shadow-none">
+                <div className="border rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg shadow-sky-100 dark:shadow-none">
                     <div className="overflow-x-auto">
                         <table className='w-full min-w-[1000px]'>
-                            <thead className='bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800'>
+                            <thead className='bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-800'>
                                 <tr>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white w-12'>#</th>
                                     <th className='px-4 py-4 text-left text-sm font-bold text-white'>Karyawan</th>
@@ -527,8 +527,8 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                     <tr>
                                         <td colSpan={10} className="px-4 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="size-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                                                    <FileText className="size-8 text-blue-500 dark:text-blue-400" />
+                                                <div className="size-16 rounded-full bg-sky-100 dark:bg-sky-900/20 flex items-center justify-center">
+                                                    <FileText className="size-8 text-red-500 dark:text-sky-400" />
                                                 </div>
                                                 <p className="text-muted-foreground font-medium">Belum ada payroll untuk bulan ini</p>
                                             </div>
@@ -537,16 +537,16 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                 ) : (
                                     employeesWithPayroll.map((employee, index) => (
                                         <>
-                                            <tr key={employee.id} className="hover:bg-blue-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <tr key={employee.id} className="hover:bg-sky-50/50 dark:hover:bg-gray-800/50 transition-colors">
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="inline-flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                                                    <span className="inline-flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/30 dark:to-sky-800/30 text-sky-600 dark:text-sky-400 font-bold text-sm">
                                                         {index + 1}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="size-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                                            <User className="size-5 text-blue-600 dark:text-blue-400" />
+                                                        <div className="size-10 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+                                                            <User className="size-5 text-sky-600 dark:text-sky-400" />
                                                         </div>
                                                         <div>
                                                             <p className="font-semibold text-gray-900 dark:text-white">{employee.nama}</p>
@@ -555,7 +555,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4">
-                                                    <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                                    <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-3 py-1 text-xs font-semibold text-sky-700 dark:text-sky-300">
                                                         {employee.kantorCabang || '-'}
                                                     </span>
                                                 </td>
@@ -565,24 +565,24 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                                                 <td className="px-4 py-4 text-right text-gray-900 dark:text-gray-300">
                                                     {formatCurrency(employee.gaji_pokok)}
                                                 </td>
-                                                <td className="px-4 py-4 text-right text-green-600 dark:text-green-400 font-medium">
+                                                <td className="px-4 py-4 text-right text-sky-600 dark:text-sky-400 font-medium">
                                                     {formatCurrency(employee.payroll?.total_gaji || 0)}
                                                 </td>
                                                 <td className="px-4 py-4 text-right text-red-600 dark:text-red-400">
                                                     {formatCurrency(employee.payroll?.total_potongan || 0)}
                                                 </td>
                                                 <td className="px-4 py-4 text-right">
-                                                    <span className="font-bold text-blue-600 dark:text-blue-400">
+                                                    <span className="font-bold text-sky-600 dark:text-sky-400">
                                                         {formatCurrency(employee.payroll?.gaji_bersih || 0)}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-4">
                                                     {employee.payroll?.status === 'published' ? (
-                                                        <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300">Published</span>
+                                                        <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300">Published</span>
                                                     ) : employee.payroll?.status === 'paid' ? (
-                                                        <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-300">Lunas</span>
+                                                        <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300">Lunas</span>
                                                     ) : (
-                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 text-xs font-semibold text-yellow-700 dark:text-yellow-300">Draft</span>
+                                                        <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/30 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300">Draft</span>
                                                     )}
                                                 </td>
                                                 <td className="px-4 py-4">
@@ -605,9 +605,9 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                     </div>
 
                     {employeesWithPayroll.length > 0 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-blue-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-sky-50/50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-800">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                Menampilkan <span className='font-bold text-blue-600 dark:text-blue-400'>{employeesWithPayroll.length}</span> karyawan dengan payroll
+                                Menampilkan <span className='font-bold text-sky-600 dark:text-sky-400'>{employeesWithPayroll.length}</span> karyawan dengan payroll
                             </div>
                         </div>
                     )}
