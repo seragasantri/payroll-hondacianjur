@@ -1158,21 +1158,39 @@ class PayrollController extends Controller
             $tunjanganPerusahaan = [];
             $tunjanganKaryawan = [];
 
+            // Get checkbox settings from employee
+            $bpjsChecked = $employee->bpjs_ketenagakerjaan ?? false;
+            $tunjanganBpjsKes = $employee->tunjangan_bpjs_kes ?? false;
+            $tunjanganJht = $employee->tunjangan_jht ?? false;
+            $tunjanganJkk = $employee->tunjangan_jkk ?? false;
+            $tunjanganJkm = $employee->tunjangan_jkm ?? false;
+            $tunjanganPensiun = $employee->tunjangan_pensiun ?? false;
+
             foreach ($tunjanganList as $tunjangan) {
                 $tunjanganId = (string) $tunjangan->id;
+
+                // Check checkbox settings - if not checked, set value to 0
+                $isChecked = true;
+                if ($tunjanganId === '1' && !$tunjanganBpjsKes) $isChecked = false;
+                if ($tunjanganId === '2' && !$tunjanganJht) $isChecked = false;
+                if ($tunjanganId === '3' && !$tunjanganJkk) $isChecked = false;
+                if ($tunjanganId === '4' && !$tunjanganJkm) $isChecked = false;
+                if ($tunjanganId === '5' && !$tunjanganPensiun) $isChecked = false;
 
                 // Get value from payroll or calculate from percentage
                 $perusahaanValue = 0;
                 $karyawanValue = 0;
 
-                if (isset($tunjanganValues[$tunjanganId])) {
-                    $perusahaanValue = isset($tunjanganValues[$tunjanganId]['perusahaan']) ? floatval($tunjanganValues[$tunjanganId]['perusahaan']) : 0;
-                    $karyawanValue = isset($tunjanganValues[$tunjanganId]['karyawan']) ? floatval($tunjanganValues[$tunjanganId]['karyawan']) : 0;
-                } else {
-                    // Calculate from percentage using payroll's gajiPokok
-                    $gajiPokokExcel = (float) $detail->gaji_pokok;
-                    $perusahaanValue = ($tunjangan->perusahaan / 100) * $gajiPokokExcel;
-                    $karyawanValue = ($tunjangan->karyawan / 100) * $gajiPokokExcel;
+                if ($isChecked) {
+                    if (isset($tunjanganValues[$tunjanganId])) {
+                        $perusahaanValue = isset($tunjanganValues[$tunjanganId]['perusahaan']) ? floatval($tunjanganValues[$tunjanganId]['perusahaan']) : 0;
+                        $karyawanValue = isset($tunjanganValues[$tunjanganId]['karyawan']) ? floatval($tunjanganValues[$tunjanganId]['karyawan']) : 0;
+                    } else {
+                        // Calculate from percentage using payroll's gajiPokok
+                        $gajiPokokExcel = (float) $detail->gaji_pokok;
+                        $perusahaanValue = ($tunjangan->perusahaan / 100) * $gajiPokokExcel;
+                        $karyawanValue = ($tunjangan->karyawan / 100) * $gajiPokokExcel;
+                    }
                 }
 
                 $tunjanganPerusahaan[] = $perusahaanValue;
