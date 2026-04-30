@@ -231,7 +231,7 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
             <div style="display: block">
                 <img src="/assets/images/logo_2.png" width="250" alt="Logo" />
                 <br />
-                <b>PUSAKA MOTOR UTAMA</b><br />
+                <b>PUSAKA MITRA RAYA</b><br />
                 <b>SLIP GAJI</b><br />
                 <b>PERIODE </b>${formatBulan(bulan)}
             </div>
@@ -350,6 +350,12 @@ export default function PayrollDetail({ bulan, status_pegawai, status, employees
                         <td class="text-left">PAJAK</td>
                         <td>:</td>
                         <td class="text-right">${formatRupiahTable(employee.payroll?.pph21_amount || 0)}</td>
+                    </tr>
+
+                     <tr>
+                        <td class="text-left">LAIN - LAIN</td>
+                        <td>:</td>
+                        <td class="text-right">${formatRupiahTable(employee.payroll?.potongan_lain || 0)}</td>
                     </tr>
                 </table>
             </div>
