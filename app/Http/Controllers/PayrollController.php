@@ -602,7 +602,11 @@ class PayrollController extends Controller
 
             $existingTunjangan = [];
             if ($existing && $existing->tunjangan_lain) {
-                $existingTunjangan = json_decode($existing->tunjangan_lain, true) ?? [];
+                $decoded = json_decode($existing->tunjangan_lain, true) ?? [];
+                // Old rows stored a list of objects with an `id` key; newer rows store a map keyed by id.
+                $existingTunjangan = array_is_list($decoded)
+                    ? collect($decoded)->keyBy(fn ($t) => (string) ($t['id'] ?? 0))->all()
+                    : $decoded;
             }
 
             // Use existing payroll values if available, otherwise use employee defaults
@@ -634,23 +638,32 @@ class PayrollController extends Controller
                 'tunjangan_jkk' => $tunjanganJkk,
                 'tunjangan_jkm' => $tunjanganJkm,
                 'tunjangan_pensiun' => $tunjanganPensiun,
-                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $employee, $gajiPokok, $tunjanganBpjsKes, $tunjanganJht, $tunjanganJkk, $tunjanganJkm, $tunjanganPensiun) {
+                'tunjangan' => $tunjanganList->map(function ($tunjangan) use ($existingTunjangan, $existing, $gajiPokok, $tunjanganBpjsKes, $tunjanganJht, $tunjanganJkk, $tunjanganJkm, $tunjanganPensiun) {
                     $tunjanganId = (string) $tunjangan->id;
+                    $stored = $existingTunjangan[$tunjanganId] ?? null;
 
-                    // Filter based on individual tunjangan checkbox settings
-                    if ($tunjanganId === '1' && !$tunjanganBpjsKes) return null;
-                    if ($tunjanganId === '2' && !$tunjanganJht) return null;
-                    if ($tunjanganId === '3' && !$tunjanganJkk) return null;
-                    if ($tunjanganId === '4' && !$tunjanganJkm) return null;
-                    if ($tunjanganId === '5' && !$tunjanganPensiun) return null;
+                    // A saved payroll is a historical record: the amounts stored at save time decide
+                    // what applies, not the employee's current checkboxes. Toggling a checkbox later
+                    // must not retroactively change a month that was already calculated.
+                    if ($stored !== null) {
+                        $nilaiPerusahaan = (float) ($stored['perusahaan'] ?? 0);
+                        $nilaiKaryawan = (float) ($stored['karyawan'] ?? 0);
+                    } else {
+                        if ($existing) return null;
 
-                    // Always calculate from percentage using payroll's gajiPokok (not from stored values)
-                    $nilaiPerusahaan = $tunjangan->perusahaan > 0
-                        ? round($tunjangan->perusahaan / 100 * $gajiPokok)
-                        : 0;
-                    $nilaiKaryawan = $tunjangan->karyawan > 0
-                        ? round($tunjangan->karyawan / 100 * $gajiPokok)
-                        : 0;
+                        if ($tunjanganId === '1' && !$tunjanganBpjsKes) return null;
+                        if ($tunjanganId === '2' && !$tunjanganJht) return null;
+                        if ($tunjanganId === '3' && !$tunjanganJkk) return null;
+                        if ($tunjanganId === '4' && !$tunjanganJkm) return null;
+                        if ($tunjanganId === '5' && !$tunjanganPensiun) return null;
+
+                        $nilaiPerusahaan = $tunjangan->perusahaan > 0
+                            ? round($tunjangan->perusahaan / 100 * $gajiPokok)
+                            : 0;
+                        $nilaiKaryawan = $tunjangan->karyawan > 0
+                            ? round($tunjangan->karyawan / 100 * $gajiPokok)
+                            : 0;
+                    }
 
                     return [
                         'id' => $tunjangan->id,
